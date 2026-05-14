@@ -1,0 +1,53 @@
+export default function Home() {
+  return (
+    <main
+      style={{
+        background: "#09090b",
+        color: "white",
+        minHeight: "100vh",
+        padding: "32px",
+        fontFamily: "Arial"
+      }}
+    >
+      <div
+        style={{
+          maxWidth: "1200px",
+          margin: "0 auto"
+        }}
+      >
+        <h1
+          style={{
+            fontSize: "48px",
+            fontWeight: "bold"
+          }}
+        >
+          SahamAI
+        </h1>
+
+        <p
+          style={{
+            color: "#a1a1aa",
+            marginTop: "12px",
+            fontSize: "18px"
+          }}
+        >
+          AI Stock Analysis Assistant
+        </p>
+
+        <div
+          style={{
+            marginTop: "40px",
+            background: "#18181b",
+            border: "1px solid #27272a",
+            borderRadius: "20px",
+            padding: "24px"
+          }}
+        >
+          <p style={{ color: "#71717a" }}>
+            Analyze Indonesian stocks professionally.
+          </p>
+        </div>
+      </div>
+    </main>
+  );
+}
