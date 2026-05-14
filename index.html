@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SahamAI.id — Analis Saham Indonesia Berbasis AI</title>
+<meta name="description" content="Analisis saham IDX gratis berbasis kecerdasan buatan. Dapatkan rekomendasi BELI/TAHAN/JUAL instan.">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #1a6b47;
+  --green-light: #22a06b;
+  --green-pale: #e6f5ef;
+  --green-glow: rgba(34,160,107,0.12);
+  --gold: #c9913a;
+  --gold-pale: #fdf3e3;
+  --red: #c0392b;
+  --red-pale: #fdecea;
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #1c2230;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --text: #e6edf3;
+  --text2: #8b949e;
+  --text3: #6e7681;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(34,160,107,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(34,160,107,0.025) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(13,17,23,0.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);padding:0 2rem;height:62px;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo{width:36px;height:36px;background:linear-gradient(135deg,var(--green),var(--green-light));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.nav-title{font-family:'DM Serif Display',serif;font-size:19px;color:var(--text);letter-spacing:-0.3px}
+.nav-title span{color:var(--green-light)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-badge{font-size:11px;background:var(--green-pale);color:var(--green);padding:4px 11px;border-radius:20px;font-weight:600;letter-spacing:0.5px}
+.nav-link{font-size:13px;color:var(--text2);text-decoration:none;padding:6px 12px;border-radius:8px;transition:all 0.15s}
+.nav-link:hover{color:var(--text);background:var(--bg2)}
+
+/* HERO */
+.hero{position:relative;z-index:1;text-align:center;padding:5rem 2rem 2.5rem;animation:fadeUp 0.6s ease both}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--green-light);background:var(--green-glow);border:1px solid rgba(34,160,107,0.28);padding:5px 14px;border-radius:20px;margin-bottom:1.5rem;letter-spacing:1px;text-transform:uppercase;font-weight:500}
+.hero h1{font-family:'DM Serif Display',serif;font-size:clamp(2.2rem,5vw,3.8rem);line-height:1.15;letter-spacing:-1px;margin-bottom:1rem}
+.hero h1 em{font-style:italic;color:var(--green-light)}
+.hero-sub{font-size:1rem;color:var(--text2);max-width:520px;margin:0 auto 2.5rem;line-height:1.7;font-weight:300}
+
+/* SEARCH */
+.search-container{position:relative;z-index:1;max-width:680px;margin:0 auto 1.25rem;padding:0 1.5rem;animation:fadeUp 0.7s ease both}
+.search-wrap{display:flex;background:var(--bg2);border:1px solid var(--border2);border-radius:14px;overflow:hidden;transition:border-color 0.2s,box-shadow 0.2s}
+.search-wrap:focus-within{border-color:var(--green-light);box-shadow:0 0 0 3px var(--green-glow)}
+.search-icon-wrap{display:flex;align-items:center;padding:0 1rem 0 1.25rem;color:var(--text3);font-size:20px;pointer-events:none}
+#stockInput{flex:1;background:transparent;border:none;outline:none;padding:1rem 0.5rem;font-size:1.05rem;font-family:'DM Sans',sans-serif;color:var(--text);font-weight:500;letter-spacing:1px;text-transform:uppercase}
+#stockInput::placeholder{text-transform:none;letter-spacing:0;font-weight:300;color:var(--text3)}
+#analyzeBtn{padding:0.8rem 1.5rem;margin:6px;background:linear-gradient(135deg,var(--green),var(--green-light));color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;transition:opacity 0.2s,transform 0.1s;white-space:nowrap}
+#analyzeBtn:hover{opacity:0.9;transform:scale(1.01)}
+#analyzeBtn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+
+/* CHIPS */
+.chips-row{position:relative;z-index:1;display:flex;align-items:center;gap:8px;max-width:680px;margin:0 auto 3rem;padding:0 1.5rem;flex-wrap:wrap;animation:fadeUp 0.8s ease both}
+.chips-label{font-size:12px;color:var(--text3)}
+.chip{font-size:12px;padding:5px 14px;border:1px solid var(--border2);border-radius:20px;cursor:pointer;color:var(--text2);background:var(--bg2);transition:all 0.15s;font-weight:500;letter-spacing:0.5px}
+.chip:hover{background:var(--green-glow);border-color:var(--green-light);color:var(--green-light)}
+
+/* RESULTS */
+#resultsSection{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:0 1.5rem 5rem;display:none}
+
+/* STOCK HEADER */
+.stock-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;animation:fadeUp 0.4s ease both}
+.stock-name-block h2{font-family:'DM Serif Display',serif;font-size:2.4rem;letter-spacing:-0.5px}
+.stock-name-block p{font-size:14px;color:var(--text2);margin-top:3px}
+.sentiment-badge{padding:9px 24px;border-radius:30px;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;flex-shrink:0;margin-top:4px}
+.badge-beli{background:var(--green-pale);color:var(--green);border:1px solid rgba(26,107,71,0.3)}
+.badge-tahan{background:var(--gold-pale);color:var(--gold);border:1px solid rgba(201,145,58,0.3)}
+.badge-jual{background:var(--red-pale);color:var(--red);border:1px solid rgba(192,57,43,0.3)}
+
+/* METRICS */
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:1.25rem;animation:fadeUp 0.5s ease both}
+.metric-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem;transition:border-color 0.2s}
+.metric-card:hover{border-color:var(--border2)}
+.metric-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.metric-value{font-family:'DM Serif Display',serif;font-size:1.55rem;color:var(--text);line-height:1;margin-bottom:4px}
+.metric-value.green{color:var(--green-light)}
+.metric-sub{font-size:12px;color:var(--text3)}
+
+/* CARDS */
+.analysis-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:1.75rem;margin-bottom:1.25rem;animation:fadeUp 0.55s ease both}
+.card-header{display:flex;align-items:center;gap:10px;margin-bottom:1rem;font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px}
+.card-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.icon-green{background:var(--green-glow)}
+.icon-gold{background:rgba(201,145,58,0.12)}
+.icon-red{background:rgba(192,57,43,0.1)}
+.icon-gray{background:var(--bg3)}
+
+.ai-summary{font-size:1rem;color:var(--text);line-height:1.85;font-weight:300}
+.rec-box{margin-top:1.25rem;padding:1.1rem 1.25rem;background:var(--green-glow);border:1px solid rgba(34,160,107,0.22);border-radius:10px}
+.rec-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--green);margin-bottom:6px}
+.rec-text{font-size:0.95rem;color:var(--green-light);line-height:1.75}
+
+/* TWO COL */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.25px}
+@media(max-width:580px){.two-col{grid-template-columns:1fr}}
+
+/* TAGS */
+.tag-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.tag{font-size:12px;padding:5px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text2);line-height:1.4}
+.tag.green{background:var(--green-glow);border-color:rgba(34,160,107,0.22);color:var(--green-light)}
+.tag.red{background:rgba(192,57,43,0.08);border-color:rgba(192,57,43,0.22);color:#e07070}
+
+/* TABLE */
+.info-table{width:100%;border-collapse:collapse}
+.info-table tr{border-bottom:1px solid var(--border)}
+.info-table tr:last-child{border-bottom:none}
+.info-table td{padding:11px 0;font-size:13px}
+.info-table td:first-child{color:var(--text2)}
+.info-table td:last-child{text-align:right;font-weight:500;color:var(--text)}
+
+/* SKELETON */
+.skeleton{background:linear-gradient(90deg,var(--bg2) 25%,var(--bg3) 50%,var(--bg2) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:6px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.spin{animation:spin 1s linear infinite;display:inline-block}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--bg2);border:1px solid var(--border2);padding:12px 20px;border-radius:10px;font-size:13px;color:var(--text);z-index:999;animation:fadeUp 0.3s ease;box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+.toast.error{border-color:rgba(192,57,43,0.4);color:#e07070}
+.toast.success{border-color:rgba(34,160,107,0.4);color:var(--green-light)}
+
+/* FOOTER */
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:2rem;text-align:center;color:var(--text3);font-size:12px;line-height:1.8}
+footer a{color:var(--text2);text-decoration:none}
+
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="/">
+    <div class="nav-logo">📈</div>
+    <span class="nav-title">Saham<span>AI</span></span>
+  </a>
+  <div class="nav-right">
+    <span class="nav-badge">GRATIS</span>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-eyebrow">✦ Powered by Claude AI</div>
+  <h1>Analisis Saham <em>Indonesia</em><br>dengan Kecerdasan Buatan</h1>
+  <p class="hero-sub">Dapatkan analisis fundamental, teknikal, dan rekomendasi investasi cerdas untuk saham di Bursa Efek Indonesia — gratis, instan, dan mudah dipahami.</p>
+</section>
+
+<div class="search-container">
+  <div class="search-wrap">
+    <div class="search-icon-wrap">🔍</div>
+    <input type="text" id="stockInput" placeholder="Ketik kode saham: BBCA, TLKM, GOTO..." maxlength="10"
+      onkeydown="if(event.key==='Enter') analyzeStock()" />
+    <button id="analyzeBtn" onclick="analyzeStock()">
+      <span id="btnIcon">✦</span> Analisis
+    </button>
+  </div>
+</div>
+
+<div class="chips-row">
+  <span class="chips-label">Populer:</span>
+  <span class="chip" onclick="quickAnalyze('BBCA')">BBCA</span>
+  <span class="chip" onclick="quickAnalyze('TLKM')">TLKM</span>
+  <span class="chip" onclick="quickAnalyze('GOTO')">GOTO</span>
+  <span class="chip" onclick="quickAnalyze('ASII')">ASII</span>
+  <span class="chip" onclick="quickAnalyze('BMRI')">BMRI</span>
+  <span class="chip" onclick="quickAnalyze('UNVR')">UNVR</span>
+  <span class="chip" onclick="quickAnalyze('BBRI')">BBRI</span>
+  <span class="chip" onclick="quickAnalyze('IHSG')">IHSG</span>
+</div>
+
+<section id="resultsSection">
+  <div id="resultsContent"></div>
+</section>
+
+<footer>
+  <p>⚠️ Konten ini hanya untuk tujuan edukasi. Bukan saran investasi resmi.</p>
+  <p style="margin-top:6px">Selalu lakukan riset mandiri sebelum berinvestasi · SahamAI © 2025</p>
+</footer>
+
+<script>
+async function analyzeStock() {
+  const ticker = document.getElementById('stockInput').value.trim().toUpperCase();
+  if (!ticker) { showToast('Masukkan kode saham terlebih dahulu', 'error'); return; }
+
+  const btn = document.getElementById('analyzeBtn');
+  const icon = document.getElementById('btnIcon');
+  btn.disabled = true;
+  icon.className = 'spin';
+  icon.textContent = '↻';
+
+  const section = document.getElementById('resultsSection');
+  const content = document.getElementById('resultsContent');
+  section.style.display = 'block';
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  content.innerHTML = buildSkeleton();
+
+  try {
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ticker })
+    });
+    if (!res.ok) {
+      const e = await res.json().catch(() => ({}));
+      throw new Error(e.error || `HTTP ${res.status}`);
+    }
+    const data = await res.json();
+    content.innerHTML = buildResult(ticker, data);
+  } catch (e) {
+    content.innerHTML = `<div style="text-align:center;padding:3rem 1rem;color:#e07070">
+      <div style="font-size:2.5rem;margin-bottom:1rem">⚠️</div>
+      <p style="font-size:1rem;margin-bottom:6px">Gagal menganalisis saham</p>
+      <p style="font-size:13px;color:var(--text3)">${e.message}</p>
+    </div>`;
+    showToast('Error: ' + e.message, 'error');
+  }
+
+  btn.disabled = false;
+  icon.className = '';
+  icon.textContent = '✦';
+}
+
+function quickAnalyze(code) {
+  document.getElementById('stockInput').value = code;
+  analyzeStock();
+}
+
+function showToast(msg, type = '') {
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+function getSentClass(s) {
+  if (s === 'BELI' || s === 'BULLISH') return 'badge-beli';
+  if (s === 'JUAL' || s === 'BEARISH') return 'badge-jual';
+  return 'badge-tahan';
+}
+
+function buildResult(ticker, d) {
+  return `
+  <div class="stock-header">
+    <div class="stock-name-block">
+      <h2>${ticker}</h2>
+      <p>${d.namaLengkap || ''} &nbsp;·&nbsp; ${d.sektor || ''}</p>
+    </div>
+    <span class="sentiment-badge ${getSentClass(d.sentiment)}">${d.sentiment}</span>
+  </div>
+
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-label">Harga Wajar</div>
+      <div class="metric-value green">${d.priceEst || '—'}</div>
+      <div class="metric-sub">Estimasi AI</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">P/E Ratio</div>
+      <div class="metric-value">${d.pe || '—'}</div>
+      <div class="metric-sub">Price to Earnings</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">P/BV</div>
+      <div class="metric-value">${d.pbv || '—'}</div>
+      <div class="metric-sub">Price to Book Value</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Div. Yield</div>
+      <div class="metric-value">${d.divYield || '—'}</div>
+      <div class="metric-sub">Dividend Yield</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Beta</div>
+      <div class="metric-value">${d.beta || '—'}</div>
+      <div class="metric-sub">Volatilitas relatif</div>
+    </div>
+  </div>
+
+  <div class="analysis-card">
+    <div class="card-header"><div class="card-icon icon-green">🤖</div> Analisis AI</div>
+    <div class="ai-summary">${d.summary || ''}</div>
+    <div class="rec-box">
+      <div class="rec-label">Rekomendasi</div>
+      <div class="rec-text">${d.rekomendasi || ''}</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="analysis-card" style="margin-bottom:0">
+      <div class="card-header"><div class="card-icon icon-green">✅</div> Keunggulan</div>
+      <div class="tag-list">${(d.keunggulan||[]).map(k=>`<span class="tag green">${k}</span>`).join('')}</div>
+    </div>
+    <div class="analysis-card" style="margin-bottom:0">
+      <div class="card-header"><div class="card-icon icon-red">⚠️</div> Risiko</div>
+      <div class="tag-list">${(d.risiko||[]).map(r=>`<span class="tag red">${r}</span>`).join('')}</div>
+    </div>
+  </div>
+
+  <div class="analysis-card" style="margin-top:1.25rem">
+    <div class="card-header"><div class="card-icon icon-gold">🚀</div> Katalis Positif</div>
+    <div class="tag-list">${(d.katalis||[]).map(k=>`<span class="tag">${k}</span>`).join('')}</div>
+  </div>
+
+  <div class="analysis-card">
+    <div class="card-header"><div class="card-icon icon-gray">📋</div> Informasi</div>
+    <table class="info-table">
+      <tr><td>Kode Saham</td><td>${ticker}${ticker!=='IHSG'&&ticker!=='LQ45'?'.JK':''}</td></tr>
+      <tr><td>Sektor</td><td>${d.sektor||'—'}</td></tr>
+      <tr><td>Bursa</td><td>IDX / Bursa Efek Indonesia</td></tr>
+      <tr><td>Dianalisis pada</td><td>${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</td></tr>
+    </table>
+  </div>`;
+}
+
+function buildSkeleton() {
+  return `
+  <div class="stock-header">
+    <div><div class="skeleton" style="height:2.4rem;width:130px;margin-bottom:10px"></div><div class="skeleton" style="height:13px;width:230px"></div></div>
+    <div class="skeleton" style="height:38px;width:110px;border-radius:20px"></div>
+  </div>
+  <div class="metrics-grid">
+    ${[1,2,3,4,5].map(()=>`<div class="metric-card"><div class="skeleton" style="height:11px;width:60%;margin-bottom:10px"></div><div class="skeleton" style="height:1.55rem;width:80%;margin-bottom:6px"></div><div class="skeleton" style="height:11px;width:50%"></div></div>`).join('')}
+  </div>
+  <div class="analysis-card">
+    <div class="skeleton" style="height:12px;width:90px;margin-bottom:16px"></div>
+    <div class="skeleton" style="height:14px;width:100%;margin-bottom:8px"></div>
+    <div class="skeleton" style="height:14px;width:92%;margin-bottom:8px"></div>
+    <div class="skeleton" style="height:14px;width:78%;margin-bottom:20px"></div>
+    <div class="skeleton" style="height:70px;border-radius:10px"></div>
+  </div>`;
+}
+</script>
+</body>
+</html>
