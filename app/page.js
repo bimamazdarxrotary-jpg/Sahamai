@@ -4,6 +4,23 @@ import { useState } from "react";
 
 export default function Home() {
   const [message, setMessage] = useState("");
+  const [response, setResponse] = useState("");
+
+  async function sendMessage() {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message
+      })
+    });
+
+    const text = await res.text();
+
+    setResponse(text);
+  }
 
   return (
     <main
@@ -11,8 +28,8 @@ export default function Home() {
         background: "#09090b",
         color: "white",
         minHeight: "100vh",
-        fontFamily: "Arial",
-        padding: "24px"
+        padding: "24px",
+        fontFamily: "Arial"
       }}
     >
       <div
@@ -21,12 +38,7 @@ export default function Home() {
           margin: "0 auto"
         }}
       >
-        <h1
-          style={{
-            fontSize: "42px",
-            fontWeight: "bold"
-          }}
-        >
+        <h1 style={{ fontSize: "42px" }}>
           SahamAI
         </h1>
 
@@ -41,24 +53,23 @@ export default function Home() {
 
         <div
           style={{
-            marginTop: "40px",
+            marginTop: "30px",
             background: "#18181b",
             border: "1px solid #27272a",
             borderRadius: "20px",
             padding: "20px",
-            minHeight: "400px"
+            minHeight: "300px",
+            whiteSpace: "pre-wrap"
           }}
         >
-          <p style={{ color: "#71717a" }}>
-            Ask about Indonesian stocks...
-          </p>
+          {response || "Ask about Indonesian stocks..."}
         </div>
 
         <div
           style={{
-            marginTop: "20px",
             display: "flex",
-            gap: "12px"
+            gap: "12px",
+            marginTop: "20px"
           }}
         >
           <input
@@ -71,12 +82,12 @@ export default function Home() {
               border: "1px solid #27272a",
               borderRadius: "14px",
               padding: "16px",
-              color: "white",
-              outline: "none"
+              color: "white"
             }}
           />
 
           <button
+            onClick={sendMessage}
             style={{
               background: "white",
               color: "black",
@@ -92,4 +103,4 @@ export default function Home() {
       </div>
     </main>
   );
-                                        }
+}
