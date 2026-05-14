@@ -1,5 +1,9 @@
 {
   "name": "sahamai",
   "version": "1.0.0",
-  "private": true
+  "description": "AI Analis Saham Indonesia",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  }
 }
