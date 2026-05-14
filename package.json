@@ -1,9 +1,13 @@
 {
   "name": "sahamai",
-  "version": "1.0.0",
-  "description": "AI Analis Saham Indonesia",
   "private": true,
-  "engines": {
-    "node": ">=18"
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build"
+  },
+  "dependencies": {
+    "next": "14.2.5",
+    "react": "^18",
+    "react-dom": "^18"
   }
 }
