@@ -256,6 +256,15 @@ function buildResult(ticker, d) {
   <div class="stock-header">
     <div class="stock-name-block">
       <h2>${ticker}</h2>
+      <p>
+  <b>Harga:</b>
+  ${data.currentPrice}
+</p>
+
+<p>
+  <b>Perubahan:</b>
+  ${data.change}%
+</p>
       <p>${d.namaLengkap || ''} &nbsp;·&nbsp; ${d.sektor || ''}</p>
     </div>
     <span class="sentiment-badge ${getSentClass(d.sentiment)}">${d.sentiment}</span>
