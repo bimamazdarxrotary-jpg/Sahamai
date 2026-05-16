@@ -4,54 +4,36 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SahamAI — Analis Saham Indonesia</title>
-<meta name="description" content="Analisis saham IDX gratis berbasis AI. Dapatkan rekomendasi BELI/TAHAN/JUAL instan.">
+<meta name="description" content="Analisis saham IDX gratis berbasis AI. Data real-time, grafik harga, rekomendasi BELI/TAHAN/JUAL instan.">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
 :root {
-  --g: #00c87a;
-  --g2: #00a362;
-  --gdim: rgba(0,200,122,0.1);
-  --gdim2: rgba(0,200,122,0.18);
-  --gold: #e2a354;
-  --red: #f05252;
-  --bg: #080c10;
-  --bg2: #0e1419;
-  --bg3: #141c24;
-  --border: rgba(255,255,255,0.06);
-  --border2: rgba(255,255,255,0.11);
-  --text: #eaf0f6;
-  --text2: #7a8a99;
-  --text3: #4a5a68;
+  --g: #00c87a; --g2: #00a362; --gdim: rgba(0,200,122,0.1); --gdim2: rgba(0,200,122,0.18);
+  --gold: #e2a354; --red: #f05252;
+  --bg: #080c10; --bg2: #0e1419; --bg3: #141c24;
+  --border: rgba(255,255,255,0.06); --border2: rgba(255,255,255,0.11);
+  --text: #eaf0f6; --text2: #7a8a99; --text3: #4a5a68;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;mask-image:radial-gradient(ellipse 80% 50% at 50% 0%,black 20%,transparent 100%)}
 
-/* NOISE OVERLAY */
-body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.5}
-
-/* GRID BG */
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,black 30%,transparent 100%)}
-
-/* NAV */
-nav{position:sticky;top:0;z-index:100;background:rgba(8,12,16,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between}
+nav{position:sticky;top:0;z-index:100;background:rgba(8,12,16,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between}
 .nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
 .nav-logo{width:34px;height:34px;background:linear-gradient(135deg,var(--g2),var(--g));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 16px rgba(0,200,122,0.3)}
 .nav-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.5px}
 .nav-title span{color:var(--g)}
 .nav-badge{font-size:10px;background:var(--gdim);color:var(--g);padding:3px 10px;border-radius:20px;font-weight:700;letter-spacing:1px;border:1px solid rgba(0,200,122,0.2)}
 
-/* HERO */
-.hero{position:relative;z-index:1;text-align:center;padding:5rem 1.5rem 3rem;animation:fadeUp 0.5s ease both}
-.hero-pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--g);background:var(--gdim);border:1px solid rgba(0,200,122,0.25);padding:5px 14px;border-radius:20px;margin-bottom:1.75rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:600}
+.hero{position:relative;z-index:1;text-align:center;padding:4.5rem 1.5rem 2.5rem;animation:fadeUp 0.5s ease both}
+.hero-pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--g);background:var(--gdim);border:1px solid rgba(0,200,122,0.25);padding:5px 14px;border-radius:20px;margin-bottom:1.5rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:600}
 .pulse{width:6px;height:6px;background:var(--g);border-radius:50%;animation:pulse 2s ease infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.7)}}
-.hero h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,6vw,3.8rem);font-weight:800;line-height:1.1;letter-spacing:-2px;margin-bottom:1rem}
-.hero h1 .accent{color:var(--g);position:relative;display:inline-block}
-.hero h1 .accent::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--g),transparent);border-radius:2px}
-.hero-sub{font-size:1rem;color:var(--text2);max-width:480px;margin:0 auto 2.5rem;line-height:1.75;font-weight:300}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(1.9rem,5.5vw,3.6rem);font-weight:800;line-height:1.1;letter-spacing:-2px;margin-bottom:1rem}
+.hero h1 .accent{color:var(--g)}
+.hero-sub{font-size:0.95rem;color:var(--text2);max-width:460px;margin:0 auto 2.5rem;line-height:1.75;font-weight:300}
 
-/* SEARCH */
 .search-wrap{position:relative;z-index:1;max-width:620px;margin:0 auto 1rem;padding:0 1.5rem;animation:fadeUp 0.6s ease both}
 .search-box{display:flex;background:var(--bg2);border:1px solid var(--border2);border-radius:14px;overflow:hidden;transition:border-color 0.2s,box-shadow 0.2s}
 .search-box:focus-within{border-color:var(--g);box-shadow:0 0 0 3px var(--gdim)}
@@ -62,62 +44,97 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,12,16,0.85);backdrop-fil
 #analyzeBtn:hover{opacity:0.88;transform:scale(1.02)}
 #analyzeBtn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
 
-/* CHIPS */
-.chips{position:relative;z-index:1;display:flex;align-items:center;gap:7px;max-width:620px;margin:0 auto 3.5rem;padding:0 1.5rem;flex-wrap:wrap;animation:fadeUp 0.7s ease both}
-.chips-label{font-size:11px;color:var(--text3);font-weight:500;letter-spacing:0.5px}
+.chips{position:relative;z-index:1;display:flex;align-items:center;gap:7px;max-width:620px;margin:0 auto 3rem;padding:0 1.5rem;flex-wrap:wrap;animation:fadeUp 0.7s ease both}
+.chips-label{font-size:11px;color:var(--text3);font-weight:500}
 .chip{font-size:11px;padding:5px 13px;border:1px solid var(--border2);border-radius:20px;cursor:pointer;color:var(--text2);background:var(--bg2);transition:all 0.15s;font-weight:600;letter-spacing:1px;font-family:'Syne',sans-serif}
 .chip:hover,.chip.active{background:var(--gdim);border-color:var(--g);color:var(--g)}
 
-/* RESULTS */
-#resultsSection{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:0 1.5rem 6rem;display:none}
+#resultsSection{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:0 1.5rem 6rem;display:none}
 
-/* STOCK HEADER */
-.stock-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;animation:fadeUp 0.3s ease both}
-.ticker-block h2{font-family:'Syne',sans-serif;font-size:2.6rem;font-weight:800;letter-spacing:-2px;line-height:1}
-.ticker-block p{font-size:13px;color:var(--text2);margin-top:6px}
-.badge{padding:8px 22px;border-radius:30px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;flex-shrink:0;margin-top:6px}
+/* PRICE HERO CARD */
+.price-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:1rem;animation:fadeUp 0.3s ease both;display:flex;flex-wrap:wrap;gap:1.5rem;align-items:flex-start;justify-content:space-between}
+.price-left h2{font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;letter-spacing:-2px;line-height:1}
+.price-left .company{font-size:13px;color:var(--text2);margin-top:5px}
+.price-right{text-align:right}
+.current-price{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-1px}
+.price-change{font-size:14px;font-weight:600;margin-top:4px}
+.price-change.up{color:var(--g)}
+.price-change.down{color:var(--red)}
+.badge{padding:7px 20px;border-radius:30px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;display:inline-block;margin-top:8px}
 .badge-beli{background:rgba(0,200,122,0.12);color:var(--g);border:1px solid rgba(0,200,122,0.3)}
 .badge-tahan{background:rgba(226,163,84,0.12);color:var(--gold);border:1px solid rgba(226,163,84,0.3)}
 .badge-jual{background:rgba(240,82,82,0.1);color:var(--red);border:1px solid rgba(240,82,82,0.3)}
 
+/* PRICE STATS ROW */
+.price-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:1rem;animation:fadeUp 0.32s ease both}
+.pstat{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:0.85rem 1rem}
+.pstat-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;font-weight:600}
+.pstat-val{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:var(--text)}
+.pstat-val.green{color:var(--g)}
+
+/* CHART */
+.chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:1rem;animation:fadeUp 0.35s ease both}
+.chart-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px}
+.chart-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;font-family:'Syne',sans-serif;display:flex;align-items:center;gap:8px}
+.chart-tabs{display:flex;gap:4px}
+.chart-tab{font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer;color:var(--text2);background:var(--bg3);border:1px solid var(--border);font-family:'Syne',sans-serif;font-weight:600;transition:all 0.15s}
+.chart-tab.active{background:var(--gdim);border-color:var(--g);color:var(--g)}
+#priceChart{width:100%;height:200px;display:block}
+
+/* SCORE CARDS */
+.scores{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;animation:fadeUp 0.37s ease both}
+.score-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.2rem}
+.score-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:8px;font-family:'Syne',sans-serif}
+.score-val{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;line-height:1;margin-bottom:4px}
+.score-bar{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-bottom:6px}
+.score-fill{height:100%;border-radius:2px;transition:width 1s ease}
+.score-desc{font-size:11px;color:var(--text2);line-height:1.5}
+
 /* METRICS */
-.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1rem;animation:fadeUp 0.35s ease both}
-.metric{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem;transition:border-color 0.2s,transform 0.2s}
-.metric:hover{border-color:var(--border2);transform:translateY(-2px)}
-.metric-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;font-weight:600}
-.metric-val{font-family:'Syne',sans-serif;font-size:1.45rem;font-weight:700;color:var(--text);line-height:1;margin-bottom:3px}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:1rem;animation:fadeUp 0.38s ease both}
+.metric{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:0.9rem 1rem;transition:border-color 0.2s}
+.metric:hover{border-color:var(--border2)}
+.metric-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:600}
+.metric-val{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700;color:var(--text);line-height:1;margin-bottom:3px}
 .metric-val.green{color:var(--g)}
 .metric-sub{font-size:11px;color:var(--text3)}
 
 /* CARDS */
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.5rem;margin-bottom:1rem;animation:fadeUp 0.4s ease both}
-.card-hdr{display:flex;align-items:center;gap:9px;margin-bottom:1rem;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;font-family:'Syne',sans-serif}
-.card-icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.ci-green{background:var(--gdim)}
-.ci-gold{background:rgba(226,163,84,0.1)}
-.ci-red{background:rgba(240,82,82,0.08)}
-.ci-gray{background:var(--bg3)}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.4rem;margin-bottom:1rem;animation:fadeUp 0.4s ease both}
+.card-hdr{display:flex;align-items:center;gap:8px;margin-bottom:0.9rem;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;font-family:'Syne',sans-serif}
+.ci{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.ci-green{background:var(--gdim)} .ci-gold{background:rgba(226,163,84,0.1)} .ci-red{background:rgba(240,82,82,0.08)} .ci-gray{background:var(--bg3)} .ci-blue{background:rgba(88,166,255,0.1)}
 
-.summary-text{font-size:0.95rem;color:var(--text);line-height:1.9;font-weight:300}
-.rec-box{margin-top:1.1rem;padding:1rem 1.2rem;background:var(--gdim);border:1px solid rgba(0,200,122,0.2);border-radius:10px}
+.summary-text{font-size:0.92rem;color:var(--text);line-height:1.9;font-weight:300}
+.rec-box{margin-top:1rem;padding:1rem 1.1rem;background:var(--gdim);border:1px solid rgba(0,200,122,0.2);border-radius:10px}
 .rec-lbl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--g);margin-bottom:5px;font-family:'Syne',sans-serif}
-.rec-text{font-size:0.9rem;color:rgba(0,200,122,0.85);line-height:1.8}
+.rec-text{font-size:0.88rem;color:rgba(0,200,122,0.85);line-height:1.8}
+
+/* TARGET ROW */
+.target-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:1rem}
+.target-item{background:var(--bg3);border-radius:9px;padding:0.75rem;text-align:center}
+.target-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-weight:600}
+.target-val{font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700}
+.target-val.green{color:var(--g)}
+.target-val.red{color:var(--red)}
+.target-val.gold{color:var(--gold)}
 
 /* TWO COL */
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
-@media(max-width:560px){.two-col{grid-template-columns:1fr}}
+@media(max-width:560px){.two-col{grid-template-columns:1fr}.scores{grid-template-columns:1fr}.target-row{grid-template-columns:1fr 1fr}}
 
 /* TAGS */
-.tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
-.tag{font-size:12px;padding:5px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text2);line-height:1.4}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.tag{font-size:12px;padding:4px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text2);line-height:1.4}
 .tag.green{background:var(--gdim);border-color:rgba(0,200,122,0.2);color:var(--g)}
 .tag.red{background:rgba(240,82,82,0.07);border-color:rgba(240,82,82,0.2);color:#e07070}
+.tag.gold{background:rgba(226,163,84,0.08);border-color:rgba(226,163,84,0.2);color:var(--gold)}
 
-/* TABLE */
+/* INFO TABLE */
 .info-table{width:100%;border-collapse:collapse}
 .info-table tr{border-bottom:1px solid var(--border)}
 .info-table tr:last-child{border-bottom:none}
-.info-table td{padding:10px 0;font-size:13px}
+.info-table td{padding:9px 0;font-size:13px}
 .info-table td:first-child{color:var(--text2)}
 .info-table td:last-child{text-align:right;font-weight:500;color:var(--text)}
 
@@ -128,12 +145,10 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,12,16,0.85);backdrop-fil
 @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 .spin{animation:spin 0.8s linear infinite;display:inline-block}
 
-/* TOAST */
-.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border2);padding:11px 20px;border-radius:10px;font-size:13px;color:var(--text);z-index:999;animation:fadeUp 0.3s ease;box-shadow:0 8px 32px rgba(0,0,0,0.6);white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border2);padding:10px 20px;border-radius:10px;font-size:13px;color:var(--text);z-index:999;animation:fadeUp 0.3s ease;box-shadow:0 8px 32px rgba(0,0,0,0.6);white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
 .toast.error{border-color:rgba(240,82,82,0.4);color:#e07070}
 .toast.ok{border-color:rgba(0,200,122,0.4);color:var(--g)}
 
-/* FOOTER */
 footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:2rem 1.5rem;text-align:center;color:var(--text3);font-size:12px;line-height:2}
 
 ::-webkit-scrollbar{width:4px}
@@ -144,24 +159,21 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:2r
 <body>
 
 <nav>
-  <a class="nav-brand" href="/">
-    <div class="nav-logo">📈</div>
-    <span class="nav-title">Saham<span>AI</span></span>
-  </a>
+  <a class="nav-brand" href="/"><div class="nav-logo">📈</div><span class="nav-title">Saham<span>AI</span></span></a>
   <span class="nav-badge">GRATIS</span>
 </nav>
 
 <section class="hero">
-  <div class="hero-pill"><div class="pulse"></div> Powered by AI</div>
+  <div class="hero-pill"><div class="pulse"></div> Real-time · AI-Powered</div>
   <h1>Analisis Saham <span class="accent">Indonesia</span><br>Berbasis Kecerdasan Buatan</h1>
-  <p class="hero-sub">Dapatkan analisis fundamental, teknikal, dan rekomendasi investasi untuk saham di Bursa Efek Indonesia — gratis, instan, mudah dipahami.</p>
+  <p class="hero-sub">Data harga real-time, grafik interaktif, dan analisis mendalam AI untuk saham di Bursa Efek Indonesia — gratis dan instan.</p>
 </section>
 
 <div class="search-wrap">
   <div class="search-box">
     <div class="search-icon">🔍</div>
     <input type="text" id="stockInput" placeholder="Ketik kode saham: BBCA, TLKM, GOTO..." maxlength="10"
-      onkeydown="if(event.key==='Enter') analyzeStock()" autocomplete="off" autocorrect="off" spellcheck="false" />
+      onkeydown="if(event.key==='Enter') analyzeStock()" autocomplete="off" autocorrect="off" spellcheck="false"/>
     <button id="analyzeBtn" onclick="analyzeStock()">
       <span id="btnIcon">✦</span> Analisis
     </button>
@@ -190,6 +202,9 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:2r
 </footer>
 
 <script>
+let currentHistory = [];
+let currentRange = '3mo';
+
 async function analyzeStock() {
   const input = document.getElementById('stockInput');
   const ticker = input.value.trim().toUpperCase();
@@ -201,10 +216,7 @@ async function analyzeStock() {
   icon.className = 'spin';
   icon.textContent = '↻';
 
-  // highlight active chip
-  document.querySelectorAll('.chip').forEach(c => {
-    c.classList.toggle('active', c.textContent === ticker);
-  });
+  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.textContent === ticker));
 
   const section = document.getElementById('resultsSection');
   const content = document.getElementById('resultsContent');
@@ -220,14 +232,17 @@ async function analyzeStock() {
     });
 
     const responseData = await res.json();
-
-    if (!res.ok) {
-      throw new Error(responseData.error || `HTTP ${res.status}`);
-    }
+    if (!res.ok) throw new Error(responseData.error || `HTTP ${res.status}`);
 
     content.innerHTML = buildResult(ticker, responseData);
-    showToast('Analisis selesai ✓', 'ok');
 
+    // Draw chart after DOM is ready
+    if (responseData.priceData && responseData.priceData.history) {
+      currentHistory = responseData.priceData.history;
+      drawChart(currentHistory, '3mo');
+    }
+
+    showToast('Analisis selesai ✓', 'ok');
   } catch (err) {
     content.innerHTML = `
       <div style="text-align:center;padding:4rem 1rem">
@@ -249,7 +264,6 @@ function quickAnalyze(code) {
 }
 
 function showToast(msg, type = '') {
-  // remove existing toasts
   document.querySelectorAll('.toast').forEach(t => t.remove());
   const t = document.createElement('div');
   t.className = 'toast ' + type;
@@ -257,6 +271,11 @@ function showToast(msg, type = '') {
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 3500);
 }
+
+function safe(val, fallback = '—') {
+  return (val !== undefined && val !== null && val !== '') ? val : fallback;
+}
+function safeArr(arr) { return Array.isArray(arr) ? arr : []; }
 
 function getBadgeClass(s) {
   if (!s) return 'badge-tahan';
@@ -266,84 +285,200 @@ function getBadgeClass(s) {
   return 'badge-tahan';
 }
 
-function safe(val, fallback = '—') {
-  return (val !== undefined && val !== null && val !== '') ? val : fallback;
+function fmtPrice(val) {
+  if (!val) return '—';
+  return 'Rp ' + Number(val).toLocaleString('id-ID');
 }
 
-function safeArr(arr) {
-  return Array.isArray(arr) ? arr : [];
+function fmtVol(val) {
+  if (!val) return '—';
+  if (val >= 1e9) return (val / 1e9).toFixed(1) + 'M lot';
+  if (val >= 1e6) return (val / 1e6).toFixed(1) + 'Jt';
+  if (val >= 1e3) return (val / 1e3).toFixed(0) + 'Rb';
+  return val;
+}
+
+function getScoreColor(score) {
+  const n = parseFloat(score) || 0;
+  if (n >= 8) return 'var(--g)';
+  if (n >= 6) return 'var(--gold)';
+  return 'var(--red)';
+}
+
+function extractScore(str) {
+  if (!str) return 0;
+  const match = str.match(/(\d+(?:\.\d+)?)/);
+  return match ? Math.min(10, parseFloat(match[1])) : 0;
 }
 
 function buildResult(ticker, d) {
+  const pd = d.priceData;
   const sentiment = safe(d.sentiment, 'TAHAN');
   const today = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+  const isIndex = ticker === 'IHSG' || ticker === 'LQ45';
 
-  return `
-  <div class="stock-header">
-    <div class="ticker-block">
+  const priceSection = pd ? `
+  <div class="price-card">
+    <div class="price-left">
       <h2>${ticker}</h2>
-      <p>${safe(d.namaLengkap)} &nbsp;·&nbsp; ${safe(d.sektor)}</p>
+      <div class="company">${safe(d.namaLengkap)} · ${safe(d.sektor)}</div>
     </div>
-    <span class="badge ${getBadgeClass(sentiment)}">${sentiment}</span>
+    <div class="price-right">
+      <div class="current-price" style="color:${pd.isUp ? 'var(--g)' : 'var(--red)'}">${fmtPrice(pd.currentPrice)}</div>
+      <div class="price-change ${pd.isUp ? 'up' : 'down'}">
+        ${pd.isUp ? '▲' : '▼'} ${Math.abs(pd.change).toLocaleString('id-ID')} (${pd.isUp ? '+' : ''}${pd.changePct}%)
+      </div>
+      <span class="badge ${getBadgeClass(sentiment)}">${sentiment}</span>
+    </div>
   </div>
 
+  <div class="price-stats">
+    <div class="pstat"><div class="pstat-lbl">52W High</div><div class="pstat-val green">${fmtPrice(pd.high52w)}</div></div>
+    <div class="pstat"><div class="pstat-lbl">52W Low</div><div class="pstat-val">${fmtPrice(pd.low52w)}</div></div>
+    <div class="pstat"><div class="pstat-lbl">MA 20</div><div class="pstat-val">${fmtPrice(pd.ma20)}</div></div>
+    <div class="pstat"><div class="pstat-lbl">MA 50</div><div class="pstat-val">${fmtPrice(pd.ma50)}</div></div>
+    <div class="pstat"><div class="pstat-lbl">Volume</div><div class="pstat-val">${fmtVol(pd.volume)}</div></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-hdr">
+      <div class="chart-title">📊 Grafik Harga</div>
+      <div class="chart-tabs">
+        <span class="chart-tab active" onclick="setRange('1mo',this)">1B</span>
+        <span class="chart-tab" onclick="setRange('3mo',this)">3B</span>
+        <span class="chart-tab" onclick="setRange('all',this)">Max</span>
+      </div>
+    </div>
+    <canvas id="priceChart"></canvas>
+  </div>` : `
+  <div class="price-card">
+    <div class="price-left">
+      <h2>${ticker}</h2>
+      <div class="company">${safe(d.namaLengkap)} · ${safe(d.sektor)}</div>
+    </div>
+    <div class="price-right">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:8px">Data harga tidak tersedia</div>
+      <span class="badge ${getBadgeClass(sentiment)}">${sentiment}</span>
+    </div>
+  </div>`;
+
+  // Score section (only for stocks, not indices)
+  const fundScore = extractScore(d.scoreFundamental);
+  const techScore = extractScore(d.scoreTeknikal);
+  const scoreSection = !isIndex && (d.scoreFundamental || d.scoreTeknikal) ? `
+  <div class="scores">
+    <div class="score-card">
+      <div class="score-lbl">Skor Fundamental</div>
+      <div class="score-val" style="color:${getScoreColor(fundScore)}">${fundScore}<span style="font-size:1rem;color:var(--text3)">/10</span></div>
+      <div class="score-bar"><div class="score-fill" style="width:${fundScore*10}%;background:${getScoreColor(fundScore)}"></div></div>
+      <div class="score-desc">${safe(d.scoreFundamental).replace(/^\d+(\.\d+)?\/?\d*\s*[-–]?\s*/,'')}</div>
+    </div>
+    <div class="score-card">
+      <div class="score-lbl">Skor Teknikal</div>
+      <div class="score-val" style="color:${getScoreColor(techScore)}">${techScore}<span style="font-size:1rem;color:var(--text3)">/10</span></div>
+      <div class="score-bar"><div class="score-fill" style="width:${techScore*10}%;background:${getScoreColor(techScore)}"></div></div>
+      <div class="score-desc">${safe(d.scoreTeknikal).replace(/^\d+(\.\d+)?\/?\d*\s*[-–]?\s*/,'')}</div>
+    </div>
+  </div>` : '';
+
+  // Technical & Fundamental analysis cards
+  const analysisCards = !isIndex ? `
+  <div class="two-col">
+    <div class="card" style="margin-bottom:0">
+      <div class="card-hdr"><div class="ci ci-blue">📈</div> Teknikal</div>
+      <div class="summary-text" style="font-size:0.88rem">${safe(d.analisisTeknikal)}</div>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-hdr"><div class="ci ci-gold">📊</div> Fundamental</div>
+      <div class="summary-text" style="font-size:0.88rem">${safe(d.analisisFundamental)}</div>
+    </div>
+  </div>
+  <div style="margin-bottom:1rem"></div>` : `
+  <div class="two-col">
+    <div class="card" style="margin-bottom:0">
+      <div class="card-hdr"><div class="ci ci-green">💪</div> Sektor Kuat</div>
+      <div class="tags">${safeArr(d.sektorKuat).map(s=>`<span class="tag green">${s}</span>`).join('')}</div>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-hdr"><div class="ci ci-red">📉</div> Sektor Lemah</div>
+      <div class="tags">${safeArr(d.sektorLemah).map(s=>`<span class="tag red">${s}</span>`).join('')}</div>
+    </div>
+  </div>
+  <div style="margin-bottom:1rem"></div>`;
+
+  // Target section
+  const targetSection = !isIndex && (d.targetHarga || d.stopLoss || d.levelBeli) ? `
+  <div class="target-row">
+    <div class="target-item">
+      <div class="target-lbl">Target Harga</div>
+      <div class="target-val green">${safe(d.targetHarga)}</div>
+    </div>
+    <div class="target-item">
+      <div class="target-lbl">Zona Beli</div>
+      <div class="target-val gold">${safe(d.levelBeli)}</div>
+    </div>
+    <div class="target-item">
+      <div class="target-lbl">Stop Loss</div>
+      <div class="target-val red">${safe(d.stopLoss)}</div>
+    </div>
+  </div>` : isIndex && (d.targetBull || d.targetBear) ? `
+  <div class="target-row">
+    <div class="target-item"><div class="target-lbl">Target Bull</div><div class="target-val green">${safe(d.targetBull)}</div></div>
+    <div class="target-item"><div class="target-lbl">Target Bear</div><div class="target-val red">${safe(d.targetBear)}</div></div>
+  </div>` : '';
+
+  return `
+  ${priceSection}
+
+  ${scoreSection}
+
   <div class="metrics">
-    <div class="metric">
-      <div class="metric-lbl">Harga Wajar</div>
-      <div class="metric-val green">${safe(d.priceEst)}</div>
-      <div class="metric-sub">Estimasi AI</div>
-    </div>
-    <div class="metric">
-      <div class="metric-lbl">P/E Ratio</div>
-      <div class="metric-val">${safe(d.pe)}</div>
-      <div class="metric-sub">Price to Earnings</div>
-    </div>
-    <div class="metric">
-      <div class="metric-lbl">P/BV</div>
-      <div class="metric-val">${safe(d.pbv)}</div>
-      <div class="metric-sub">Price to Book Value</div>
-    </div>
-    <div class="metric">
-      <div class="metric-lbl">Div. Yield</div>
-      <div class="metric-val">${safe(d.divYield)}</div>
-      <div class="metric-sub">Dividend Yield</div>
-    </div>
-    <div class="metric">
-      <div class="metric-lbl">Beta</div>
-      <div class="metric-val">${safe(d.beta)}</div>
-      <div class="metric-sub">Volatilitas Relatif</div>
-    </div>
+    <div class="metric"><div class="metric-lbl">Harga Wajar</div><div class="metric-val green">${safe(d.priceEst)}</div><div class="metric-sub">Estimasi AI</div></div>
+    <div class="metric"><div class="metric-lbl">P/E Ratio</div><div class="metric-val">${safe(d.pe)}</div><div class="metric-sub">Price/Earnings</div></div>
+    <div class="metric"><div class="metric-lbl">P/BV</div><div class="metric-val">${safe(d.pbv)}</div><div class="metric-sub">Price/Book</div></div>
+    <div class="metric"><div class="metric-lbl">Div. Yield</div><div class="metric-val">${safe(d.divYield)}</div><div class="metric-sub">Dividend Yield</div></div>
+    <div class="metric"><div class="metric-lbl">Beta</div><div class="metric-val">${safe(d.beta)}</div><div class="metric-sub">vs IHSG</div></div>
   </div>
 
   <div class="card">
-    <div class="card-hdr"><div class="card-icon ci-green">🤖</div> Analisis AI</div>
+    <div class="card-hdr"><div class="ci ci-green">🤖</div> Analisis AI Mendalam</div>
     <div class="summary-text">${safe(d.summary)}</div>
+    ${d.posisiKompetitif ? `<div style="margin-top:0.75rem;padding:0.75rem;background:var(--bg3);border-radius:8px;font-size:0.88rem;color:var(--text2);line-height:1.7">${d.posisiKompetitif}</div>` : ''}
     <div class="rec-box">
       <div class="rec-lbl">Rekomendasi</div>
       <div class="rec-text">${safe(d.rekomendasi)}</div>
+      ${targetSection}
     </div>
   </div>
 
+  ${analysisCards}
+
   <div class="two-col">
     <div class="card" style="margin-bottom:0">
-      <div class="card-hdr"><div class="card-icon ci-green">✅</div> Keunggulan</div>
-      <div class="tags">${safeArr(d.keunggulan).map(k => `<span class="tag green">${k}</span>`).join('')}</div>
+      <div class="card-hdr"><div class="ci ci-green">✅</div> Keunggulan</div>
+      <div class="tags">${safeArr(d.keunggulan).map(k=>`<span class="tag green">${k}</span>`).join('')}</div>
     </div>
     <div class="card" style="margin-bottom:0">
-      <div class="card-hdr"><div class="card-icon ci-red">⚠️</div> Risiko</div>
-      <div class="tags">${safeArr(d.risiko).map(r => `<span class="tag red">${r}</span>`).join('')}</div>
+      <div class="card-hdr"><div class="ci ci-red">⚠️</div> Risiko</div>
+      <div class="tags">${safeArr(d.risiko).map(r=>`<span class="tag red">${r}</span>`).join('')}</div>
     </div>
   </div>
 
   <div class="card" style="margin-top:1rem">
-    <div class="card-hdr"><div class="card-icon ci-gold">🚀</div> Katalis Positif</div>
-    <div class="tags">${safeArr(d.katalis).map(k => `<span class="tag">${k}</span>`).join('')}</div>
+    <div class="card-hdr"><div class="ci ci-gold">🚀</div> Katalis</div>
+    <div class="tags">${safeArr(d.katalis).map((k,i)=>`<span class="tag ${i===safeArr(d.katalis).length-1?'red':''}">${k}</span>`).join('')}</div>
   </div>
 
+  ${isIndex && safeArr(d.rekomendasiSaham).length ? `
   <div class="card">
-    <div class="card-hdr"><div class="card-icon ci-gray">📋</div> Informasi</div>
+    <div class="card-hdr"><div class="ci ci-blue">⭐</div> Rekomendasi Saham</div>
+    <div class="tags">${safeArr(d.rekomendasiSaham).map(s=>`<span class="tag gold">${s}</span>`).join('')}</div>
+  </div>` : ''}
+
+  <div class="card">
+    <div class="card-hdr"><div class="ci ci-gray">📋</div> Informasi</div>
     <table class="info-table">
-      <tr><td>Kode Saham</td><td>${ticker}${ticker !== 'IHSG' && ticker !== 'LQ45' ? '.JK' : ''}</td></tr>
+      <tr><td>Kode Saham</td><td>${ticker}${!isIndex?'.JK':''}</td></tr>
       <tr><td>Sektor</td><td>${safe(d.sektor)}</td></tr>
       <tr><td>Bursa</td><td>IDX / Bursa Efek Indonesia</td></tr>
       <tr><td>Dianalisis pada</td><td>${today}</td></tr>
@@ -351,30 +486,139 @@ function buildResult(ticker, d) {
   </div>`;
 }
 
+// ── CHART ENGINE ──
+function setRange(range, el) {
+  document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  currentRange = range;
+  drawChart(currentHistory, range);
+}
+
+function drawChart(history, range) {
+  const canvas = document.getElementById('priceChart');
+  if (!canvas || !history || history.length === 0) return;
+
+  let data = history;
+  if (range === '1mo') data = history.slice(-22);
+  else if (range === '3mo') data = history.slice(-66);
+
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = 200 * dpr;
+  ctx.scale(dpr, dpr);
+
+  const W = rect.width;
+  const H = 200;
+  const pad = { top: 16, right: 16, bottom: 28, left: 52 };
+  const chartW = W - pad.left - pad.right;
+  const chartH = H - pad.top - pad.bottom;
+
+  const prices = data.map(d => d.close);
+  const minP = Math.min(...prices) * 0.998;
+  const maxP = Math.max(...prices) * 1.002;
+  const range_ = maxP - minP;
+
+  const px = (i) => pad.left + (i / (data.length - 1)) * chartW;
+  const py = (p) => pad.top + chartH - ((p - minP) / range_) * chartH;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + (i / 4) * chartH;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+    const price = maxP - (i / 4) * range_;
+    ctx.fillStyle = 'rgba(122,138,153,0.7)';
+    ctx.font = '10px DM Sans';
+    ctx.textAlign = 'right';
+    ctx.fillText(formatK(price), pad.left - 6, y + 3);
+  }
+
+  // MA20 line
+  if (data.length >= 20) {
+    ctx.strokeStyle = 'rgba(226,163,84,0.5)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    for (let i = 19; i < data.length; i++) {
+      const ma = data.slice(i - 19, i + 1).reduce((a, b) => a + b.close, 0) / 20;
+      if (i === 19) ctx.moveTo(px(i), py(ma));
+      else ctx.lineTo(px(i), py(ma));
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Gradient fill
+  const isUp = prices[prices.length - 1] >= prices[0];
+  const grad = ctx.createLinearGradient(0, pad.top, 0, H - pad.bottom);
+  if (isUp) {
+    grad.addColorStop(0, 'rgba(0,200,122,0.25)');
+    grad.addColorStop(1, 'rgba(0,200,122,0)');
+  } else {
+    grad.addColorStop(0, 'rgba(240,82,82,0.2)');
+    grad.addColorStop(1, 'rgba(240,82,82,0)');
+  }
+
+  ctx.beginPath();
+  ctx.moveTo(px(0), py(prices[0]));
+  for (let i = 1; i < data.length; i++) ctx.lineTo(px(i), py(prices[i]));
+  ctx.lineTo(px(data.length - 1), H - pad.bottom);
+  ctx.lineTo(px(0), H - pad.bottom);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Price line
+  ctx.strokeStyle = isUp ? '#00c87a' : '#f05252';
+  ctx.lineWidth = 1.5;
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ctx.moveTo(px(0), py(prices[0]));
+  for (let i = 1; i < data.length; i++) ctx.lineTo(px(i), py(prices[i]));
+  ctx.stroke();
+
+  // Last price dot
+  const lastX = px(data.length - 1);
+  const lastY = py(prices[prices.length - 1]);
+  ctx.beginPath();
+  ctx.arc(lastX, lastY, 3, 0, Math.PI * 2);
+  ctx.fillStyle = isUp ? '#00c87a' : '#f05252';
+  ctx.fill();
+
+  // X axis dates
+  ctx.fillStyle = 'rgba(122,138,153,0.7)';
+  ctx.font = '10px DM Sans';
+  ctx.textAlign = 'center';
+  const labelCount = Math.min(5, data.length);
+  for (let i = 0; i < labelCount; i++) {
+    const idx = Math.round((i / (labelCount - 1)) * (data.length - 1));
+    const d = new Date(data[idx].date);
+    const label = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+    ctx.fillText(label, px(idx), H - 6);
+  }
+}
+
+function formatK(num) {
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+  if (num >= 1000) return (num / 1000).toFixed(0) + 'K';
+  return Math.round(num).toString();
+}
+
 function buildSkeleton() {
   return `
-  <div class="stock-header">
-    <div>
-      <div class="sk" style="height:2.6rem;width:140px;margin-bottom:10px"></div>
-      <div class="sk" style="height:13px;width:220px"></div>
-    </div>
-    <div class="sk" style="height:36px;width:100px;border-radius:20px"></div>
+  <div class="price-card">
+    <div><div class="sk" style="height:2.4rem;width:130px;margin-bottom:10px"></div><div class="sk" style="height:13px;width:200px"></div></div>
+    <div style="text-align:right"><div class="sk" style="height:2rem;width:120px;margin-bottom:8px;margin-left:auto"></div><div class="sk" style="height:13px;width:80px;margin-left:auto;margin-bottom:8px"></div><div class="sk" style="height:28px;width:90px;border-radius:20px;margin-left:auto"></div></div>
   </div>
-  <div class="metrics">
-    ${[1,2,3,4,5].map(() => `
-    <div class="metric">
-      <div class="sk" style="height:10px;width:60%;margin-bottom:10px"></div>
-      <div class="sk" style="height:1.45rem;width:75%;margin-bottom:6px"></div>
-      <div class="sk" style="height:10px;width:50%"></div>
-    </div>`).join('')}
-  </div>
-  <div class="card">
-    <div class="sk" style="height:11px;width:80px;margin-bottom:16px"></div>
-    <div class="sk" style="height:14px;width:100%;margin-bottom:8px"></div>
-    <div class="sk" style="height:14px;width:90%;margin-bottom:8px"></div>
-    <div class="sk" style="height:14px;width:75%;margin-bottom:20px"></div>
-    <div class="sk" style="height:65px;border-radius:10px"></div>
-  </div>`;
+  <div class="price-stats">${[1,2,3,4,5].map(()=>`<div class="pstat"><div class="sk" style="height:10px;width:60%;margin-bottom:8px"></div><div class="sk" style="height:1rem;width:80%"></div></div>`).join('')}</div>
+  <div class="chart-card"><div class="sk" style="height:200px;border-radius:8px"></div></div>
+  <div class="metrics">${[1,2,3,4,5].map(()=>`<div class="metric"><div class="sk" style="height:10px;width:60%;margin-bottom:8px"></div><div class="sk" style="height:1.3rem;width:75%;margin-bottom:5px"></div><div class="sk" style="height:10px;width:50%"></div></div>`).join('')}</div>
+  <div class="card"><div class="sk" style="height:11px;width:100px;margin-bottom:14px"></div><div class="sk" style="height:14px;width:100%;margin-bottom:7px"></div><div class="sk" style="height:14px;width:92%;margin-bottom:7px"></div><div class="sk" style="height:14px;width:80%;margin-bottom:18px"></div><div class="sk" style="height:70px;border-radius:10px"></div></div>`;
 }
 </script>
 </body>
