@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Kode saham tidak valid' });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
     return res.status(500).json({ error: 'API key tidak dikonfigurasi di server' });
   }
@@ -28,46 +28,47 @@ export default async function handler(req, res) {
 {"namaLengkap":"nama perusahaan lengkap","sektor":"sektor industri","summary":"analisis fundamental dan teknikal 3 kalimat","sentiment":"BELI atau TAHAN atau JUAL","rekomendasi":"rekomendasi aksi dan target harga 2 kalimat","priceEst":"estimasi harga wajar Rp","pe":"P/E ratio","pbv":"P/BV","divYield":"dividend yield %","beta":"estimasi beta","keunggulan":["keunggulan1","keunggulan2","keunggulan3"],"risiko":["risiko1","risiko2","risiko3"],"katalis":["katalis1","katalis2"]}`;
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-    const response = await fetch(url, {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 1500
-        }
+        model: 'llama-3.3-70b-versatile',
+        max_tokens: 1500,
+        temperature: 0.7,
+        messages: [
+          {
+            role: 'system',
+            content: 'Kamu adalah analis saham Indonesia senior. Selalu jawab HANYA dengan JSON valid tanpa markdown, tanpa komentar, tanpa teks tambahan apapun.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ]
       })
     });
 
     if (!response.ok) {
       const errBody = await response.json().catch(() => ({}));
-      const errMsg = errBody.error?.message || `Gemini API error ${response.status}`;
+      const errMsg = errBody.error?.message || `Groq API error ${response.status}`;
       return res.status(502).json({ error: errMsg });
     }
 
     const body = await response.json();
 
-    const candidate = body.candidates?.[0];
-    if (!candidate) {
-      return res.status(502).json({ error: 'Tidak ada respons dari Gemini. Coba lagi.' });
-    }
-
-    const raw = candidate.content?.parts
-      ?.map(p => p.text || '')
-      .join('')
-      .replace(/```json|```/g, '')
-      .trim();
-
+    const raw = body.choices?.[0]?.message?.content;
     if (!raw) {
-      return res.status(502).json({ error: 'Respons Gemini kosong. Coba lagi.' });
+      return res.status(502).json({ error: 'Tidak ada respons dari Groq. Coba lagi.' });
     }
+
+    const cleaned = raw.replace(/```json|```/g, '').trim();
 
     let parsed;
     try {
-      parsed = JSON.parse(raw);
+      parsed = JSON.parse(cleaned);
     } catch (parseErr) {
       console.error('JSON parse error. Raw:', raw);
       return res.status(502).json({ error: 'Format respons AI tidak valid. Coba lagi.' });
