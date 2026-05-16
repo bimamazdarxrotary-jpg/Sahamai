@@ -248,7 +248,7 @@ async function analyzeStock() {
       <div style="text-align:center;padding:4rem 1rem">
         <div style="font-size:3rem;margin-bottom:1rem">⚠️</div>
         <p style="font-size:1rem;color:#e07070;margin-bottom:8px;font-family:'Syne',sans-serif;font-weight:700">Gagal menganalisis saham</p>
-        <p style="font-size:13px;color:var(--text3)">${err.message}</p>
+        <p style="font-size:13px;color:var(--text3)">${String(err.message).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>
       </div>`;
     showToast('Error: ' + err.message, 'error');
   }
@@ -275,6 +275,15 @@ function showToast(msg, type = '') {
 function safe(val, fallback = '—') {
   return (val !== undefined && val !== null && val !== '') ? val : fallback;
 }
+function sanitize(val, fallback = '—') {
+  if (val === undefined || val === null || val === '') return fallback;
+  return String(val)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#x27;');
+}
 function safeArr(arr) { return Array.isArray(arr) ? arr : []; }
 
 function getBadgeClass(s) {
@@ -286,16 +295,16 @@ function getBadgeClass(s) {
 }
 
 function fmtPrice(val) {
-  if (!val) return '—';
+  if (val === null || val === undefined || val === '') return '—';
   return 'Rp ' + Number(val).toLocaleString('id-ID');
 }
 
 function fmtVol(val) {
   if (!val) return '—';
-  if (val >= 1e9) return (val / 1e9).toFixed(1) + 'M lot';
+  if (val >= 1e9) return (val / 1e9).toFixed(2) + 'B';
   if (val >= 1e6) return (val / 1e6).toFixed(1) + 'Jt';
   if (val >= 1e3) return (val / 1e3).toFixed(0) + 'Rb';
-  return val;
+  return val.toLocaleString('id-ID');
 }
 
 function getScoreColor(score) {
@@ -321,7 +330,7 @@ function buildResult(ticker, d) {
   <div class="price-card">
     <div class="price-left">
       <h2>${ticker}</h2>
-      <div class="company">${safe(d.namaLengkap)} · ${safe(d.sektor)}</div>
+      <div class="company">${sanitize(d.namaLengkap)} · ${sanitize(d.sektor)}</div>
     </div>
     <div class="price-right">
       <div class="current-price" style="color:${pd.isUp ? 'var(--g)' : 'var(--red)'}">${fmtPrice(pd.currentPrice)}</div>
@@ -344,8 +353,8 @@ function buildResult(ticker, d) {
     <div class="chart-hdr">
       <div class="chart-title">📊 Grafik Harga</div>
       <div class="chart-tabs">
-        <span class="chart-tab active" onclick="setRange('1mo',this)">1B</span>
-        <span class="chart-tab" onclick="setRange('3mo',this)">3B</span>
+        <span class="chart-tab" onclick="setRange('1mo',this)">1B</span>
+        <span class="chart-tab active" onclick="setRange('3mo',this)">3B</span>
         <span class="chart-tab" onclick="setRange('all',this)">Max</span>
       </div>
     </div>
@@ -354,7 +363,7 @@ function buildResult(ticker, d) {
   <div class="price-card">
     <div class="price-left">
       <h2>${ticker}</h2>
-      <div class="company">${safe(d.namaLengkap)} · ${safe(d.sektor)}</div>
+      <div class="company">${sanitize(d.namaLengkap)} · ${sanitize(d.sektor)}</div>
     </div>
     <div class="price-right">
       <div style="font-size:12px;color:var(--text3);margin-bottom:8px">Data harga tidak tersedia</div>
@@ -371,13 +380,13 @@ function buildResult(ticker, d) {
       <div class="score-lbl">Skor Fundamental</div>
       <div class="score-val" style="color:${getScoreColor(fundScore)}">${fundScore}<span style="font-size:1rem;color:var(--text3)">/10</span></div>
       <div class="score-bar"><div class="score-fill" style="width:${fundScore*10}%;background:${getScoreColor(fundScore)}"></div></div>
-      <div class="score-desc">${safe(d.scoreFundamental).replace(/^\d+(\.\d+)?\/?\d*\s*[-–]?\s*/,'')}</div>
+      <div class="score-desc">${sanitize(safe(d.scoreFundamental).replace(/^\d+(\.\d+)?\/?\d*\s*[-–]?\s*/,''))}</div>
     </div>
     <div class="score-card">
       <div class="score-lbl">Skor Teknikal</div>
       <div class="score-val" style="color:${getScoreColor(techScore)}">${techScore}<span style="font-size:1rem;color:var(--text3)">/10</span></div>
       <div class="score-bar"><div class="score-fill" style="width:${techScore*10}%;background:${getScoreColor(techScore)}"></div></div>
-      <div class="score-desc">${safe(d.scoreTeknikal).replace(/^\d+(\.\d+)?\/?\d*\s*[-–]?\s*/,'')}</div>
+      <div class="score-desc">${sanitize(safe(d.scoreTeknikal).replace(/^\d+(\.\d+)?\/?\d*\s*[-–]?\s*/,''))}</div>
     </div>
   </div>` : '';
 
@@ -386,22 +395,22 @@ function buildResult(ticker, d) {
   <div class="two-col">
     <div class="card" style="margin-bottom:0">
       <div class="card-hdr"><div class="ci ci-blue">📈</div> Teknikal</div>
-      <div class="summary-text" style="font-size:0.88rem">${safe(d.analisisTeknikal)}</div>
+      <div class="summary-text" style="font-size:0.88rem">${sanitize(d.analisisTeknikal)}</div>
     </div>
     <div class="card" style="margin-bottom:0">
       <div class="card-hdr"><div class="ci ci-gold">📊</div> Fundamental</div>
-      <div class="summary-text" style="font-size:0.88rem">${safe(d.analisisFundamental)}</div>
+      <div class="summary-text" style="font-size:0.88rem">${sanitize(d.analisisFundamental || d.analisisfundamental)}</div>
     </div>
   </div>
   <div style="margin-bottom:1rem"></div>` : `
   <div class="two-col">
     <div class="card" style="margin-bottom:0">
       <div class="card-hdr"><div class="ci ci-green">💪</div> Sektor Kuat</div>
-      <div class="tags">${safeArr(d.sektorKuat).map(s=>`<span class="tag green">${s}</span>`).join('')}</div>
+      <div class="tags">${safeArr(d.sektorKuat).map(s=>`<span class="tag green">${sanitize(s)}</span>`).join('')}</div>
     </div>
     <div class="card" style="margin-bottom:0">
       <div class="card-hdr"><div class="ci ci-red">📉</div> Sektor Lemah</div>
-      <div class="tags">${safeArr(d.sektorLemah).map(s=>`<span class="tag red">${s}</span>`).join('')}</div>
+      <div class="tags">${safeArr(d.sektorLemah).map(s=>`<span class="tag red">${sanitize(s)}</span>`).join('')}</div>
     </div>
   </div>
   <div style="margin-bottom:1rem"></div>`;
@@ -411,20 +420,20 @@ function buildResult(ticker, d) {
   <div class="target-row">
     <div class="target-item">
       <div class="target-lbl">Target Harga</div>
-      <div class="target-val green">${safe(d.targetHarga)}</div>
+      <div class="target-val green">${sanitize(d.targetHarga)}</div>
     </div>
     <div class="target-item">
       <div class="target-lbl">Zona Beli</div>
-      <div class="target-val gold">${safe(d.levelBeli)}</div>
+      <div class="target-val gold">${sanitize(d.levelBeli)}</div>
     </div>
     <div class="target-item">
       <div class="target-lbl">Stop Loss</div>
-      <div class="target-val red">${safe(d.stopLoss)}</div>
+      <div class="target-val red">${sanitize(d.stopLoss)}</div>
     </div>
   </div>` : isIndex && (d.targetBull || d.targetBear) ? `
-  <div class="target-row">
-    <div class="target-item"><div class="target-lbl">Target Bull</div><div class="target-val green">${safe(d.targetBull)}</div></div>
-    <div class="target-item"><div class="target-lbl">Target Bear</div><div class="target-val red">${safe(d.targetBear)}</div></div>
+  <div class="target-row" style="grid-template-columns:1fr 1fr">
+    <div class="target-item"><div class="target-lbl">Target Bull</div><div class="target-val green">${sanitize(d.targetBull)}</div></div>
+    <div class="target-item"><div class="target-lbl">Target Bear</div><div class="target-val red">${sanitize(d.targetBear)}</div></div>
   </div>` : '';
 
   return `
@@ -433,20 +442,20 @@ function buildResult(ticker, d) {
   ${scoreSection}
 
   <div class="metrics">
-    <div class="metric"><div class="metric-lbl">Harga Wajar</div><div class="metric-val green">${safe(d.priceEst)}</div><div class="metric-sub">Estimasi AI</div></div>
-    <div class="metric"><div class="metric-lbl">P/E Ratio</div><div class="metric-val">${safe(d.pe)}</div><div class="metric-sub">Price/Earnings</div></div>
-    <div class="metric"><div class="metric-lbl">P/BV</div><div class="metric-val">${safe(d.pbv)}</div><div class="metric-sub">Price/Book</div></div>
-    <div class="metric"><div class="metric-lbl">Div. Yield</div><div class="metric-val">${safe(d.divYield)}</div><div class="metric-sub">Dividend Yield</div></div>
-    <div class="metric"><div class="metric-lbl">Beta</div><div class="metric-val">${safe(d.beta)}</div><div class="metric-sub">vs IHSG</div></div>
+    <div class="metric"><div class="metric-lbl">Harga Wajar</div><div class="metric-val green">${sanitize(d.priceEst)}</div><div class="metric-sub">Estimasi AI</div></div>
+    <div class="metric"><div class="metric-lbl">P/E Ratio</div><div class="metric-val">${sanitize(d.pe)}</div><div class="metric-sub">Price/Earnings</div></div>
+    <div class="metric"><div class="metric-lbl">P/BV</div><div class="metric-val">${sanitize(d.pbv)}</div><div class="metric-sub">Price/Book</div></div>
+    <div class="metric"><div class="metric-lbl">Div. Yield</div><div class="metric-val">${sanitize(d.divYield)}</div><div class="metric-sub">Dividend Yield</div></div>
+    <div class="metric"><div class="metric-lbl">Beta</div><div class="metric-val">${sanitize(d.beta)}</div><div class="metric-sub">vs IHSG</div></div>
   </div>
 
   <div class="card">
     <div class="card-hdr"><div class="ci ci-green">🤖</div> Analisis AI Mendalam</div>
-    <div class="summary-text">${safe(d.summary)}</div>
-    ${d.posisiKompetitif ? `<div style="margin-top:0.75rem;padding:0.75rem;background:var(--bg3);border-radius:8px;font-size:0.88rem;color:var(--text2);line-height:1.7">${d.posisiKompetitif}</div>` : ''}
+    <div class="summary-text">${sanitize(d.summary)}</div>
+    ${d.posisiKompetitif ? `<div style="margin-top:0.75rem;padding:0.75rem;background:var(--bg3);border-radius:8px;font-size:0.88rem;color:var(--text2);line-height:1.7">${sanitize(d.posisiKompetitif)}</div>` : ''}
     <div class="rec-box">
       <div class="rec-lbl">Rekomendasi</div>
-      <div class="rec-text">${safe(d.rekomendasi)}</div>
+      <div class="rec-text">${sanitize(d.rekomendasi)}</div>
       ${targetSection}
     </div>
   </div>
@@ -456,30 +465,33 @@ function buildResult(ticker, d) {
   <div class="two-col">
     <div class="card" style="margin-bottom:0">
       <div class="card-hdr"><div class="ci ci-green">✅</div> Keunggulan</div>
-      <div class="tags">${safeArr(d.keunggulan).map(k=>`<span class="tag green">${k}</span>`).join('')}</div>
+      <div class="tags">${safeArr(d.keunggulan).map(k=>`<span class="tag green">${sanitize(k)}</span>`).join('')}</div>
     </div>
     <div class="card" style="margin-bottom:0">
       <div class="card-hdr"><div class="ci ci-red">⚠️</div> Risiko</div>
-      <div class="tags">${safeArr(d.risiko).map(r=>`<span class="tag red">${r}</span>`).join('')}</div>
+      <div class="tags">${safeArr(d.risiko).map(r=>`<span class="tag red">${sanitize(r)}</span>`).join('')}</div>
     </div>
   </div>
 
   <div class="card" style="margin-top:1rem">
     <div class="card-hdr"><div class="ci ci-gold">🚀</div> Katalis</div>
-    <div class="tags">${safeArr(d.katalis).map((k,i)=>`<span class="tag ${i===safeArr(d.katalis).length-1?'red':''}">${k}</span>`).join('')}</div>
+    <div class="tags">${safeArr(d.katalis).map((k,i)=>{
+      const isNeg = /risiko|waspada|ancaman|negatif|turun|melemah|tekanan|penurunan/i.test(k);
+      return `<span class="tag ${isNeg ? 'red' : i === 0 ? 'green' : ''}">${sanitize(k)}</span>`;
+    }).join('')}</div>
   </div>
 
   ${isIndex && safeArr(d.rekomendasiSaham).length ? `
   <div class="card">
     <div class="card-hdr"><div class="ci ci-blue">⭐</div> Rekomendasi Saham</div>
-    <div class="tags">${safeArr(d.rekomendasiSaham).map(s=>`<span class="tag gold">${s}</span>`).join('')}</div>
+    <div class="tags">${safeArr(d.rekomendasiSaham).map(s=>`<span class="tag gold">${sanitize(s)}</span>`).join('')}</div>
   </div>` : ''}
 
   <div class="card">
     <div class="card-hdr"><div class="ci ci-gray">📋</div> Informasi</div>
     <table class="info-table">
       <tr><td>Kode Saham</td><td>${ticker}${!isIndex?'.JK':''}</td></tr>
-      <tr><td>Sektor</td><td>${safe(d.sektor)}</td></tr>
+      <tr><td>Sektor</td><td>${sanitize(d.sektor)}</td></tr>
       <tr><td>Bursa</td><td>IDX / Bursa Efek Indonesia</td></tr>
       <tr><td>Dianalisis pada</td><td>${today}</td></tr>
     </table>
@@ -496,11 +508,11 @@ function setRange(range, el) {
 
 function drawChart(history, range) {
   const canvas = document.getElementById('priceChart');
-  if (!canvas || !history || history.length === 0) return;
+  if (!canvas || !history || history.length < 2) return;
 
   let data = history;
   if (range === '1mo') data = history.slice(-22);
-  else if (range === '3mo') data = history.slice(-66);
+  else if (range === '3mo') data = history.slice(-60);
 
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
@@ -595,11 +607,16 @@ function drawChart(history, range) {
   ctx.font = '10px DM Sans';
   ctx.textAlign = 'center';
   const labelCount = Math.min(5, data.length);
-  for (let i = 0; i < labelCount; i++) {
-    const idx = Math.round((i / (labelCount - 1)) * (data.length - 1));
-    const d = new Date(data[idx].date);
-    const label = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
-    ctx.fillText(label, px(idx), H - 6);
+  if (labelCount === 1) {
+    const d = new Date(data[0].date);
+    ctx.fillText(d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }), px(0), H - 6);
+  } else {
+    for (let i = 0; i < labelCount; i++) {
+      const idx = Math.round((i / (labelCount - 1)) * (data.length - 1));
+      const d = new Date(data[idx].date);
+      const label = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+      ctx.fillText(label, px(idx), H - 6);
+    }
   }
 }
 
