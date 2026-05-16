@@ -60,9 +60,9 @@ export default async function handler(req, res) {
         }
 
         const lastClose = meta.regularMarketPrice || closes[closes.length - 1];
-        const prevClose = meta.chartPreviousClose || closes[closes.length - 2];
+        const prevClose = meta.chartPreviousClose || closes[closes.length - 2] || lastClose;
         const change = lastClose - prevClose;
-        const changePct = ((change / prevClose) * 100);
+        const changePct = prevClose ? ((change / prevClose) * 100) : 0;
 
         // Simple technical indicators
         const recentCloses = history.slice(-20).map(h => h.close).filter(Boolean);
@@ -133,7 +133,7 @@ Jawab HANYA JSON valid tanpa markdown:
   "sektorKuat": ["sektor terkuat 1", "sektor terkuat 2", "sektor terkuat 3"],
   "sektorLemah": ["sektor lemah 1", "sektor lemah 2"],
   "analisisTeknikal": "analisis teknikal 2 kalimat mencakup support/resistance dan momentum",
-  "analisisfundamental": "analisis fundamental makro 2 kalimat",
+  "analisisFundamental": "analisis fundamental makro 2 kalimat",
   "keunggulan": ["poin positif 1", "poin positif 2", "poin positif 3"],
   "risiko": ["risiko utama 1", "risiko utama 2", "risiko utama 3"],
   "katalis": ["katalis positif jangka pendek 1", "katalis positif 2", "katalis negatif yang perlu diwaspadai"],
