@@ -14,54 +14,62 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Kode saham tidak valid' });
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return res.status(500).json({ error: 'API key tidak dikonfigurasi di server' });
   }
 
   const isIndex = clean === 'IHSG' || clean === 'LQ45';
-  const today = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
   const prompt = isIndex
-    ? `Kamu adalah analis pasar modal Indonesia senior. Analisis kondisi ${clean} saat ini. Jawab HANYA JSON valid tanpa markdown:
+    ? `Kamu adalah analis pasar modal Indonesia senior. Analisis kondisi ${clean} saat ini. Jawab HANYA JSON valid tanpa markdown dan tanpa komentar apapun:
 {"namaLengkap":"${clean === 'IHSG' ? 'Indeks Harga Saham Gabungan' : 'Indeks LQ45'}","sektor":"Indeks Pasar","summary":"analisis kondisi pasar 3 kalimat informatif","sentiment":"BULLISH atau BEARISH atau NETRAL","rekomendasi":"strategi investasi konkret 2 kalimat","priceEst":"estimasi range nilai indeks","pe":"rata-rata P/E pasar","pbv":"rata-rata P/BV pasar","divYield":"rata-rata yield","beta":"1.0","keunggulan":["poin1","poin2","poin3"],"risiko":["risiko1","risiko2","risiko3"],"katalis":["katalis1","katalis2"]}`
-    : `Kamu adalah analis saham Indonesia senior. Analisis saham ${clean} di Bursa Efek Indonesia. Jawab HANYA JSON valid tanpa markdown:
+    : `Kamu adalah analis saham Indonesia senior. Analisis saham ${clean} di Bursa Efek Indonesia. Jawab HANYA JSON valid tanpa markdown dan tanpa komentar apapun:
 {"namaLengkap":"nama perusahaan lengkap","sektor":"sektor industri","summary":"analisis fundamental dan teknikal 3 kalimat","sentiment":"BELI atau TAHAN atau JUAL","rekomendasi":"rekomendasi aksi dan target harga 2 kalimat","priceEst":"estimasi harga wajar Rp","pe":"P/E ratio","pbv":"P/BV","divYield":"dividend yield %","beta":"estimasi beta","keunggulan":["keunggulan1","keunggulan2","keunggulan3"],"risiko":["risiko1","risiko2","risiko3"],"katalis":["katalis1","katalis2"]}`;
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+    const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1500,
-        messages: [{ role: 'user', content: prompt }]
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 1500
+        }
       })
     });
 
     if (!response.ok) {
       const errBody = await response.json().catch(() => ({}));
-      return res.status(502).json({ error: errBody.error?.message || `Claude API error ${response.status}` });
+      const errMsg = errBody.error?.message || `Gemini API error ${response.status}`;
+      return res.status(502).json({ error: errMsg });
     }
 
     const body = await response.json();
 
-    if (!body.content || !Array.isArray(body.content) || body.content.length === 0) {
-      console.error('Unexpected API response structure:', JSON.stringify(body));
-      return res.status(502).json({ error: 'Respons API tidak valid. Coba lagi dalam beberapa detik.' });
+    const candidate = body.candidates?.[0];
+    if (!candidate) {
+      return res.status(502).json({ error: 'Tidak ada respons dari Gemini. Coba lagi.' });
     }
 
-    const raw = body.content.map(c => c.text || '').join('').replace(/```json|```/g, '').trim();
+    const raw = candidate.content?.parts
+      ?.map(p => p.text || '')
+      .join('')
+      .replace(/```json|```/g, '')
+      .trim();
+
+    if (!raw) {
+      return res.status(502).json({ error: 'Respons Gemini kosong. Coba lagi.' });
+    }
 
     let parsed;
     try {
       parsed = JSON.parse(raw);
     } catch (parseErr) {
-      console.error('JSON parse error. Raw response:', raw);
+      console.error('JSON parse error. Raw:', raw);
       return res.status(502).json({ error: 'Format respons AI tidak valid. Coba lagi.' });
     }
 
