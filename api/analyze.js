@@ -28,7 +28,7 @@ export default async function handler(req, res) {
 {"namaLengkap":"nama perusahaan lengkap","sektor":"sektor industri","summary":"analisis fundamental dan teknikal 3 kalimat","sentiment":"BELI atau TAHAN atau JUAL","rekomendasi":"rekomendasi aksi dan target harga 2 kalimat","priceEst":"estimasi harga wajar Rp","pe":"P/E ratio","pbv":"P/BV","divYield":"dividend yield %","beta":"estimasi beta","keunggulan":["keunggulan1","keunggulan2","keunggulan3"],"risiko":["risiko1","risiko2","risiko3"],"katalis":["katalis1","katalis2"]}`;
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(url, {
       method: 'POST',
