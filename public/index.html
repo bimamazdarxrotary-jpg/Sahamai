@@ -3,140 +3,142 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SahamAI.id — Analis Saham Indonesia Berbasis AI</title>
-<meta name="description" content="Analisis saham IDX gratis berbasis kecerdasan buatan. Dapatkan rekomendasi BELI/TAHAN/JUAL instan.">
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<title>SahamAI — Analis Saham Indonesia</title>
+<meta name="description" content="Analisis saham IDX gratis berbasis AI. Dapatkan rekomendasi BELI/TAHAN/JUAL instan.">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
 :root {
-  --green: #1a6b47;
-  --green-light: #22a06b;
-  --green-pale: #e6f5ef;
-  --green-glow: rgba(34,160,107,0.12);
-  --gold: #c9913a;
-  --gold-pale: #fdf3e3;
-  --red: #c0392b;
-  --red-pale: #fdecea;
-  --bg: #0d1117;
-  --bg2: #161b22;
-  --bg3: #1c2230;
-  --border: rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.13);
-  --text: #e6edf3;
-  --text2: #8b949e;
-  --text3: #6e7681;
+  --g: #00c87a;
+  --g2: #00a362;
+  --gdim: rgba(0,200,122,0.1);
+  --gdim2: rgba(0,200,122,0.18);
+  --gold: #e2a354;
+  --red: #f05252;
+  --bg: #080c10;
+  --bg2: #0e1419;
+  --bg3: #141c24;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.11);
+  --text: #eaf0f6;
+  --text2: #7a8a99;
+  --text3: #4a5a68;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(34,160,107,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(34,160,107,0.025) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0}
+
+/* NOISE OVERLAY */
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.5}
+
+/* GRID BG */
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,black 30%,transparent 100%)}
 
 /* NAV */
-nav{position:sticky;top:0;z-index:100;background:rgba(13,17,23,0.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);padding:0 2rem;height:62px;display:flex;align-items:center;justify-content:space-between}
+nav{position:sticky;top:0;z-index:100;background:rgba(8,12,16,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between}
 .nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
-.nav-logo{width:36px;height:36px;background:linear-gradient(135deg,var(--green),var(--green-light));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:20px}
-.nav-title{font-family:'DM Serif Display',serif;font-size:19px;color:var(--text);letter-spacing:-0.3px}
-.nav-title span{color:var(--green-light)}
-.nav-right{display:flex;align-items:center;gap:10px}
-.nav-badge{font-size:11px;background:var(--green-pale);color:var(--green);padding:4px 11px;border-radius:20px;font-weight:600;letter-spacing:0.5px}
-.nav-link{font-size:13px;color:var(--text2);text-decoration:none;padding:6px 12px;border-radius:8px;transition:all 0.15s}
-.nav-link:hover{color:var(--text);background:var(--bg2)}
+.nav-logo{width:34px;height:34px;background:linear-gradient(135deg,var(--g2),var(--g));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 16px rgba(0,200,122,0.3)}
+.nav-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.5px}
+.nav-title span{color:var(--g)}
+.nav-badge{font-size:10px;background:var(--gdim);color:var(--g);padding:3px 10px;border-radius:20px;font-weight:700;letter-spacing:1px;border:1px solid rgba(0,200,122,0.2)}
 
 /* HERO */
-.hero{position:relative;z-index:1;text-align:center;padding:5rem 2rem 2.5rem;animation:fadeUp 0.6s ease both}
-.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--green-light);background:var(--green-glow);border:1px solid rgba(34,160,107,0.28);padding:5px 14px;border-radius:20px;margin-bottom:1.5rem;letter-spacing:1px;text-transform:uppercase;font-weight:500}
-.hero h1{font-family:'DM Serif Display',serif;font-size:clamp(2.2rem,5vw,3.8rem);line-height:1.15;letter-spacing:-1px;margin-bottom:1rem}
-.hero h1 em{font-style:italic;color:var(--green-light)}
-.hero-sub{font-size:1rem;color:var(--text2);max-width:520px;margin:0 auto 2.5rem;line-height:1.7;font-weight:300}
+.hero{position:relative;z-index:1;text-align:center;padding:5rem 1.5rem 3rem;animation:fadeUp 0.5s ease both}
+.hero-pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--g);background:var(--gdim);border:1px solid rgba(0,200,122,0.25);padding:5px 14px;border-radius:20px;margin-bottom:1.75rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:600}
+.pulse{width:6px;height:6px;background:var(--g);border-radius:50%;animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.7)}}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,6vw,3.8rem);font-weight:800;line-height:1.1;letter-spacing:-2px;margin-bottom:1rem}
+.hero h1 .accent{color:var(--g);position:relative;display:inline-block}
+.hero h1 .accent::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--g),transparent);border-radius:2px}
+.hero-sub{font-size:1rem;color:var(--text2);max-width:480px;margin:0 auto 2.5rem;line-height:1.75;font-weight:300}
 
 /* SEARCH */
-.search-container{position:relative;z-index:1;max-width:680px;margin:0 auto 1.25rem;padding:0 1.5rem;animation:fadeUp 0.7s ease both}
-.search-wrap{display:flex;background:var(--bg2);border:1px solid var(--border2);border-radius:14px;overflow:hidden;transition:border-color 0.2s,box-shadow 0.2s}
-.search-wrap:focus-within{border-color:var(--green-light);box-shadow:0 0 0 3px var(--green-glow)}
-.search-icon-wrap{display:flex;align-items:center;padding:0 1rem 0 1.25rem;color:var(--text3);font-size:20px;pointer-events:none}
-#stockInput{flex:1;background:transparent;border:none;outline:none;padding:1rem 0.5rem;font-size:1.05rem;font-family:'DM Sans',sans-serif;color:var(--text);font-weight:500;letter-spacing:1px;text-transform:uppercase}
-#stockInput::placeholder{text-transform:none;letter-spacing:0;font-weight:300;color:var(--text3)}
-#analyzeBtn{padding:0.8rem 1.5rem;margin:6px;background:linear-gradient(135deg,var(--green),var(--green-light));color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;transition:opacity 0.2s,transform 0.1s;white-space:nowrap}
-#analyzeBtn:hover{opacity:0.9;transform:scale(1.01)}
-#analyzeBtn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+.search-wrap{position:relative;z-index:1;max-width:620px;margin:0 auto 1rem;padding:0 1.5rem;animation:fadeUp 0.6s ease both}
+.search-box{display:flex;background:var(--bg2);border:1px solid var(--border2);border-radius:14px;overflow:hidden;transition:border-color 0.2s,box-shadow 0.2s}
+.search-box:focus-within{border-color:var(--g);box-shadow:0 0 0 3px var(--gdim)}
+.search-icon{display:flex;align-items:center;padding:0 1rem 0 1.25rem;color:var(--text3);font-size:18px;flex-shrink:0}
+#stockInput{flex:1;background:transparent;border:none;outline:none;padding:1rem 0.5rem;font-size:1rem;font-family:'Syne',sans-serif;color:var(--text);font-weight:600;letter-spacing:2px;text-transform:uppercase;min-width:0}
+#stockInput::placeholder{text-transform:none;letter-spacing:0;font-weight:300;font-family:'DM Sans',sans-serif;color:var(--text3);font-size:0.95rem}
+#analyzeBtn{padding:0.75rem 1.4rem;margin:6px;background:linear-gradient(135deg,var(--g2),var(--g));color:#000;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;transition:opacity 0.2s,transform 0.15s;white-space:nowrap;letter-spacing:0.5px}
+#analyzeBtn:hover{opacity:0.88;transform:scale(1.02)}
+#analyzeBtn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
 
 /* CHIPS */
-.chips-row{position:relative;z-index:1;display:flex;align-items:center;gap:8px;max-width:680px;margin:0 auto 3rem;padding:0 1.5rem;flex-wrap:wrap;animation:fadeUp 0.8s ease both}
-.chips-label{font-size:12px;color:var(--text3)}
-.chip{font-size:12px;padding:5px 14px;border:1px solid var(--border2);border-radius:20px;cursor:pointer;color:var(--text2);background:var(--bg2);transition:all 0.15s;font-weight:500;letter-spacing:0.5px}
-.chip:hover{background:var(--green-glow);border-color:var(--green-light);color:var(--green-light)}
+.chips{position:relative;z-index:1;display:flex;align-items:center;gap:7px;max-width:620px;margin:0 auto 3.5rem;padding:0 1.5rem;flex-wrap:wrap;animation:fadeUp 0.7s ease both}
+.chips-label{font-size:11px;color:var(--text3);font-weight:500;letter-spacing:0.5px}
+.chip{font-size:11px;padding:5px 13px;border:1px solid var(--border2);border-radius:20px;cursor:pointer;color:var(--text2);background:var(--bg2);transition:all 0.15s;font-weight:600;letter-spacing:1px;font-family:'Syne',sans-serif}
+.chip:hover,.chip.active{background:var(--gdim);border-color:var(--g);color:var(--g)}
 
 /* RESULTS */
-#resultsSection{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:0 1.5rem 5rem;display:none}
+#resultsSection{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:0 1.5rem 6rem;display:none}
 
 /* STOCK HEADER */
-.stock-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;animation:fadeUp 0.4s ease both}
-.stock-name-block h2{font-family:'DM Serif Display',serif;font-size:2.4rem;letter-spacing:-0.5px}
-.stock-name-block p{font-size:14px;color:var(--text2);margin-top:3px}
-.sentiment-badge{padding:9px 24px;border-radius:30px;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;flex-shrink:0;margin-top:4px}
-.badge-beli{background:var(--green-pale);color:var(--green);border:1px solid rgba(26,107,71,0.3)}
-.badge-tahan{background:var(--gold-pale);color:var(--gold);border:1px solid rgba(201,145,58,0.3)}
-.badge-jual{background:var(--red-pale);color:var(--red);border:1px solid rgba(192,57,43,0.3)}
+.stock-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;animation:fadeUp 0.3s ease both}
+.ticker-block h2{font-family:'Syne',sans-serif;font-size:2.6rem;font-weight:800;letter-spacing:-2px;line-height:1}
+.ticker-block p{font-size:13px;color:var(--text2);margin-top:6px}
+.badge{padding:8px 22px;border-radius:30px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;flex-shrink:0;margin-top:6px}
+.badge-beli{background:rgba(0,200,122,0.12);color:var(--g);border:1px solid rgba(0,200,122,0.3)}
+.badge-tahan{background:rgba(226,163,84,0.12);color:var(--gold);border:1px solid rgba(226,163,84,0.3)}
+.badge-jual{background:rgba(240,82,82,0.1);color:var(--red);border:1px solid rgba(240,82,82,0.3)}
 
 /* METRICS */
-.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:1.25rem;animation:fadeUp 0.5s ease both}
-.metric-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem;transition:border-color 0.2s}
-.metric-card:hover{border-color:var(--border2)}
-.metric-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
-.metric-value{font-family:'DM Serif Display',serif;font-size:1.55rem;color:var(--text);line-height:1;margin-bottom:4px}
-.metric-value.green{color:var(--green-light)}
-.metric-sub{font-size:12px;color:var(--text3)}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1rem;animation:fadeUp 0.35s ease both}
+.metric{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem;transition:border-color 0.2s,transform 0.2s}
+.metric:hover{border-color:var(--border2);transform:translateY(-2px)}
+.metric-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;font-weight:600}
+.metric-val{font-family:'Syne',sans-serif;font-size:1.45rem;font-weight:700;color:var(--text);line-height:1;margin-bottom:3px}
+.metric-val.green{color:var(--g)}
+.metric-sub{font-size:11px;color:var(--text3)}
 
 /* CARDS */
-.analysis-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:1.75rem;margin-bottom:1.25rem;animation:fadeUp 0.55s ease both}
-.card-header{display:flex;align-items:center;gap:10px;margin-bottom:1rem;font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px}
-.card-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
-.icon-green{background:var(--green-glow)}
-.icon-gold{background:rgba(201,145,58,0.12)}
-.icon-red{background:rgba(192,57,43,0.1)}
-.icon-gray{background:var(--bg3)}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.5rem;margin-bottom:1rem;animation:fadeUp 0.4s ease both}
+.card-hdr{display:flex;align-items:center;gap:9px;margin-bottom:1rem;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;font-family:'Syne',sans-serif}
+.card-icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.ci-green{background:var(--gdim)}
+.ci-gold{background:rgba(226,163,84,0.1)}
+.ci-red{background:rgba(240,82,82,0.08)}
+.ci-gray{background:var(--bg3)}
 
-.ai-summary{font-size:1rem;color:var(--text);line-height:1.85;font-weight:300}
-.rec-box{margin-top:1.25rem;padding:1.1rem 1.25rem;background:var(--green-glow);border:1px solid rgba(34,160,107,0.22);border-radius:10px}
-.rec-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--green);margin-bottom:6px}
-.rec-text{font-size:0.95rem;color:var(--green-light);line-height:1.75}
+.summary-text{font-size:0.95rem;color:var(--text);line-height:1.9;font-weight:300}
+.rec-box{margin-top:1.1rem;padding:1rem 1.2rem;background:var(--gdim);border:1px solid rgba(0,200,122,0.2);border-radius:10px}
+.rec-lbl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--g);margin-bottom:5px;font-family:'Syne',sans-serif}
+.rec-text{font-size:0.9rem;color:rgba(0,200,122,0.85);line-height:1.8}
 
 /* TWO COL */
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.25px}
-@media(max-width:580px){.two-col{grid-template-columns:1fr}}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+@media(max-width:560px){.two-col{grid-template-columns:1fr}}
 
 /* TAGS */
-.tag-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
-.tag{font-size:12px;padding:5px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text2);line-height:1.4}
-.tag.green{background:var(--green-glow);border-color:rgba(34,160,107,0.22);color:var(--green-light)}
-.tag.red{background:rgba(192,57,43,0.08);border-color:rgba(192,57,43,0.22);color:#e07070}
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+.tag{font-size:12px;padding:5px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text2);line-height:1.4}
+.tag.green{background:var(--gdim);border-color:rgba(0,200,122,0.2);color:var(--g)}
+.tag.red{background:rgba(240,82,82,0.07);border-color:rgba(240,82,82,0.2);color:#e07070}
 
 /* TABLE */
 .info-table{width:100%;border-collapse:collapse}
 .info-table tr{border-bottom:1px solid var(--border)}
 .info-table tr:last-child{border-bottom:none}
-.info-table td{padding:11px 0;font-size:13px}
+.info-table td{padding:10px 0;font-size:13px}
 .info-table td:first-child{color:var(--text2)}
 .info-table td:last-child{text-align:right;font-weight:500;color:var(--text)}
 
 /* SKELETON */
-.skeleton{background:linear-gradient(90deg,var(--bg2) 25%,var(--bg3) 50%,var(--bg2) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:6px}
+.sk{background:linear-gradient(90deg,var(--bg2) 25%,var(--bg3) 50%,var(--bg2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-.spin{animation:spin 1s linear infinite;display:inline-block}
+.spin{animation:spin 0.8s linear infinite;display:inline-block}
 
 /* TOAST */
-.toast{position:fixed;bottom:2rem;right:2rem;background:var(--bg2);border:1px solid var(--border2);padding:12px 20px;border-radius:10px;font-size:13px;color:var(--text);z-index:999;animation:fadeUp 0.3s ease;box-shadow:0 8px 32px rgba(0,0,0,0.5)}
-.toast.error{border-color:rgba(192,57,43,0.4);color:#e07070}
-.toast.success{border-color:rgba(34,160,107,0.4);color:var(--green-light)}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border2);padding:11px 20px;border-radius:10px;font-size:13px;color:var(--text);z-index:999;animation:fadeUp 0.3s ease;box-shadow:0 8px 32px rgba(0,0,0,0.6);white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+.toast.error{border-color:rgba(240,82,82,0.4);color:#e07070}
+.toast.ok{border-color:rgba(0,200,122,0.4);color:var(--g)}
 
 /* FOOTER */
-footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:2rem;text-align:center;color:var(--text3);font-size:12px;line-height:1.8}
-footer a{color:var(--text2);text-decoration:none}
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:2rem 1.5rem;text-align:center;color:var(--text3);font-size:12px;line-height:2}
 
-::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 </style>
 </head>
 <body>
@@ -146,29 +148,27 @@ footer a{color:var(--text2);text-decoration:none}
     <div class="nav-logo">📈</div>
     <span class="nav-title">Saham<span>AI</span></span>
   </a>
-  <div class="nav-right">
-    <span class="nav-badge">GRATIS</span>
-  </div>
+  <span class="nav-badge">GRATIS</span>
 </nav>
 
 <section class="hero">
-  <div class="hero-eyebrow">✦ Powered by Claude AI</div>
-  <h1>Analisis Saham <em>Indonesia</em><br>dengan Kecerdasan Buatan</h1>
-  <p class="hero-sub">Dapatkan analisis fundamental, teknikal, dan rekomendasi investasi cerdas untuk saham di Bursa Efek Indonesia — gratis, instan, dan mudah dipahami.</p>
+  <div class="hero-pill"><div class="pulse"></div> Powered by AI</div>
+  <h1>Analisis Saham <span class="accent">Indonesia</span><br>Berbasis Kecerdasan Buatan</h1>
+  <p class="hero-sub">Dapatkan analisis fundamental, teknikal, dan rekomendasi investasi untuk saham di Bursa Efek Indonesia — gratis, instan, mudah dipahami.</p>
 </section>
 
-<div class="search-container">
-  <div class="search-wrap">
-    <div class="search-icon-wrap">🔍</div>
+<div class="search-wrap">
+  <div class="search-box">
+    <div class="search-icon">🔍</div>
     <input type="text" id="stockInput" placeholder="Ketik kode saham: BBCA, TLKM, GOTO..." maxlength="10"
-      onkeydown="if(event.key==='Enter') analyzeStock()" />
+      onkeydown="if(event.key==='Enter') analyzeStock()" autocomplete="off" autocorrect="off" spellcheck="false" />
     <button id="analyzeBtn" onclick="analyzeStock()">
       <span id="btnIcon">✦</span> Analisis
     </button>
   </div>
 </div>
 
-<div class="chips-row">
+<div class="chips">
   <span class="chips-label">Populer:</span>
   <span class="chip" onclick="quickAnalyze('BBCA')">BBCA</span>
   <span class="chip" onclick="quickAnalyze('TLKM')">TLKM</span>
@@ -186,12 +186,13 @@ footer a{color:var(--text2);text-decoration:none}
 
 <footer>
   <p>⚠️ Konten ini hanya untuk tujuan edukasi. Bukan saran investasi resmi.</p>
-  <p style="margin-top:6px">Selalu lakukan riset mandiri sebelum berinvestasi · SahamAI © 2025</p>
+  <p>Selalu lakukan riset mandiri sebelum berinvestasi · SahamAI © 2025</p>
 </footer>
 
 <script>
 async function analyzeStock() {
-  const ticker = document.getElementById('stockInput').value.trim().toUpperCase();
+  const input = document.getElementById('stockInput');
+  const ticker = input.value.trim().toUpperCase();
   if (!ticker) { showToast('Masukkan kode saham terlebih dahulu', 'error'); return; }
 
   const btn = document.getElementById('analyzeBtn');
@@ -199,6 +200,11 @@ async function analyzeStock() {
   btn.disabled = true;
   icon.className = 'spin';
   icon.textContent = '↻';
+
+  // highlight active chip
+  document.querySelectorAll('.chip').forEach(c => {
+    c.classList.toggle('active', c.textContent === ticker);
+  });
 
   const section = document.getElementById('resultsSection');
   const content = document.getElementById('resultsContent');
@@ -212,19 +218,24 @@ async function analyzeStock() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ticker })
     });
+
+    const responseData = await res.json();
+
     if (!res.ok) {
-      const e = await res.json().catch(() => ({}));
-      throw new Error(e.error || `HTTP ${res.status}`);
+      throw new Error(responseData.error || `HTTP ${res.status}`);
     }
-    const data = await res.json();
-    content.innerHTML = buildResult(ticker, data);
-  } catch (e) {
-    content.innerHTML = `<div style="text-align:center;padding:3rem 1rem;color:#e07070">
-      <div style="font-size:2.5rem;margin-bottom:1rem">⚠️</div>
-      <p style="font-size:1rem;margin-bottom:6px">Gagal menganalisis saham</p>
-      <p style="font-size:13px;color:var(--text3)">${e.message}</p>
-    </div>`;
-    showToast('Error: ' + e.message, 'error');
+
+    content.innerHTML = buildResult(ticker, responseData);
+    showToast('Analisis selesai ✓', 'ok');
+
+  } catch (err) {
+    content.innerHTML = `
+      <div style="text-align:center;padding:4rem 1rem">
+        <div style="font-size:3rem;margin-bottom:1rem">⚠️</div>
+        <p style="font-size:1rem;color:#e07070;margin-bottom:8px;font-family:'Syne',sans-serif;font-weight:700">Gagal menganalisis saham</p>
+        <p style="font-size:13px;color:var(--text3)">${err.message}</p>
+      </div>`;
+    showToast('Error: ' + err.message, 'error');
   }
 
   btn.disabled = false;
@@ -238,6 +249,8 @@ function quickAnalyze(code) {
 }
 
 function showToast(msg, type = '') {
+  // remove existing toasts
+  document.querySelectorAll('.toast').forEach(t => t.remove());
   const t = document.createElement('div');
   t.className = 'toast ' + type;
   t.textContent = msg;
@@ -245,91 +258,95 @@ function showToast(msg, type = '') {
   setTimeout(() => t.remove(), 3500);
 }
 
-function getSentClass(s) {
-  if (s === 'BELI' || s === 'BULLISH') return 'badge-beli';
-  if (s === 'JUAL' || s === 'BEARISH') return 'badge-jual';
+function getBadgeClass(s) {
+  if (!s) return 'badge-tahan';
+  const u = s.toUpperCase();
+  if (u === 'BELI' || u === 'BULLISH') return 'badge-beli';
+  if (u === 'JUAL' || u === 'BEARISH') return 'badge-jual';
   return 'badge-tahan';
 }
 
+function safe(val, fallback = '—') {
+  return (val !== undefined && val !== null && val !== '') ? val : fallback;
+}
+
+function safeArr(arr) {
+  return Array.isArray(arr) ? arr : [];
+}
+
 function buildResult(ticker, d) {
+  const sentiment = safe(d.sentiment, 'TAHAN');
+  const today = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
   return `
   <div class="stock-header">
-    <div class="stock-name-block">
+    <div class="ticker-block">
       <h2>${ticker}</h2>
-      <p>
-  <b>Harga:</b>
-  ${data.currentPrice}
-</p>
-
-<p>
-  <b>Perubahan:</b>
-  ${data.change}%
-</p>
-      <p>${d.namaLengkap || ''} &nbsp;·&nbsp; ${d.sektor || ''}</p>
+      <p>${safe(d.namaLengkap)} &nbsp;·&nbsp; ${safe(d.sektor)}</p>
     </div>
-    <span class="sentiment-badge ${getSentClass(d.sentiment)}">${d.sentiment}</span>
+    <span class="badge ${getBadgeClass(sentiment)}">${sentiment}</span>
   </div>
 
-  <div class="metrics-grid">
-    <div class="metric-card">
-      <div class="metric-label">Harga Wajar</div>
-      <div class="metric-value green">${d.priceEst || '—'}</div>
+  <div class="metrics">
+    <div class="metric">
+      <div class="metric-lbl">Harga Wajar</div>
+      <div class="metric-val green">${safe(d.priceEst)}</div>
       <div class="metric-sub">Estimasi AI</div>
     </div>
-    <div class="metric-card">
-      <div class="metric-label">P/E Ratio</div>
-      <div class="metric-value">${d.pe || '—'}</div>
+    <div class="metric">
+      <div class="metric-lbl">P/E Ratio</div>
+      <div class="metric-val">${safe(d.pe)}</div>
       <div class="metric-sub">Price to Earnings</div>
     </div>
-    <div class="metric-card">
-      <div class="metric-label">P/BV</div>
-      <div class="metric-value">${d.pbv || '—'}</div>
+    <div class="metric">
+      <div class="metric-lbl">P/BV</div>
+      <div class="metric-val">${safe(d.pbv)}</div>
       <div class="metric-sub">Price to Book Value</div>
     </div>
-    <div class="metric-card">
-      <div class="metric-label">Div. Yield</div>
-      <div class="metric-value">${d.divYield || '—'}</div>
+    <div class="metric">
+      <div class="metric-lbl">Div. Yield</div>
+      <div class="metric-val">${safe(d.divYield)}</div>
       <div class="metric-sub">Dividend Yield</div>
     </div>
-    <div class="metric-card">
-      <div class="metric-label">Beta</div>
-      <div class="metric-value">${d.beta || '—'}</div>
-      <div class="metric-sub">Volatilitas relatif</div>
+    <div class="metric">
+      <div class="metric-lbl">Beta</div>
+      <div class="metric-val">${safe(d.beta)}</div>
+      <div class="metric-sub">Volatilitas Relatif</div>
     </div>
   </div>
 
-  <div class="analysis-card">
-    <div class="card-header"><div class="card-icon icon-green">🤖</div> Analisis AI</div>
-    <div class="ai-summary">${d.summary || ''}</div>
+  <div class="card">
+    <div class="card-hdr"><div class="card-icon ci-green">🤖</div> Analisis AI</div>
+    <div class="summary-text">${safe(d.summary)}</div>
     <div class="rec-box">
-      <div class="rec-label">Rekomendasi</div>
-      <div class="rec-text">${d.rekomendasi || ''}</div>
+      <div class="rec-lbl">Rekomendasi</div>
+      <div class="rec-text">${safe(d.rekomendasi)}</div>
     </div>
   </div>
 
   <div class="two-col">
-    <div class="analysis-card" style="margin-bottom:0">
-      <div class="card-header"><div class="card-icon icon-green">✅</div> Keunggulan</div>
-      <div class="tag-list">${(d.keunggulan||[]).map(k=>`<span class="tag green">${k}</span>`).join('')}</div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-hdr"><div class="card-icon ci-green">✅</div> Keunggulan</div>
+      <div class="tags">${safeArr(d.keunggulan).map(k => `<span class="tag green">${k}</span>`).join('')}</div>
     </div>
-    <div class="analysis-card" style="margin-bottom:0">
-      <div class="card-header"><div class="card-icon icon-red">⚠️</div> Risiko</div>
-      <div class="tag-list">${(d.risiko||[]).map(r=>`<span class="tag red">${r}</span>`).join('')}</div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-hdr"><div class="card-icon ci-red">⚠️</div> Risiko</div>
+      <div class="tags">${safeArr(d.risiko).map(r => `<span class="tag red">${r}</span>`).join('')}</div>
     </div>
   </div>
 
-  <div class="analysis-card" style="margin-top:1.25rem">
-    <div class="card-header"><div class="card-icon icon-gold">🚀</div> Katalis Positif</div>
-    <div class="tag-list">${(d.katalis||[]).map(k=>`<span class="tag">${k}</span>`).join('')}</div>
+  <div class="card" style="margin-top:1rem">
+    <div class="card-hdr"><div class="card-icon ci-gold">🚀</div> Katalis Positif</div>
+    <div class="tags">${safeArr(d.katalis).map(k => `<span class="tag">${k}</span>`).join('')}</div>
   </div>
 
-  <div class="analysis-card">
-    <div class="card-header"><div class="card-icon icon-gray">📋</div> Informasi</div>
+  <div class="card">
+    <div class="card-hdr"><div class="card-icon ci-gray">📋</div> Informasi</div>
     <table class="info-table">
-      <tr><td>Kode Saham</td><td>${ticker}${ticker!=='IHSG'&&ticker!=='LQ45'?'.JK':''}</td></tr>
-      <tr><td>Sektor</td><td>${d.sektor||'—'}</td></tr>
+      <tr><td>Kode Saham</td><td>${ticker}${ticker !== 'IHSG' && ticker !== 'LQ45' ? '.JK' : ''}</td></tr>
+      <tr><td>Sektor</td><td>${safe(d.sektor)}</td></tr>
       <tr><td>Bursa</td><td>IDX / Bursa Efek Indonesia</td></tr>
-      <tr><td>Dianalisis pada</td><td>${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</td></tr>
+      <tr><td>Dianalisis pada</td><td>${today}</td></tr>
     </table>
   </div>`;
 }
@@ -337,18 +354,26 @@ function buildResult(ticker, d) {
 function buildSkeleton() {
   return `
   <div class="stock-header">
-    <div><div class="skeleton" style="height:2.4rem;width:130px;margin-bottom:10px"></div><div class="skeleton" style="height:13px;width:230px"></div></div>
-    <div class="skeleton" style="height:38px;width:110px;border-radius:20px"></div>
+    <div>
+      <div class="sk" style="height:2.6rem;width:140px;margin-bottom:10px"></div>
+      <div class="sk" style="height:13px;width:220px"></div>
+    </div>
+    <div class="sk" style="height:36px;width:100px;border-radius:20px"></div>
   </div>
-  <div class="metrics-grid">
-    ${[1,2,3,4,5].map(()=>`<div class="metric-card"><div class="skeleton" style="height:11px;width:60%;margin-bottom:10px"></div><div class="skeleton" style="height:1.55rem;width:80%;margin-bottom:6px"></div><div class="skeleton" style="height:11px;width:50%"></div></div>`).join('')}
+  <div class="metrics">
+    ${[1,2,3,4,5].map(() => `
+    <div class="metric">
+      <div class="sk" style="height:10px;width:60%;margin-bottom:10px"></div>
+      <div class="sk" style="height:1.45rem;width:75%;margin-bottom:6px"></div>
+      <div class="sk" style="height:10px;width:50%"></div>
+    </div>`).join('')}
   </div>
-  <div class="analysis-card">
-    <div class="skeleton" style="height:12px;width:90px;margin-bottom:16px"></div>
-    <div class="skeleton" style="height:14px;width:100%;margin-bottom:8px"></div>
-    <div class="skeleton" style="height:14px;width:92%;margin-bottom:8px"></div>
-    <div class="skeleton" style="height:14px;width:78%;margin-bottom:20px"></div>
-    <div class="skeleton" style="height:70px;border-radius:10px"></div>
+  <div class="card">
+    <div class="sk" style="height:11px;width:80px;margin-bottom:16px"></div>
+    <div class="sk" style="height:14px;width:100%;margin-bottom:8px"></div>
+    <div class="sk" style="height:14px;width:90%;margin-bottom:8px"></div>
+    <div class="sk" style="height:14px;width:75%;margin-bottom:20px"></div>
+    <div class="sk" style="height:65px;border-radius:10px"></div>
   </div>`;
 }
 </script>
