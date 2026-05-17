@@ -228,13 +228,55 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:2r
 .bandar-text{font-size:0.88rem;color:rgba(88,166,255,0.85);line-height:1.7}
 .sector-ctx-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem;margin-bottom:1rem;animation:fadeUp 0.43s ease both}
 
+
+/* SCANNER */
+.nav-scanner-btn{font-size:11px;padding:6px 14px;background:var(--gdim);border:1px solid rgba(0,200,122,0.3);border-radius:20px;color:var(--g);cursor:pointer;font-weight:700;font-family:'Syne',sans-serif;letter-spacing:1px;transition:all 0.15s;text-decoration:none}
+.nav-scanner-btn:hover{background:rgba(0,200,122,0.2)}
+.nav-scanner-btn.active{background:var(--g);color:#000}
+#scannerSection{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:0 1.5rem 6rem;display:none}
+.scanner-hdr{margin-bottom:1.5rem}
+.scanner-title{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:-1px;margin-bottom:0.4rem}
+.scanner-sub{font-size:13px;color:var(--text3)}
+.scanner-filters{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:1.5rem}
+.sf-btn{font-size:11px;padding:6px 14px;border-radius:20px;cursor:pointer;color:var(--text2);background:var(--bg2);border:1px solid var(--border2);font-family:'Syne',sans-serif;font-weight:700;letter-spacing:0.5px;transition:all 0.15s}
+.sf-btn:hover{border-color:var(--g);color:var(--g)}
+.sf-btn.active{background:var(--gdim);border-color:var(--g);color:var(--g)}
+.scanner-run-btn{padding:8px 24px;background:linear-gradient(135deg,var(--g2),var(--g));color:#000;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;transition:opacity 0.2s;letter-spacing:0.5px}
+.scanner-run-btn:hover{opacity:0.85}
+.scanner-run-btn:disabled{opacity:0.4;cursor:not-allowed}
+.scanner-results-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.scanner-count{font-size:12px;color:var(--text3)}
+.scanner-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.sc-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.1rem;cursor:pointer;transition:all 0.15s;border-left:3px solid transparent}
+.sc-card:hover{border-color:var(--g);transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,200,122,0.1)}
+.sc-card.high{border-left-color:var(--g)}
+.sc-card.medium{border-left-color:var(--gold)}
+.sc-card.short{border-left-color:var(--red)}
+.sc-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.6rem}
+.sc-ticker{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:-0.5px}
+.sc-score{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800}
+.sc-name{font-size:11px;color:var(--text3);margin-bottom:0.6rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc-price-row{display:flex;align-items:center;gap:8px;margin-bottom:0.7rem}
+.sc-price{font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700}
+.sc-chg{font-size:11px;font-weight:600}
+.sc-chg.up{color:var(--g)}.sc-chg.down{color:var(--red)}
+.sc-signals{display:flex;flex-wrap:wrap;gap:4px}
+.sc-sig{font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700;font-family:'Syne',sans-serif}
+.sc-sig.high{background:var(--gdim);border:1px solid rgba(0,200,122,0.3);color:var(--g)}
+.sc-sig.medium{background:rgba(226,163,84,0.08);border:1px solid rgba(226,163,84,0.3);color:var(--gold)}
+.sc-sig.short{background:rgba(240,82,82,0.08);border:1px solid rgba(240,82,82,0.3);color:var(--red)}
+.scanner-empty{text-align:center;padding:3rem;color:var(--text3);font-size:14px}
+.scanner-loading{text-align:center;padding:3rem}
+.progress-bar{width:100%;height:3px;background:var(--bg3);border-radius:2px;margin-top:1rem;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--g2),var(--g));border-radius:2px;transition:width 0.3s ease;width:0%}
+
 </style>
 </head>
 <body>
 
 <nav>
   <a class="nav-brand" href="/"><div class="nav-logo">📈</div><span class="nav-title">Saham<span>AI</span></span></a>
-  <span class="nav-badge">IHSG INTELLIGENCE</span>
+  <div style="display:flex;align-items:center;gap:10px"><span class="nav-scanner-btn" id="navScannerBtn" onclick="toggleScanner()">⚡ Scanner</span><span class="nav-badge">IHSG INTELLIGENCE</span></div>
 </nav>
 
 <section class="hero">
@@ -273,6 +315,31 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:2r
 </div>
 <section id="resultsSection">
   <div id="resultsContent"></div>
+</section>
+
+
+<section id="scannerSection">
+  <div class="scanner-hdr">
+    <div class="scanner-title">⚡ Scanner Saham IHSG</div>
+    <div class="scanner-sub">Scan <span id="scanUniverse">50+</span> saham likuid IHSG — deteksi setup secara real-time</div>
+  </div>
+  <div class="scanner-filters">
+    <span class="chips-label">Filter:</span>
+    <button class="sf-btn active" data-filter="all" onclick="setScanFilter(this,'all')">Semua Setup</button>
+    <button class="sf-btn" data-filter="breakout" onclick="setScanFilter(this,'breakout')">🚀 Breakout</button>
+    <button class="sf-btn" data-filter="volume_spike" onclick="setScanFilter(this,'volume_spike')">📊 Volume Spike</button>
+    <button class="sf-btn" data-filter="oversold" onclick="setScanFilter(this,'oversold')">🔻 Oversold</button>
+    <button class="sf-btn" data-filter="golden_cross" onclick="setScanFilter(this,'golden_cross')">✨ Golden Cross</button>
+    <button class="sf-btn" data-filter="accumulation" onclick="setScanFilter(this,'accumulation')">📦 Akumulasi</button>
+    <button class="sf-btn" data-filter="death_cross" onclick="setScanFilter(this,'death_cross')">💀 Death Cross</button>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;flex-wrap:wrap">
+    <button class="scanner-run-btn" id="scanRunBtn" onclick="runScanner()">
+      <span id="scanBtnIcon">⚡</span> Mulai Scan
+    </button>
+    <span style="font-size:12px;color:var(--text3)" id="scanLastRun"></span>
+  </div>
+  <div id="scannerResults"></div>
 </section>
 
 <footer>
@@ -910,6 +977,166 @@ function renderWatchlist() {
   }).join('');
 }
 document.addEventListener('DOMContentLoaded', renderWatchlist);
+
+// ── SCANNER ────────────────────────────────────────────────────────
+var currentScanFilter = 'all';
+var scannerVisible    = false;
+
+function toggleScanner() {
+  scannerVisible = !scannerVisible;
+  var scanSec  = document.getElementById('scannerSection');
+  var resSec   = document.getElementById('resultsSection');
+  var wlBar    = document.getElementById('watchlistBar');
+  var heroSec  = document.querySelector('.hero');
+  var searchSec = document.querySelector('.search-wrap');
+  var chipsSec  = document.querySelector('.chips');
+  var btn       = document.getElementById('navScannerBtn');
+
+  if (scannerVisible) {
+    scanSec.style.display   = 'block';
+    resSec.style.display    = 'none';
+    if (wlBar) wlBar.style.display = 'none';
+    if (heroSec) heroSec.style.display = 'none';
+    if (searchSec) searchSec.style.display = 'none';
+    if (chipsSec) chipsSec.style.display = 'none';
+    btn.classList.add('active');
+    btn.textContent = '✕ Tutup';
+    scanSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else {
+    scanSec.style.display   = 'none';
+    if (heroSec) heroSec.style.display = '';
+    if (searchSec) searchSec.style.display = '';
+    if (chipsSec) chipsSec.style.display = '';
+    renderWatchlist();
+    btn.classList.remove('active');
+    btn.textContent = '⚡ Scanner';
+  }
+}
+
+function setScanFilter(el, filter) {
+  currentScanFilter = filter;
+  document.querySelectorAll('.sf-btn').forEach(function(b) { b.classList.remove('active'); });
+  el.classList.add('active');
+}
+
+async function runScanner() {
+  var btn  = document.getElementById('scanRunBtn');
+  var icon = document.getElementById('scanBtnIcon');
+  var res  = document.getElementById('scannerResults');
+
+  btn.disabled  = true;
+  icon.className = 'spin';
+  icon.textContent = '↻';
+
+  res.innerHTML = '<div class="scanner-loading">' +
+    '<div style="font-size:14px;color:var(--text2);margin-bottom:1rem">Scanning saham IHSG...</div>' +
+    '<div style="font-size:12px;color:var(--text3);margin-bottom:1rem">Mengambil data ' + (currentScanFilter === 'all' ? 'semua setup' : currentScanFilter.replace('_',' ')) + '</div>' +
+    '<div class="progress-bar"><div class="progress-fill" id="scanProgress"></div></div>' +
+    '</div>';
+
+  // Animate progress bar
+  var prog = document.getElementById('scanProgress');
+  var pct  = 0;
+  var progInterval = setInterval(function() {
+    pct = Math.min(pct + 2, 90);
+    if (prog) prog.style.width = pct + '%';
+  }, 300);
+
+  try {
+    var response = await fetch('/api/scanner', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filter: currentScanFilter })
+    });
+
+    clearInterval(progInterval);
+    if (prog) prog.style.width = '100%';
+
+    if (!response.ok) {
+      var err = await response.json().catch(function() { return {}; });
+      throw new Error(err.error || 'Scanner gagal');
+    }
+
+    var data = await response.json();
+    renderScanResults(data);
+
+    var lastRun = document.getElementById('scanLastRun');
+    if (lastRun) {
+      var now = new Date();
+      lastRun.textContent = (data.fromCache ? '⚡ Cache — ' : '✅ ') +
+        'Scan selesai · ' + data.total + ' setup ditemukan dari ' + data.universe + ' saham · ' +
+        now.toLocaleTimeString('id-ID');
+    }
+  } catch (e) {
+    clearInterval(progInterval);
+    res.innerHTML = '<div class="scanner-empty">❌ ' + esc(e.message) + '<br><span style="font-size:12px;color:var(--text3);margin-top:8px;display:block">Coba lagi beberapa saat.</span></div>';
+    showToast(e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    icon.className = '';
+    icon.textContent = '⚡';
+  }
+}
+
+function renderScanResults(data) {
+  var res = document.getElementById('scannerResults');
+  if (!res) return;
+
+  if (!data.results || !data.results.length) {
+    res.innerHTML = '<div class="scanner-empty">🔍 Tidak ada setup terdeteksi untuk filter ini.<br>' +
+      '<span style="font-size:12px;color:var(--text3);margin-top:8px;display:block">Coba filter "Semua Setup" atau scan ulang.</span></div>';
+    return;
+  }
+
+  var hdr = '<div class="scanner-results-hdr">' +
+    '<span style="font-size:13px;font-weight:700;font-family:Syne,sans-serif">' + data.results.length + ' Setup Ditemukan</span>' +
+    '<span class="scanner-count">dari ' + data.universe + ' saham</span>' +
+    '</div>';
+
+  var cards = data.results.map(function(item) {
+    var topStrength = item.topSignal ? item.topSignal.strength : 'medium';
+    var cardClass   = topStrength === 'high' ? 'high' : item.topSignal && item.topSignal.direction === 'short' ? 'short' : 'medium';
+    var scoreColor  = item.score >= 7 ? 'var(--g)' : item.score >= 5 ? 'var(--gold)' : 'var(--red)';
+
+    var sigBadges = item.signals.slice(0, 3).map(function(s) {
+      var sigClass = s.strength === 'high' ? 'high' : s.direction === 'short' ? 'short' : 'medium';
+      var icon = s.type==='breakout'?'🚀':s.type==='volume_spike'?'📊':s.type==='oversold'?'🔻':
+                 s.type==='golden_cross'?'✨':s.type==='accumulation'?'📦':s.type==='death_cross'?'💀':'⚡';
+      return '<span class="sc-sig ' + sigClass + '">' + icon + ' ' + esc(s.label) + '</span>';
+    }).join('');
+
+    return '<div class="sc-card ' + cardClass + '" onclick="analyzeFromScanner('' + item.ticker + '')">' +
+      '<div class="sc-card-top">' +
+        '<div>' +
+          '<div class="sc-ticker">' + esc(item.ticker) + '</div>' +
+          '<div style="font-size:10px;color:var(--text3);margin-top:2px">' + esc(item.sector || '') + '</div>' +
+        '</div>' +
+        '<div style="text-align:right">' +
+          '<div class="sc-score" style="color:' + scoreColor + '">' + item.score + '/10</div>' +
+          '<div style="font-size:10px;color:var(--text3)">' + esc(item.recommendation || '') + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="sc-name">' + esc(item.name || item.ticker) + '</div>' +
+      '<div class="sc-price-row">' +
+        '<span class="sc-price">Rp ' + (item.lastClose ? item.lastClose.toLocaleString('id-ID') : 'N/A') + '</span>' +
+        '<span class="sc-chg ' + (item.isUp ? 'up' : 'down') + '">' +
+          (item.isUp ? '+' : '') + (item.changePct || 0) + '%' +
+        '</span>' +
+        (item.rsi != null ? '<span style="font-size:10px;color:var(--text3);margin-left:4px">RSI ' + item.rsi + '</span>' : '') +
+      '</div>' +
+      '<div class="sc-signals">' + sigBadges + '</div>' +
+    '</div>';
+  }).join('');
+
+  res.innerHTML = hdr + '<div class="scanner-grid">' + cards + '</div>';
+}
+
+function analyzeFromScanner(ticker) {
+  toggleScanner();
+  document.getElementById('stockInput').value = ticker;
+  setTimeout(function() { analyzeStock(); }, 100);
+}
+
 </script>
 </body>
 </html>
