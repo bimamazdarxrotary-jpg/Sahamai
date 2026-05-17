@@ -2,21 +2,23 @@
 // api/analyze.js — Main Handler (CommonJS)
 // ══════════════════════════════════════════════════════════════════
 
-const { validateTicker, validateAIOutput } = require('../lib/validation');
-const { computeAll }                        = require('../lib/indicators');
-const { analyzeVolume }                     = require('../lib/volume');
-const { analyzeStructure }                  = require('../lib/structure');
-const { computeScore }                      = require('../lib/scoring');
-const { callAI }                            = require('../lib/ai');
-const { cacheGet, cacheSet, TTL }           = require('../lib/cache');
+var { validateTicker, validateAIOutput } = require('../lib/validation');
+var { computeAll }                        = require('../lib/indicators');
+var { analyzeVolume }                     = require('../lib/volume');
+var { analyzeStructure }                  = require('../lib/structure');
+var { computeScore }                      = require('../lib/scoring');
+var { callAI }                            = require('../lib/ai');
+var { cacheGet, cacheSet, TTL }           = require('../lib/cache');
+var { analyzeMarketContext }              = require('../lib/context');
+var { quickScan }                         = require('../lib/scanner');
 
 // ── Rate Limiting ──────────────────────────────────────────────────
-const rateLimitMap = new Map();
+var rateLimitMap = new Map();
 function isRateLimited(ip) {
-  const now    = Date.now();
-  const window = 60 * 1000;
-  const max    = 10;
-  const hits   = (rateLimitMap.get(ip) || []).filter(t => now - t < window);
+  var now    = Date.now();
+  var window = 60 * 1000;
+  var max    = 10;
+  var hits   = (rateLimitMap.get(ip) || []).filter(function(t) { return now - t < window; });
   hits.push(now);
   rateLimitMap.set(ip, hits);
   return hits.length > max;
@@ -24,17 +26,17 @@ function isRateLimited(ip) {
 
 // ── Fetch harga dari Yahoo Finance ─────────────────────────────────
 async function fetchPriceData(ticker, isIndex) {
-  const cacheKey = `price:${ticker}`;
-  const cached   = cacheGet(cacheKey);
+  var cacheKey = 'price:' + ticker;
+  var cached   = cacheGet(cacheKey);
   if (cached) return cached;
 
-  const symbol = isIndex
+  var symbol = isIndex
     ? (ticker === 'IHSG' ? '%5EJKSE' : '%5EJKLQ45')
-    : `${ticker}.JK`;
+    : ticker + '.JK';
 
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=6mo`;
+  var url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + symbol + '?interval=1d&range=6mo';
 
-  let res;
+  var res;
   try {
     res = await fetch(url, {
       headers: {
@@ -52,30 +54,34 @@ async function fetchPriceData(ticker, isIndex) {
     return null;
   }
 
-  let json;
+  var json;
   try { json = await res.json(); }
   catch (e) { console.error('[YAHOO JSON PARSE]', e.message); return null; }
 
-  const result     = json?.chart?.result?.[0];
-  const meta       = result?.meta;
-  const quotes     = result?.indicators?.quote?.[0];
-  const timestamps = result?.timestamp;
+  var result     = json && json.chart && json.chart.result && json.chart.result[0];
+  var meta       = result && result.meta;
+  var quotes     = result && result.indicators && result.indicators.quote && result.indicators.quote[0];
+  var timestamps = result && result.timestamp;
 
   if (!meta || !quotes || !timestamps) {
     console.error('[YAHOO NO DATA]', ticker);
     return null;
   }
 
-  const { close: closes, high: highs, low: lows, open: opens, volume: volumes } = quotes;
+  var closes  = quotes.close;
+  var highs   = quotes.high;
+  var lows    = quotes.low;
+  var opens   = quotes.open;
+  var volumes = quotes.volume;
 
-  const candles = [];
-  for (let i = 0; i < timestamps.length; i++) {
+  var candles = [];
+  for (var i = 0; i < timestamps.length; i++) {
     if (closes[i] == null) continue;
     candles.push({
       date:   new Date(timestamps[i] * 1000).toISOString().split('T')[0],
-      open:   Math.round(opens?.[i]  || closes[i]),
-      high:   Math.round(highs[i]    || closes[i]),
-      low:    Math.round(lows[i]     || closes[i]),
+      open:   Math.round(opens && opens[i] ? opens[i] : closes[i]),
+      high:   Math.round(highs[i] || closes[i]),
+      low:    Math.round(lows[i]  || closes[i]),
       close:  Math.round(closes[i]),
       volume: volumes[i] || 0
     });
@@ -83,23 +89,23 @@ async function fetchPriceData(ticker, isIndex) {
 
   if (!candles.length) return null;
 
-  const lastClose = meta.regularMarketPrice || candles[candles.length - 1].close;
-  const prevClose = meta.chartPreviousClose  || candles[candles.length - 2]?.close || lastClose;
-  const change    = lastClose - prevClose;
-  const changePct = prevClose ? parseFloat((change / prevClose * 100).toFixed(2)) : 0;
+  var lastClose = meta.regularMarketPrice || candles[candles.length - 1].close;
+  var prevClose = meta.chartPreviousClose  || (candles[candles.length - 2] && candles[candles.length - 2].close) || lastClose;
+  var change    = lastClose - prevClose;
+  var changePct = prevClose ? parseFloat((change / prevClose * 100).toFixed(2)) : 0;
 
-  const priceData = {
+  var priceData = {
     current:   Math.round(lastClose),
     prevClose: Math.round(prevClose),
     change:    Math.round(change),
-    changePct,
+    changePct: changePct,
     isUp:      change >= 0,
     high52w:   meta.fiftyTwoWeekHigh ? Math.round(meta.fiftyTwoWeekHigh) : null,
     low52w:    meta.fiftyTwoWeekLow  ? Math.round(meta.fiftyTwoWeekLow)  : null,
     volume:    meta.regularMarketVolume || candles[candles.length - 1].volume || null,
     marketCap: meta.marketCap || null,
     currency:  meta.currency  || 'IDR',
-    candles,
+    candles:   candles,
     history:   candles.slice(-60)
   };
 
@@ -110,21 +116,30 @@ async function fetchPriceData(ticker, isIndex) {
 // ── Build price context ─────────────────────────────────────────────
 function buildPriceContext(priceData) {
   if (!priceData) return 'Data harga real-time tidak tersedia.';
-  const { current, changePct, isUp, high52w, low52w, volume, marketCap, currency } = priceData;
-  const pct52wHigh = high52w ? ((high52w - current) / high52w * 100).toFixed(1) : null;
-  const pct52wLow  = low52w  ? ((current - low52w)  / low52w  * 100).toFixed(1) : null;
-  return `DATA PASAR REAL-TIME (FAKTUAL):
-- Harga saat ini : ${currency} ${current.toLocaleString('id-ID')}
-- Perubahan hari : ${isUp ? '+' : ''}${priceData.change.toLocaleString('id-ID')} (${isUp ? '+' : ''}${changePct}%)
-- 52W High       : ${high52w?.toLocaleString('id-ID') || 'N/A'}${pct52wHigh ? ` (${pct52wHigh}% di atas harga sekarang)` : ''}
-- 52W Low        : ${low52w?.toLocaleString('id-ID')  || 'N/A'}${pct52wLow  ? ` (${pct52wLow}% di atas 52W Low)` : ''}
-- Volume         : ${volume?.toLocaleString('id-ID')  || 'N/A'}
-- Market Cap     : ${marketCap ? (marketCap / 1e12).toFixed(2) + ' T IDR' : 'N/A'}`;
+  var current   = priceData.current;
+  var changePct = priceData.changePct;
+  var isUp      = priceData.isUp;
+  var high52w   = priceData.high52w;
+  var low52w    = priceData.low52w;
+  var volume    = priceData.volume;
+  var marketCap = priceData.marketCap;
+  var currency  = priceData.currency;
+
+  var pct52wHigh = high52w ? ((high52w - current) / high52w * 100).toFixed(1) : null;
+  var pct52wLow  = low52w  ? ((current - low52w)  / low52w  * 100).toFixed(1) : null;
+
+  return 'DATA PASAR REAL-TIME (FAKTUAL):\n' +
+    '- Harga saat ini : ' + currency + ' ' + current.toLocaleString('id-ID') + '\n' +
+    '- Perubahan hari : ' + (isUp ? '+' : '') + priceData.change.toLocaleString('id-ID') + ' (' + (isUp ? '+' : '') + changePct + '%)\n' +
+    '- 52W High       : ' + (high52w ? high52w.toLocaleString('id-ID') : 'N/A') + (pct52wHigh ? ' (' + pct52wHigh + '% di atas harga sekarang)' : '') + '\n' +
+    '- 52W Low        : ' + (low52w  ? low52w.toLocaleString('id-ID')  : 'N/A') + (pct52wLow  ? ' (' + pct52wLow  + '% di atas 52W Low)' : '') + '\n' +
+    '- Volume         : ' + (volume  ? volume.toLocaleString('id-ID')  : 'N/A') + '\n' +
+    '- Market Cap     : ' + (marketCap ? (marketCap / 1e12).toFixed(2) + ' T IDR' : 'N/A');
 }
 
 // ── Main Handler ────────────────────────────────────────────────────
 module.exports = async function handler(req, res) {
-  const startTime = Date.now();
+  var startTime = Date.now();
 
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -134,67 +149,78 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST')    return res.status(405).json({ error: 'Method not allowed' });
 
-  const ip = (req.headers['x-forwarded-for'] || '').split(',')[0] || 'unknown';
+  var ip = ((req.headers['x-forwarded-for'] || '').split(',')[0] || 'unknown');
   if (isRateLimited(ip)) return res.status(429).json({ error: 'Terlalu banyak request. Tunggu sebentar.' });
 
   // ── Validasi input ─────────────────────────────────────────────
-  const tickerRaw  = req.body?.ticker;
-  const validation = validateTicker(tickerRaw);
+  var tickerRaw  = req.body && req.body.ticker;
+  var validation = validateTicker(tickerRaw);
   if (!validation.valid) return res.status(400).json({ error: validation.error });
 
-  const { ticker, isIndex, metadata } = validation;
+  var ticker   = validation.ticker;
+  var isIndex  = validation.isIndex;
+  var metadata = validation.metadata;
 
   // ── Cek cache analisis ─────────────────────────────────────────
-  const cacheKey      = `analysis:${ticker}`;
-  const cachedAnalysis = cacheGet(cacheKey);
+  var cacheKey      = 'analysis:' + ticker;
+  var cachedAnalysis = cacheGet(cacheKey);
   if (cachedAnalysis) {
-    console.log(`[CACHE HIT] ${ticker}`);
-    return res.status(200).json({ ...cachedAnalysis, fromCache: true });
+    console.log('[CACHE HIT]', ticker);
+    return res.status(200).json(Object.assign({}, cachedAnalysis, { fromCache: true }));
   }
 
   // ── 1. Fetch harga ─────────────────────────────────────────────
-  const priceData = await fetchPriceData(ticker, isIndex);
-  const candles   = priceData?.candles || [];
+  var priceData = await fetchPriceData(ticker, isIndex);
+  var candles   = (priceData && priceData.candles) || [];
 
   // ── 2. Indikator matematis ─────────────────────────────────────
-  const indicators = candles.length >= 5 ? computeAll(candles) : {};
-  console.log(`[IND] ${ticker} RSI=${indicators?.rsi} MA20=${indicators?.ma?.ma20}`);
+  var indicators = candles.length >= 5 ? computeAll(candles) : {};
+  console.log('[IND]', ticker, 'RSI=' + (indicators && indicators.rsi), 'MA20=' + (indicators && indicators.ma && indicators.ma.ma20));
 
   // ── 3. Volume intelligence ─────────────────────────────────────
-  const volumeData = candles.length >= 5 ? analyzeVolume(candles) : null;
+  var volumeData = candles.length >= 5 ? analyzeVolume(candles) : null;
 
   // ── 4. Market structure ────────────────────────────────────────
-  const structure = candles.length >= 10 ? analyzeStructure(candles, indicators, volumeData) : null;
+  var structure = candles.length >= 10 ? analyzeStructure(candles, indicators, volumeData) : null;
 
   // ── 5. Scoring ─────────────────────────────────────────────────
-  const scoring = computeScore(indicators, volumeData, structure, priceData);
-  console.log(`[SCORE] ${ticker}: ${scoring.final}/10 → ${scoring.recommendation}`);
+  var scoring = computeScore(indicators, volumeData, structure, priceData);
+  console.log('[SCORE]', ticker + ': ' + scoring.final + '/10 ->', scoring.recommendation);
 
-  // ── 6. AI ──────────────────────────────────────────────────────
-  const priceContext = buildPriceContext(priceData);
-  let parsed;
+  // ── 6. Market context ──────────────────────────────────────────
+  var marketContext = !isIndex && candles.length >= 5
+    ? analyzeMarketContext(ticker, candles, indicators, volumeData, structure)
+    : null;
+
+  // ── 7. Quick scan signals ──────────────────────────────────────
+  var scanSignals = !isIndex && candles.length >= 20
+    ? quickScan(ticker, candles, indicators, volumeData, structure, scoring)
+    : null;
+
+  // ── 8. AI ──────────────────────────────────────────────────────
+  var priceContext = buildPriceContext(priceData);
+  var parsed;
   try {
-    const rawAI = await callAI({ ticker, metadata, isIndex, priceData, priceContext, indicators, volumeData, structure, scoring });
-    const aiValidation = validateAIOutput(rawAI);
+    var rawAI = await callAI({ ticker: ticker, metadata: metadata, isIndex: isIndex, priceData: priceData, priceContext: priceContext, indicators: indicators, volumeData: volumeData, structure: structure, scoring: scoring });
+    var aiValidation = validateAIOutput(rawAI);
     if (!aiValidation.valid) {
-      console.error(`[AI PARSE] ${ticker}:`, aiValidation.error);
+      console.error('[AI PARSE]', ticker + ':', aiValidation.error);
       return res.status(502).json({ error: 'Format respons AI tidak valid. Coba lagi.' });
     }
     parsed = aiValidation.parsed;
   } catch (err) {
-    console.error(`[AI ERROR] ${ticker}:`, err.message);
+    console.error('[AI ERROR]', ticker + ':', err.message);
     return res.status(502).json({ error: err.message || 'AI tidak merespons. Coba lagi.' });
   }
 
-  // ── 7. Override metadata IDX ───────────────────────────────────
+  // ── 9. Override metadata IDX ───────────────────────────────────
   if (metadata) {
-    parsed.namaLengkap = `PT ${metadata.name}`;
-    parsed.sektor      = metadata.sector + (metadata.subsector ? ` — ${metadata.subsector}` : '');
+    parsed.namaLengkap = 'PT ' + metadata.name;
+    parsed.sektor      = metadata.sector + (metadata.subsector ? ' - ' + metadata.subsector : '');
   }
 
-  // ── 8. Build response ──────────────────────────────────────────
-  const response = {
-    ...parsed,
+  // ── 10. Build response ─────────────────────────────────────────
+  var response = Object.assign({}, parsed, {
     priceData: priceData ? {
       current:   priceData.current,
       prevClose: priceData.prevClose,
@@ -212,8 +238,8 @@ module.exports = async function handler(req, res) {
     indicators: {
       rsi:    indicators.rsi,
       ma:     indicators.ma,
-      ma20:   indicators.ma?.ma20,
-      ma50:   indicators.ma?.ma50,
+      ma20:   indicators.ma && indicators.ma.ma20,
+      ma50:   indicators.ma && indicators.ma.ma50,
       macd:   indicators.macd,
       bb:     indicators.bb,
       atr:    indicators.atr,
@@ -222,15 +248,15 @@ module.exports = async function handler(req, res) {
       levels: indicators.levels
     },
     volumeData: volumeData ? {
-      bias:      volumeData.accDist?.bias,
-      isSpike:   volumeData.spike?.isSpike,
-      spikeRatio: volumeData.spike?.ratio,
-      narrative: volumeData.narrative,
-      score:     volumeData.score,
-      accDist:   volumeData.accDist,
-      spike:     volumeData.spike,
-      obv:       volumeData.obv,
-      vwap:      volumeData.vwap,
+      bias:         volumeData.accDist && volumeData.accDist.bias,
+      isSpike:      volumeData.spike && volumeData.spike.isSpike,
+      spikeRatio:   volumeData.spike && volumeData.spike.ratio,
+      narrative:    volumeData.narrative,
+      score:        volumeData.score,
+      accDist:      volumeData.accDist,
+      spike:        volumeData.spike,
+      obv:          volumeData.obv,
+      vwap:         volumeData.vwap,
       confirmation: volumeData.confirmation
     } : null,
     structureData: structure ? {
@@ -241,14 +267,16 @@ module.exports = async function handler(req, res) {
       breakout:   structure.breakout,
       hhll:       structure.hhll
     } : null,
-    scoringData: scoring,
-    ticker,
-    generatedAt: new Date().toISOString(),
-    latencyMs:   Date.now() - startTime,
-    fromCache:   false
-  };
+    scoringData:   scoring,
+    marketContext: marketContext,
+    scanSignals:   scanSignals ? scanSignals.signals : [],
+    ticker:        ticker,
+    generatedAt:   new Date().toISOString(),
+    latencyMs:     Date.now() - startTime,
+    fromCache:     false
+  });
 
   cacheSet(cacheKey, response, TTL.analysis);
-  console.log(`[DONE] ${ticker} ${Date.now() - startTime}ms`);
+  console.log('[DONE]', ticker, (Date.now() - startTime) + 'ms');
   return res.status(200).json(response);
 };
