@@ -1,1 +1,822 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SahamAI — Analis Saham Indonesia</title>
+<meta name="description" content="Platform AI analisis saham IHSG. Indikator teknikal matematis, volume intelligence, market structure, scoring deterministik.">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<style>
+:root {
+  --g: #00c87a; --g2: #00a362; --gdim: rgba(0,200,122,0.1); --gdim2: rgba(0,200,122,0.18);
+  --gold: #e2a354; --red: #f05252; --blue: #58a6ff;
+  --bg: #080c10; --bg2: #0e1419; --bg3: #141c24; --bg4: #1a2330;
+  --border: rgba(255,255,255,0.06); --border2: rgba(255,255,255,0.11);
+  --text: #eaf0f6; --text2: #7a8a99; --text3: #4a5a68;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;mask-image:radial-gradient(ellipse 80% 50% at 50% 0%,black 20%,transparent 100%)}
 
+nav{position:sticky;top:0;z-index:100;background:rgba(8,12,16,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo{width:34px;height:34px;background:linear-gradient(135deg,var(--g2),var(--g));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 16px rgba(0,200,122,0.3)}
+.nav-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.5px}
+.nav-title span{color:var(--g)}
+.nav-badge{font-size:10px;background:var(--gdim);color:var(--g);padding:3px 10px;border-radius:20px;font-weight:700;letter-spacing:1px;border:1px solid rgba(0,200,122,0.2)}
+
+.hero{position:relative;z-index:1;text-align:center;padding:4.5rem 1.5rem 2.5rem;animation:fadeUp 0.5s ease both}
+.hero-pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--g);background:var(--gdim);border:1px solid rgba(0,200,122,0.25);padding:5px 14px;border-radius:20px;margin-bottom:1.5rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:600}
+.pulse{width:6px;height:6px;background:var(--g);border-radius:50%;animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.7)}}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(1.9rem,5.5vw,3.6rem);font-weight:800;line-height:1.1;letter-spacing:-2px;margin-bottom:1rem}
+.hero h1 .accent{color:var(--g)}
+.hero-sub{font-size:0.95rem;color:var(--text2);max-width:480px;margin:0 auto 2.5rem;line-height:1.75;font-weight:300}
+
+.search-wrap{position:relative;z-index:1;max-width:620px;margin:0 auto 1rem;padding:0 1.5rem;animation:fadeUp 0.6s ease both}
+.search-box{display:flex;background:var(--bg2);border:1px solid var(--border2);border-radius:14px;overflow:hidden;transition:border-color 0.2s,box-shadow 0.2s}
+.search-box:focus-within{border-color:var(--g);box-shadow:0 0 0 3px var(--gdim)}
+.search-icon{display:flex;align-items:center;padding:0 1rem 0 1.25rem;color:var(--text3);font-size:18px;flex-shrink:0}
+#stockInput{flex:1;background:transparent;border:none;outline:none;padding:1rem 0.5rem;font-size:1rem;font-family:'Syne',sans-serif;color:var(--text);font-weight:600;letter-spacing:2px;text-transform:uppercase;min-width:0}
+#stockInput::placeholder{text-transform:none;letter-spacing:0;font-weight:300;font-family:'DM Sans',sans-serif;color:var(--text3);font-size:0.95rem}
+#analyzeBtn{padding:0.75rem 1.4rem;margin:6px;background:linear-gradient(135deg,var(--g2),var(--g));color:#000;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;transition:opacity 0.2s,transform 0.15s;white-space:nowrap;letter-spacing:0.5px}
+#analyzeBtn:hover{opacity:0.88;transform:scale(1.02)}
+#analyzeBtn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+
+.chips{position:relative;z-index:1;display:flex;align-items:center;gap:7px;max-width:620px;margin:0 auto 3rem;padding:0 1.5rem;flex-wrap:wrap;animation:fadeUp 0.7s ease both}
+.chips-label{font-size:11px;color:var(--text3);font-weight:500}
+.chip{font-size:11px;padding:5px 13px;border:1px solid var(--border2);border-radius:20px;cursor:pointer;color:var(--text2);background:var(--bg2);transition:all 0.15s;font-weight:600;letter-spacing:1px;font-family:'Syne',sans-serif}
+.chip:hover,.chip.active{background:var(--gdim);border-color:var(--g);color:var(--g)}
+
+#resultsSection{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:0 1.5rem 6rem;display:none}
+
+/* PRICE CARD */
+.price-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:1rem;animation:fadeUp 0.3s ease both;display:flex;flex-wrap:wrap;gap:1.5rem;align-items:flex-start;justify-content:space-between}
+.price-left h2{font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;letter-spacing:-2px;line-height:1}
+.price-left .company{font-size:13px;color:var(--text2);margin-top:5px}
+.price-left .sector-badge{display:inline-block;margin-top:8px;font-size:10px;padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border2);color:var(--text3);letter-spacing:0.5px}
+.price-right{text-align:right}
+.current-price{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-1px}
+.price-change{font-size:14px;font-weight:600;margin-top:4px}
+.price-change.up{color:var(--g)}.price-change.down{color:var(--red)}
+.badge{padding:7px 20px;border-radius:30px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;display:inline-block;margin-top:8px}
+.badge-beli{background:rgba(0,200,122,0.12);color:var(--g);border:1px solid rgba(0,200,122,0.3)}
+.badge-tahan{background:rgba(226,163,84,0.12);color:var(--gold);border:1px solid rgba(226,163,84,0.3)}
+.badge-jual{background:rgba(240,82,82,0.1);color:var(--red);border:1px solid rgba(240,82,82,0.3)}
+
+/* PRICE STATS */
+.price-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:1rem;animation:fadeUp 0.32s ease both}
+.pstat{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:0.85rem 1rem}
+.pstat-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;font-weight:600}
+.pstat-val{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:var(--text)}
+.pstat-val.green{color:var(--g)}.pstat-val.red{color:var(--red)}.pstat-val.gold{color:var(--gold)}
+
+/* CHART — TradingView */
+.chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:1rem;animation:fadeUp 0.35s ease both}
+.chart-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px}
+.chart-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;font-family:'Syne',sans-serif;display:flex;align-items:center;gap:8px}
+.chart-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chart-tabs{display:flex;gap:4px}
+.chart-tab{font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer;color:var(--text2);background:var(--bg3);border:1px solid var(--border);font-family:'Syne',sans-serif;font-weight:600;transition:all 0.15s}
+.chart-tab.active{background:var(--gdim);border-color:var(--g);color:var(--g)}
+.chart-type-tabs{display:flex;gap:4px}
+.chart-type-tab{font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer;color:var(--text2);background:var(--bg3);border:1px solid var(--border);font-family:'Syne',sans-serif;font-weight:600;transition:all 0.15s}
+.chart-type-tab.active{background:rgba(88,166,255,0.1);border-color:rgba(88,166,255,0.4);color:var(--blue)}
+#tvChart{width:100%;height:320px;border-radius:8px;overflow:hidden}
+
+/* SCORE PANEL */
+.score-panel{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:1rem;animation:fadeUp 0.36s ease both}
+.score-panel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px}
+.score-panel-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;font-family:'Syne',sans-serif}
+.final-score{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:-1px}
+.score-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.score-item{background:var(--bg3);border-radius:10px;padding:0.9rem}
+.score-item-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:6px}
+.score-item-val{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:4px}
+.score-bar{height:3px;background:var(--bg2);border-radius:2px;overflow:hidden;margin-bottom:6px}
+.score-fill{height:100%;border-radius:2px;transition:width 1.2s ease}
+.score-reasons{font-size:11px;color:var(--text3);line-height:1.6}
+
+/* MARKET INTELLIGENCE */
+.intel-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem;animation:fadeUp 0.38s ease both}
+.intel-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem}
+.intel-hdr{display:flex;align-items:center;gap:8px;margin-bottom:0.7rem;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;font-family:'Syne',sans-serif}
+.intel-val{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:4px}
+.intel-sub{font-size:12px;color:var(--text2);line-height:1.6}
+.intel-badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;letter-spacing:0.5px;margin-bottom:6px}
+.intel-badge.green{background:var(--gdim);color:var(--g);border:1px solid rgba(0,200,122,0.2)}
+.intel-badge.red{background:rgba(240,82,82,0.08);color:var(--red);border:1px solid rgba(240,82,82,0.2)}
+.intel-badge.gold{background:rgba(226,163,84,0.08);color:var(--gold);border:1px solid rgba(226,163,84,0.2)}
+.intel-badge.blue{background:rgba(88,166,255,0.08);color:var(--blue);border:1px solid rgba(88,166,255,0.2)}
+
+/* SETUP CARDS */
+.setups-wrap{margin-bottom:1rem;animation:fadeUp 0.39s ease both}
+.setup-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:0.9rem 1.1rem;margin-bottom:8px;border-left:3px solid transparent}
+.setup-card.high{border-left-color:var(--g)}
+.setup-card.medium{border-left-color:var(--gold)}
+.setup-card.low{border-left-color:var(--text3)}
+.setup-type{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.setup-reason{font-size:12px;color:var(--text2);line-height:1.6}
+
+/* WHY NOW */
+.why-now{background:linear-gradient(135deg,rgba(0,200,122,0.08),rgba(0,163,98,0.04));border:1px solid rgba(0,200,122,0.2);border-radius:14px;padding:1.25rem;margin-bottom:1rem;animation:fadeUp 0.4s ease both}
+.why-now-lbl{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--g);margin-bottom:8px;font-family:'Syne',sans-serif;display:flex;align-items:center;gap:6px}
+.why-now-text{font-size:0.95rem;color:var(--text);line-height:1.8}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.4rem;margin-bottom:1rem;animation:fadeUp 0.4s ease both}
+.card-hdr{display:flex;align-items:center;gap:8px;margin-bottom:0.9rem;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;font-family:'Syne',sans-serif}
+.ci{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.ci-green{background:var(--gdim)} .ci-gold{background:rgba(226,163,84,0.1)} .ci-red{background:rgba(240,82,82,0.08)} .ci-gray{background:var(--bg3)} .ci-blue{background:rgba(88,166,255,0.1)}
+.summary-text{font-size:0.92rem;color:var(--text);line-height:1.9;font-weight:300}
+.rec-box{margin-top:1rem;padding:1rem 1.1rem;background:var(--gdim);border:1px solid rgba(0,200,122,0.2);border-radius:10px}
+.rec-lbl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--g);margin-bottom:5px;font-family:'Syne',sans-serif}
+.rec-text{font-size:0.88rem;color:rgba(0,200,122,0.85);line-height:1.8}
+
+/* TARGET ROW */
+.target-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:1rem}
+.target-item{background:var(--bg3);border-radius:9px;padding:0.75rem;text-align:center}
+.target-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-weight:600}
+.target-val{font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700}
+.target-val.green{color:var(--g)}.target-val.red{color:var(--red)}.target-val.gold{color:var(--gold)}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:1rem;animation:fadeUp 0.41s ease both}
+.metric{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:0.9rem 1rem}
+.metric-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:600}
+.metric-val{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700;color:var(--text);line-height:1;margin-bottom:3px}
+.metric-val.green{color:var(--g)}
+.metric-sub{font-size:11px;color:var(--text3)}
+
+/* TWO COL */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+
+/* TAGS */
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.tag{font-size:12px;padding:4px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text2);line-height:1.4}
+.tag.green{background:var(--gdim);border-color:rgba(0,200,122,0.2);color:var(--g)}
+.tag.red{background:rgba(240,82,82,0.07);border-color:rgba(240,82,82,0.2);color:#e07070}
+.tag.gold{background:rgba(226,163,84,0.08);border-color:rgba(226,163,84,0.2);color:var(--gold)}
+
+/* INFO TABLE */
+.info-table{width:100%;border-collapse:collapse}
+.info-table tr{border-bottom:1px solid var(--border)}
+.info-table tr:last-child{border-bottom:none}
+.info-table td{padding:9px 0;font-size:13px}
+.info-table td:first-child{color:var(--text2)}
+.info-table td:last-child{text-align:right;font-weight:500;color:var(--text)}
+
+/* SKELETON */
+.sk{background:linear-gradient(90deg,var(--bg2) 25%,var(--bg3) 50%,var(--bg2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.spin{animation:spin 0.8s linear infinite;display:inline-block}
+
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border2);padding:10px 20px;border-radius:10px;font-size:13px;color:var(--text);z-index:999;animation:fadeUp 0.3s ease;box-shadow:0 8px 32px rgba(0,0,0,0.6);white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+.toast.error{border-color:rgba(240,82,82,0.4);color:#e07070}
+.toast.ok{border-color:rgba(0,200,122,0.4);color:var(--g)}
+
+/* SMART MONEY SIGNAL */
+.smart-money{background:linear-gradient(135deg,rgba(226,163,84,0.08),rgba(226,163,84,0.03));border:1px solid rgba(226,163,84,0.2);border-radius:12px;padding:1rem 1.1rem;margin-bottom:1rem;animation:fadeUp 0.42s ease both}
+.sm-lbl{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;font-family:'Syne',sans-serif}
+.sm-text{font-size:0.88rem;color:rgba(226,163,84,0.85);line-height:1.7}
+
+/* CONFIDENCE BADGE */
+.confidence-wrap{display:flex;align-items:center;gap:8px;margin-top:6px}
+.conf-badge{font-size:10px;padding:3px 10px;border-radius:10px;font-weight:700;letter-spacing:1px;font-family:'Syne',sans-serif}
+.conf-high{background:var(--gdim);color:var(--g);border:1px solid rgba(0,200,122,0.25)}
+.conf-medium{background:rgba(226,163,84,0.1);color:var(--gold);border:1px solid rgba(226,163,84,0.25)}
+.conf-low{background:var(--bg3);color:var(--text3);border:1px solid var(--border)}
+.rr-badge{font-size:10px;padding:3px 10px;border-radius:10px;font-weight:700;letter-spacing:1px;font-family:'Syne',sans-serif;background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
+
+@media(max-width:600px){
+  .two-col{grid-template-columns:1fr}
+  .intel-grid{grid-template-columns:1fr}
+  .target-row{grid-template-columns:1fr 1fr}
+  .score-grid{grid-template-columns:1fr 1fr}
+  nav{padding:0 1rem}
+}
+
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:2rem 1.5rem;text-align:center;color:var(--text3);font-size:12px;line-height:2}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="/"><div class="nav-logo">📈</div><span class="nav-title">Saham<span>AI</span></span></a>
+  <span class="nav-badge">IHSG INTELLIGENCE</span>
+</nav>
+
+<section class="hero">
+  <div class="hero-pill"><div class="pulse"></div> Indikator Matematis · AI IHSG</div>
+  <h1>Analisis Saham <span class="accent">Indonesia</span><br>Level Analis Profesional</h1>
+  <p class="hero-sub">Indikator teknikal dihitung matematis, volume intelligence, market structure, scoring deterministik — terasa seperti analis IHSG sungguhan.</p>
+</section>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <div class="search-icon">🔍</div>
+    <input type="text" id="stockInput" placeholder="Ketik kode saham: BBCA, TLKM, BREN..." maxlength="10"
+      onkeydown="if(event.key==='Enter') analyzeStock()" autocomplete="off" autocorrect="off" spellcheck="false"/>
+    <button id="analyzeBtn" onclick="analyzeStock()">
+      <span id="btnIcon">✦</span> Analisis
+    </button>
+  </div>
+</div>
+
+<div class="chips">
+  <span class="chips-label">Populer:</span>
+  <span class="chip" onclick="quickAnalyze('BBCA')">BBCA</span>
+  <span class="chip" onclick="quickAnalyze('TLKM')">TLKM</span>
+  <span class="chip" onclick="quickAnalyze('GOTO')">GOTO</span>
+  <span class="chip" onclick="quickAnalyze('ASII')">ASII</span>
+  <span class="chip" onclick="quickAnalyze('BMRI')">BMRI</span>
+  <span class="chip" onclick="quickAnalyze('BREN')">BREN</span>
+  <span class="chip" onclick="quickAnalyze('AMMN')">AMMN</span>
+  <span class="chip" onclick="quickAnalyze('IHSG')">IHSG</span>
+</div>
+
+<section id="resultsSection">
+  <div id="resultsContent"></div>
+</section>
+
+<footer>
+  <p>⚠️ Konten ini hanya untuk tujuan edukasi. Bukan saran investasi resmi.</p>
+  <p>Selalu lakukan riset mandiri sebelum berinvestasi · SahamAI © 2025</p>
+</footer>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────────
+let tvChart = null;
+let tvSeries = null;
+let tvVolSeries = null;
+let currentCandles = [];
+let currentChartType = 'candle';
+let currentRange = '3mo';
+
+// ── ANALYZE ────────────────────────────────────────────────────────
+async function analyzeStock() {
+  const input  = document.getElementById('stockInput');
+  const ticker = input.value.trim().toUpperCase();
+  if (!ticker) { showToast('Masukkan kode saham terlebih dahulu', 'error'); return; }
+
+  const btn  = document.getElementById('analyzeBtn');
+  const icon = document.getElementById('btnIcon');
+  btn.disabled = true;
+  icon.className = 'spin';
+  icon.textContent = '↻';
+
+  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.textContent === ticker));
+
+  const section = document.getElementById('resultsSection');
+  const content = document.getElementById('resultsContent');
+  section.style.display = 'block';
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  content.innerHTML = buildSkeleton();
+
+  // Destroy existing chart
+  if (tvChart) { tvChart.remove(); tvChart = null; tvSeries = null; tvVolSeries = null; }
+
+  try {
+    const res  = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ticker })
+    });
+
+    const d = await res.json();
+    if (!res.ok) throw new Error(d.error || `HTTP ${res.status}`);
+
+    content.innerHTML = buildResult(ticker, d);
+
+    // Init TradingView chart
+    if (d.priceData?.candles?.length) {
+      currentCandles = d.priceData.candles;
+      initTVChart(currentCandles, currentChartType);
+    }
+
+    showToast(`${d.fromCache ? '⚡ Cache' : '✓ Analisis selesai'} — ${d.latencyMs || 0}ms`, 'ok');
+  } catch (err) {
+    content.innerHTML = `
+      <div style="text-align:center;padding:4rem 1rem">
+        <div style="font-size:3rem;margin-bottom:1rem">⚠️</div>
+        <p style="font-size:1rem;color:#e07070;margin-bottom:8px;font-family:'Syne',sans-serif;font-weight:700">Gagal menganalisis saham</p>
+        <p style="font-size:13px;color:var(--text3)">${esc(String(err.message))}</p>
+      </div>`;
+    showToast('Error: ' + err.message, 'error');
+  }
+
+  btn.disabled = false;
+  icon.className = '';
+  icon.textContent = '✦';
+}
+
+function quickAnalyze(code) {
+  document.getElementById('stockInput').value = code;
+  analyzeStock();
+}
+
+// ── TRADINGVIEW CHART ──────────────────────────────────────────────
+function initTVChart(allCandles, type = 'candle') {
+  const container = document.getElementById('tvChart');
+  if (!container || !allCandles?.length) return;
+
+  if (tvChart) { tvChart.remove(); tvChart = null; }
+
+  tvChart = LightweightCharts.createChart(container, {
+    width:  container.clientWidth,
+    height: 320,
+    layout: { background: { color: 'transparent' }, textColor: '#7a8a99' },
+    grid:   { vertLines: { color: 'rgba(255,255,255,0.04)' }, horzLines: { color: 'rgba(255,255,255,0.04)' } },
+    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+    rightPriceScale: { borderColor: 'rgba(255,255,255,0.06)', scaleMargins: { top: 0.1, bottom: 0.3 } },
+    timeScale: { borderColor: 'rgba(255,255,255,0.06)', timeVisible: true, secondsVisible: false },
+    handleScroll: true,
+    handleScale:  true,
+  });
+
+  const data = filterByRange(allCandles, currentRange);
+  const isUp = data.length > 1 && data[data.length - 1].close >= data[0].close;
+
+  if (type === 'candle') {
+    tvSeries = tvChart.addCandlestickSeries({
+      upColor:        '#00c87a', downColor:  '#f05252',
+      borderUpColor:  '#00c87a', borderDownColor: '#f05252',
+      wickUpColor:    '#00c87a', wickDownColor:   '#f05252',
+    });
+    tvSeries.setData(data.map(c => ({
+      time:  c.date,
+      open:  c.open || c.close,
+      high:  c.high,
+      low:   c.low,
+      close: c.close
+    })));
+  } else {
+    tvSeries = tvChart.addAreaSeries({
+      lineColor:   isUp ? '#00c87a' : '#f05252',
+      topColor:    isUp ? 'rgba(0,200,122,0.25)' : 'rgba(240,82,82,0.2)',
+      bottomColor: isUp ? 'rgba(0,200,122,0)' : 'rgba(240,82,82,0)',
+      lineWidth: 2,
+    });
+    tvSeries.setData(data.map(c => ({ time: c.date, value: c.close })));
+  }
+
+  // MA20 overlay
+  if (data.length >= 20) {
+    const maSeries = tvChart.addLineSeries({ color: 'rgba(226,163,84,0.6)', lineWidth: 1, lineStyle: 1 });
+    const maData = [];
+    for (let i = 19; i < data.length; i++) {
+      const slice = data.slice(i - 19, i + 1);
+      const avg   = slice.reduce((a, c) => a + c.close, 0) / 20;
+      maData.push({ time: data[i].date, value: Math.round(avg) });
+    }
+    maSeries.setData(maData);
+  }
+
+  // MA50 overlay
+  if (data.length >= 50) {
+    const ma50Series = tvChart.addLineSeries({ color: 'rgba(88,166,255,0.5)', lineWidth: 1, lineStyle: 1 });
+    const ma50Data = [];
+    for (let i = 49; i < data.length; i++) {
+      const slice = data.slice(i - 49, i + 1);
+      const avg   = slice.reduce((a, c) => a + c.close, 0) / 50;
+      ma50Data.push({ time: data[i].date, value: Math.round(avg) });
+    }
+    ma50Series.setData(ma50Data);
+  }
+
+  // Volume bars
+  tvVolSeries = tvChart.addHistogramSeries({
+    color: 'rgba(255,255,255,0.08)',
+    priceFormat: { type: 'volume' },
+    priceScaleId: '',
+    scaleMargins: { top: 0.75, bottom: 0 },
+  });
+  tvVolSeries.setData(data.map(c => ({
+    time:  c.date,
+    value: c.volume || 0,
+    color: (c.close >= (c.open || c.close)) ? 'rgba(0,200,122,0.3)' : 'rgba(240,82,82,0.25)'
+  })));
+
+  tvChart.timeScale().fitContent();
+
+  // Responsive resize
+  const ro = new ResizeObserver(() => {
+    if (tvChart && container) tvChart.applyOptions({ width: container.clientWidth });
+  });
+  ro.observe(container);
+}
+
+function filterByRange(candles, range) {
+  if (!candles) return [];
+  if (range === '1mo')  return candles.slice(-22);
+  if (range === '3mo')  return candles.slice(-65);
+  if (range === '6mo')  return candles.slice(-130);
+  return candles;
+}
+
+function setRange(range, el) {
+  document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  currentRange = range;
+  if (tvChart) { tvChart.remove(); tvChart = null; }
+  initTVChart(currentCandles, currentChartType);
+}
+
+function setChartType(type, el) {
+  document.querySelectorAll('.chart-type-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  currentChartType = type;
+  if (tvChart) { tvChart.remove(); tvChart = null; }
+  initTVChart(currentCandles, type);
+}
+
+// ── HELPERS ────────────────────────────────────────────────────────
+function showToast(msg, type = '') {
+  document.querySelectorAll('.toast').forEach(t => t.remove());
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+function safe(v, fb = '—') { return (v != null && v !== '') ? v : fb; }
+function esc(v) {
+  return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function safeArr(a) { return Array.isArray(a) ? a : []; }
+function fmtPrice(v) { if (!v && v !== 0) return '—'; return 'Rp ' + Number(v).toLocaleString('id-ID'); }
+function fmtVol(v) {
+  if (!v) return '—';
+  if (v >= 1e9) return (v/1e9).toFixed(2) + 'B';
+  if (v >= 1e6) return (v/1e6).toFixed(1) + 'Jt';
+  if (v >= 1e3) return (v/1e3).toFixed(0) + 'K';
+  return v.toLocaleString('id-ID');
+}
+function getBadgeClass(s) {
+  if (!s) return 'badge-tahan';
+  const u = (s||'').toUpperCase();
+  if (u === 'BELI' || u === 'BULLISH' || u === 'AKUMULASI') return 'badge-beli';
+  if (u === 'JUAL' || u === 'BEARISH' || u === 'KURANGI')   return 'badge-jual';
+  return 'badge-tahan';
+}
+function getScoreColor(n) {
+  n = parseFloat(n) || 0;
+  if (n >= 7) return '#00c87a';
+  if (n >= 5) return '#e2a354';
+  return '#f05252';
+}
+function getScoreGradient(n) {
+  if (n >= 7) return 'linear-gradient(90deg,#00a362,#00c87a)';
+  if (n >= 5) return 'linear-gradient(90deg,#c47800,#e2a354)';
+  return 'linear-gradient(90deg,#b02020,#f05252)';
+}
+function extractNum(str) {
+  if (typeof str === 'number') return str;
+  const m = String(str||'').match(/\d+(\.\d+)?/);
+  return m ? parseFloat(m[0]) : 0;
+}
+function phaseColor(phase) {
+  const m = { markup:'green', markdown:'red', accumulation:'gold', distribution:'red', consolidation:'blue' };
+  return m[phase] || 'blue';
+}
+function trendIcon(d) { return d === 'uptrend' ? '↑' : d === 'downtrend' ? '↓' : '→'; }
+
+// ── BUILD RESULT ───────────────────────────────────────────────────
+function buildResult(ticker, d) {
+  const pd       = d.priceData || {};
+  const ind      = d.indicators || {};
+  const vol      = d.volumeData || {};
+  const str      = d.structureData || {};
+  const sc       = d.scoringData || {};
+  const isIndex  = ['IHSG','LQ45'].includes(ticker);
+  const sentiment= safe(d.sentiment, 'TAHAN');
+  const today    = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+
+  // ── PRICE SECTION ────────────────────────────────────────────────
+  const priceSection = pd.current ? `
+  <div class="price-card">
+    <div class="price-left">
+      <h2>${ticker}</h2>
+      <div class="company">${esc(d.namaLengkap || ticker)}</div>
+      <span class="sector-badge">${esc(d.sektor || 'IDX')}</span>
+    </div>
+    <div class="price-right">
+      <div class="current-price">${fmtPrice(pd.current)}</div>
+      <div class="price-change ${pd.isUp ? 'up':'down'}">${pd.isUp ? '+':''}${fmtPrice(pd.change)} (${pd.isUp ? '+':''}${pd.changePct}%)</div>
+      <div class="confidence-wrap">
+        <span class="badge ${getBadgeClass(sentiment)}">${sentiment}</span>
+        <span class="conf-badge conf-${(sc.confidence||'medium').toLowerCase()}">${sc.confidence || 'Medium'}</span>
+        ${sc.riskReward ? `<span class="rr-badge">R/R: ${sc.riskReward}</span>` : ''}
+      </div>
+    </div>
+  </div>
+
+  <div class="price-stats">
+    <div class="pstat"><div class="pstat-lbl">52W High</div><div class="pstat-val green">${fmtPrice(pd.high52w)}</div></div>
+    <div class="pstat"><div class="pstat-lbl">52W Low</div><div class="pstat-val">${fmtPrice(pd.low52w)}</div></div>
+    <div class="pstat"><div class="pstat-lbl">MA 20</div><div class="pstat-val ${ind.ma20 && pd.current > ind.ma20 ? 'green':'red'}">${fmtPrice(ind.ma20)}</div></div>
+    <div class="pstat"><div class="pstat-lbl">MA 50</div><div class="pstat-val ${ind.ma50 && pd.current > ind.ma50 ? 'green':'red'}">${fmtPrice(ind.ma50)}</div></div>
+    <div class="pstat"><div class="pstat-lbl">RSI(14)</div><div class="pstat-val ${ind.rsi < 30 ? 'green' : ind.rsi > 70 ? 'red' : 'gold'}">${ind.rsi ?? '—'}</div></div>
+    <div class="pstat"><div class="pstat-lbl">Volume</div><div class="pstat-val">${fmtVol(pd.volume)}</div></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-hdr">
+      <div class="chart-title">📊 Grafik Harga
+        <span style="font-size:9px;color:var(--g);background:var(--gdim);padding:2px 6px;border-radius:4px">TV Chart · MA20 · MA50 · Vol</span>
+      </div>
+      <div class="chart-controls">
+        <div class="chart-type-tabs">
+          <span class="chart-type-tab active" onclick="setChartType('candle',this)">Candle</span>
+          <span class="chart-type-tab" onclick="setChartType('area',this)">Area</span>
+        </div>
+        <div class="chart-tabs">
+          <span class="chart-tab" onclick="setRange('1mo',this)">1B</span>
+          <span class="chart-tab active" onclick="setRange('3mo',this)">3B</span>
+          <span class="chart-tab" onclick="setRange('6mo',this)">6B</span>
+          <span class="chart-tab" onclick="setRange('all',this)">Max</span>
+        </div>
+      </div>
+    </div>
+    <div id="tvChart"></div>
+  </div>` : `
+  <div class="price-card">
+    <div class="price-left"><h2>${ticker}</h2><div class="company">${esc(d.namaLengkap||ticker)}</div></div>
+    <div class="price-right"><div style="font-size:12px;color:var(--text3);margin-bottom:8px">Data harga tidak tersedia</div><span class="badge ${getBadgeClass(sentiment)}">${sentiment}</span></div>
+  </div>`;
+
+  // ── WHY NOW ──────────────────────────────────────────────────────
+  const whyNow = d.whyNow ? `
+  <div class="why-now">
+    <div class="why-now-lbl">⚡ Kenapa Sekarang?</div>
+    <div class="why-now-text">${esc(d.whyNow)}</div>
+  </div>` : '';
+
+  // ── SCORING PANEL ────────────────────────────────────────────────
+  const finalScore = sc.final ?? extractNum(d.scoreTeknikal);
+  const scorePanel = sc.breakdown ? `
+  <div class="score-panel">
+    <div class="score-panel-hdr">
+      <div class="score-panel-title">📐 Scoring Deterministik</div>
+      <div>
+        <div class="final-score" style="color:${getScoreColor(finalScore)}">${finalScore}<span style="font-size:1rem;color:var(--text3)">/10</span></div>
+        <div style="font-size:11px;color:var(--text3);text-align:right">${esc(sc.recommendation||'TAHAN')}</div>
+      </div>
+    </div>
+    <div class="score-grid">
+      ${['trend','volume','momentum','risk','setup'].map(k => {
+        const item = sc.breakdown[k];
+        if (!item) return '';
+        const isRisk = k === 'risk';
+        const displayScore = isRisk ? (10 - item.score) : item.score;
+        return `
+        <div class="score-item">
+          <div class="score-item-lbl">${{trend:'Tren',volume:'Volume',momentum:'Momentum',risk:'Safety',setup:'Setup'}[k]}</div>
+          <div class="score-item-val" style="color:${getScoreColor(displayScore)}">${displayScore}</div>
+          <div class="score-bar"><div class="score-fill" style="width:${displayScore*10}%;background:${getScoreColor(displayScore)}"></div></div>
+          <div class="score-reasons">${(item.reasons||[]).slice(0,2).map(r => `• ${esc(r)}`).join('<br>')}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>` : '';
+
+  // ── MARKET INTELLIGENCE ──────────────────────────────────────────
+  const intelGrid = (vol.bias || str.phase) ? `
+  <div class="intel-grid">
+    ${str.phase ? `
+    <div class="intel-card">
+      <div class="intel-hdr">🏗️ Fase Market</div>
+      <span class="intel-badge ${phaseColor(str.phase)}">${str.phase?.toUpperCase()}</span>
+      <div class="intel-sub">${esc(str.phaseLabel || '')}</div>
+      ${str.trend ? `<div style="margin-top:6px;font-size:11px;color:var(--text3)">${trendIcon(str.trend)} Tren: <strong style="color:var(--text)">${esc(str.trend)}</strong></div>` : ''}
+    </div>` : ''}
+
+    ${vol.bias ? `
+    <div class="intel-card">
+      <div class="intel-hdr">📦 Volume Pattern</div>
+      <span class="intel-badge ${vol.bias==='accumulation'?'green':vol.bias==='distribution'?'red':'gold'}">${(vol.bias||'').toUpperCase()}</span>
+      ${vol.isSpike ? `<div style="margin-top:4px"><span class="intel-badge gold">SPIKE ${vol.spikeRatio}×</span></div>` : ''}
+      <div class="intel-sub">${esc(vol.narrative || '')}</div>
+    </div>` : ''}
+
+    ${ind.bb ? `
+    <div class="intel-card">
+      <div class="intel-hdr">〰️ Bollinger Bands</div>
+      <div class="intel-val" style="color:${ind.bb.position==='overbought_zone'?'var(--red)':ind.bb.position==='oversold_zone'?'var(--g)':'var(--text)'}">${(ind.bb.position||'').replace(/_/g,' ')}</div>
+      <div class="intel-sub">Upper: ${fmtPrice(ind.bb.upper)}<br>Mid: ${fmtPrice(ind.bb.middle)}<br>Lower: ${fmtPrice(ind.bb.lower)}<br>BW: ${ind.bb.bandwidth}% · Pos: ${ind.bb.bandPct}%</div>
+    </div>` : ''}
+
+    ${ind.macd ? `
+    <div class="intel-card">
+      <div class="intel-hdr">📡 MACD</div>
+      <span class="intel-badge ${ind.macd.trend==='bullish'?'green':'red'}">${(ind.macd.trend||'').toUpperCase()}</span>
+      ${ind.macd.crossover ? `<span class="intel-badge gold">${ind.macd.crossover.replace(/_/g,' ').toUpperCase()}</span>` : ''}
+      <div class="intel-sub">MACD: ${ind.macd.macd ?? '—'}<br>Signal: ${ind.macd.signal ?? '—'}<br>Histogram: ${ind.macd.histogram ?? '—'}</div>
+    </div>` : ''}
+
+    ${ind.stoch ? `
+    <div class="intel-card">
+      <div class="intel-hdr">🎯 Stochastic</div>
+      <span class="intel-badge ${ind.stoch.signal==='oversold'?'green':ind.stoch.signal==='overbought'?'red':'gold'}">${(ind.stoch.signal||'').toUpperCase()}</span>
+      <div class="intel-sub">K: ${ind.stoch.k} · D: ${ind.stoch.d}</div>
+    </div>` : ''}
+
+    ${ind.atr ? `
+    <div class="intel-card">
+      <div class="intel-hdr">💨 Volatilitas (ATR)</div>
+      <div class="intel-val">${fmtPrice(ind.atr.atr)}</div>
+      <div class="intel-sub">${ind.atr.atrPct}% dari harga — ${ind.atr.atrPct > 4 ? '⚠️ Sangat Volatil' : ind.atr.atrPct > 2 ? 'Volatil' : 'Stabil'}</div>
+    </div>` : ''}
+  </div>` : '';
+
+  // ── SUPPORT/RESISTANCE ───────────────────────────────────────────
+  const srSection = ind.levels && (ind.levels.support?.length || ind.levels.resistance?.length) ? `
+  <div class="card" style="margin-bottom:1rem">
+    <div class="card-hdr"><div class="ci ci-blue">🎯</div> Support & Resistance</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div>
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600">Support</div>
+        ${(ind.levels.support||[]).map(l => `<div style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:var(--g);margin-bottom:4px">${fmtPrice(l)}</div>`).join('')}
+        ${!ind.levels.support?.length ? `<div style="color:var(--text3);font-size:12px">—</div>` : ''}
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600">Resistance</div>
+        ${(ind.levels.resistance||[]).map(l => `<div style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:var(--red);margin-bottom:4px">${fmtPrice(l)}</div>`).join('')}
+        ${!ind.levels.resistance?.length ? `<div style="color:var(--text3);font-size:12px">—</div>` : ''}
+      </div>
+    </div>
+    ${ind.levels.pivot ? `<div style="margin-top:8px;font-size:12px;color:var(--text3)">Pivot: <strong style="color:var(--text)">${fmtPrice(ind.levels.pivot)}</strong></div>` : ''}
+  </div>` : '';
+
+  // ── SETUPS ───────────────────────────────────────────────────────
+  const setupsSection = safeArr(str.setups).length ? `
+  <div class="setups-wrap">
+    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;font-family:'Syne',sans-serif;margin-bottom:8px">⚙️ Setup Terdeteksi</div>
+    ${safeArr(str.setups).map(s => `
+    <div class="setup-card ${s.confidence}">
+      <div class="setup-type" style="color:${s.direction==='long'?'var(--g)':s.direction==='short'?'var(--red)':'var(--text2)'}">${esc(s.type?.replace(/_/g,' '))} · ${esc(s.direction)} · ${esc(s.confidence)}</div>
+      <div class="setup-reason">${esc(s.reason)}</div>
+    </div>`).join('')}
+  </div>` : '';
+
+  // ── SMART MONEY ──────────────────────────────────────────────────
+  const smartMoney = d.smartMoneySignal && d.smartMoneySignal !== 'Tidak terdeteksi.' ? `
+  <div class="smart-money">
+    <div class="sm-lbl">🧠 Smart Money Signal</div>
+    <div class="sm-text">${esc(d.smartMoneySignal)}</div>
+  </div>` : '';
+
+  // ── MAIN ANALYSIS CARD ───────────────────────────────────────────
+  const mainCard = `
+  <div class="card">
+    <div class="card-hdr"><div class="ci ci-green">🤖</div> Analisis AI Mendalam</div>
+    <div class="summary-text">${esc(d.summary)}</div>
+    ${d.posisiKompetitif ? `<div style="margin-top:0.75rem;padding:0.75rem;background:var(--bg3);border-radius:8px;font-size:0.88rem;color:var(--text2);line-height:1.7">${esc(d.posisiKompetitif)}</div>` : ''}
+    <div class="rec-box">
+      <div class="rec-lbl">Rekomendasi Aksi</div>
+      <div class="rec-text">${esc(d.rekomendasi)}</div>
+      ${!isIndex && (d.targetHarga || d.stopLoss || d.levelBeli) ? `
+      <div class="target-row">
+        <div class="target-item"><div class="target-lbl">Target</div><div class="target-val green">${esc(d.targetHarga||'—')}</div></div>
+        <div class="target-item"><div class="target-lbl">Zona Beli</div><div class="target-val gold">${esc(d.levelBeli||'—')}</div></div>
+        <div class="target-item"><div class="target-lbl">Stop Loss</div><div class="target-val red">${esc(d.stopLoss||'—')}</div></div>
+      </div>` : ''}
+      ${isIndex && (d.targetBull || d.targetBear) ? `
+      <div class="target-row" style="grid-template-columns:1fr 1fr">
+        <div class="target-item"><div class="target-lbl">Target Bull</div><div class="target-val green">${esc(d.targetBull||'—')}</div></div>
+        <div class="target-item"><div class="target-lbl">Target Bear</div><div class="target-val red">${esc(d.targetBear||'—')}</div></div>
+      </div>` : ''}
+    </div>
+  </div>`;
+
+  // ── BULL / BEAR THESIS ───────────────────────────────────────────
+  const thesis = (safeArr(d.bullThesis).length || safeArr(d.bearThesis).length) ? `
+  <div class="two-col">
+    <div class="card" style="margin-bottom:0">
+      <div class="card-hdr"><div class="ci ci-green">🐂</div> Bull Thesis</div>
+      <div class="tags">${safeArr(d.bullThesis).map(t => `<span class="tag green">${esc(t)}</span>`).join('')}</div>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-hdr"><div class="ci ci-red">🐻</div> Bear Thesis</div>
+      <div class="tags">${safeArr(d.bearThesis).map(t => `<span class="tag red">${esc(t)}</span>`).join('')}</div>
+    </div>
+  </div>
+  <div style="margin-bottom:1rem"></div>` : '';
+
+  // ── TEKNIKAL / FUNDAMENTAL ───────────────────────────────────────
+  const analysisCards = !isIndex ? `
+  <div class="two-col">
+    <div class="card" style="margin-bottom:0">
+      <div class="card-hdr"><div class="ci ci-blue">📈</div> Teknikal</div>
+      <div class="summary-text" style="font-size:0.88rem">${esc(d.analisisTeknikal)}</div>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-hdr"><div class="ci ci-gold">📊</div> Fundamental</div>
+      <div class="summary-text" style="font-size:0.88rem">${esc(d.analisisFundamental)}</div>
+    </div>
+  </div>
+  <div style="margin-bottom:1rem"></div>` : `
+  <div class="two-col">
+    <div class="card" style="margin-bottom:0">
+      <div class="card-hdr"><div class="ci ci-green">💪</div> Sektor Kuat</div>
+      <div class="tags">${safeArr(d.sektorKuat).map(s => `<span class="tag green">${esc(s)}</span>`).join('')}</div>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-hdr"><div class="ci ci-red">📉</div> Sektor Lemah</div>
+      <div class="tags">${safeArr(d.sektorLemah).map(s => `<span class="tag red">${esc(s)}</span>`).join('')}</div>
+    </div>
+  </div>
+  <div style="margin-bottom:1rem"></div>`;
+
+  // ── METRICS ──────────────────────────────────────────────────────
+  const metricsSection = `
+  <div class="metrics">
+    <div class="metric"><div class="metric-lbl">Harga Wajar</div><div class="metric-val green">${esc(safe(d.priceEst))}</div><div class="metric-sub">Estimasi AI</div></div>
+    <div class="metric"><div class="metric-lbl">P/E Ratio</div><div class="metric-val">${esc(safe(d.pe))}</div><div class="metric-sub">Price/Earnings</div></div>
+    <div class="metric"><div class="metric-lbl">P/BV</div><div class="metric-val">${esc(safe(d.pbv))}</div><div class="metric-sub">Price/Book</div></div>
+    <div class="metric"><div class="metric-lbl">Div. Yield</div><div class="metric-val">${esc(safe(d.divYield))}</div><div class="metric-sub">Dividend</div></div>
+    <div class="metric"><div class="metric-lbl">Beta</div><div class="metric-val">${esc(safe(d.beta))}</div><div class="metric-sub">vs IHSG</div></div>
+  </div>`;
+
+  // ── KEUNGGULAN / RISIKO / KATALIS ────────────────────────────────
+  const krkSection = `
+  <div class="two-col">
+    <div class="card" style="margin-bottom:0">
+      <div class="card-hdr"><div class="ci ci-green">✅</div> Keunggulan</div>
+      <div class="tags">${safeArr(d.keunggulan).map(k => `<span class="tag green">${esc(k)}</span>`).join('')}</div>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-hdr"><div class="ci ci-red">⚠️</div> Risiko</div>
+      <div class="tags">${safeArr(d.risiko).map(r => `<span class="tag red">${esc(r)}</span>`).join('')}</div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:1rem">
+    <div class="card-hdr"><div class="ci ci-gold">🚀</div> Katalis</div>
+    <div class="tags">${safeArr(d.katalis).map((k,i) => {
+      const neg = /risiko|waspada|ancaman|negatif|turun|melemah|tekanan|penurunan/i.test(k);
+      return `<span class="tag ${neg ? 'red' : i===0 ? 'green' : ''}">${esc(k)}</span>`;
+    }).join('')}</div>
+  </div>`;
+
+  // ── REKOMENDASI SAHAM (IHSG) ─────────────────────────────────────
+  const rekSaham = isIndex && safeArr(d.rekomendasiSaham).length ? `
+  <div class="card">
+    <div class="card-hdr"><div class="ci ci-blue">⭐</div> Saham Pilihan</div>
+    <div class="tags">${safeArr(d.rekomendasiSaham).map(s => `<span class="tag gold">${esc(s)}</span>`).join('')}</div>
+  </div>` : '';
+
+  // ── INFO TABLE ───────────────────────────────────────────────────
+  const infoCard = `
+  <div class="card">
+    <div class="card-hdr"><div class="ci ci-gray">📋</div> Informasi</div>
+    <table class="info-table">
+      <tr><td>Kode Saham</td><td>${ticker}${!isIndex ? '.JK' : ''}</td></tr>
+      <tr><td>Sektor</td><td>${esc(safe(d.sektor, 'IDX'))}</td></tr>
+      <tr><td>Bursa</td><td>IDX / Bursa Efek Indonesia</td></tr>
+      <tr><td>Dianalisis pada</td><td>${today}</td></tr>
+      ${d.latencyMs ? `<tr><td>Waktu analisis</td><td>${d.latencyMs}ms</td></tr>` : ''}
+      ${d.fromCache  ? `<tr><td>Data</td><td>⚡ Cache</td></tr>` : ''}
+    </table>
+  </div>`;
+
+  return `
+    ${priceSection}
+    ${whyNow}
+    ${scorePanel}
+    ${intelGrid}
+    ${srSection}
+    ${setupsSection}
+    ${smartMoney}
+    ${mainCard}
+    ${thesis}
+    ${analysisCards}
+    ${metricsSection}
+    ${krkSection}
+    ${rekSaham}
+    ${infoCard}
+  `;
+}
+
+// ── SKELETON ───────────────────────────────────────────────────────
+function buildSkeleton() {
+  return `
+  <div class="price-card">
+    <div><div class="sk" style="height:2.4rem;width:130px;margin-bottom:10px"></div><div class="sk" style="height:13px;width:220px"></div></div>
+    <div style="text-align:right"><div class="sk" style="height:2rem;width:120px;margin-bottom:8px;margin-left:auto"></div><div class="sk" style="height:13px;width:80px;margin-left:auto"></div></div>
+  </div>
+  <div class="price-stats">${[1,2,3,4,5,6].map(() => `<div class="pstat"><div class="sk" style="height:10px;width:60%;margin-bottom:8px"></div><div class="sk" style="height:1rem;width:80%"></div></div>`).join('')}</div>
+  <div class="chart-card"><div class="sk" style="height:320px;border-radius:8px"></div></div>
+  <div class="score-panel"><div class="sk" style="height:11px;width:120px;margin-bottom:14px"></div><div class="score-grid">${[1,2,3,4,5].map(() => `<div class="score-item"><div class="sk" style="height:10px;width:60%;margin-bottom:8px"></div><div class="sk" style="height:1.4rem;width:40%;margin-bottom:8px"></div><div class="sk" style="height:3px;margin-bottom:8px"></div></div>`).join('')}</div></div>
+  <div class="card"><div class="sk" style="height:11px;width:100px;margin-bottom:14px"></div><div class="sk" style="height:14px;width:100%;margin-bottom:7px"></div><div class="sk" style="height:14px;width:92%;margin-bottom:7px"></div><div class="sk" style="height:14px;width:80%;margin-bottom:18px"></div><div class="sk" style="height:70px;border-radius:10px"></div></div>`;
+}
+</script>
+</body>
+</html>
