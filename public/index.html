@@ -6,7 +6,65 @@
 <title>SahamAI — Analis Saham Indonesia</title>
 <meta name="description" content="Platform AI analisis saham IHSG. Indikator teknikal matematis, volume intelligence, market structure, scoring deterministik.">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js">
+// ── WATCHLIST ──────────────────────────────────────────────────────
+function getWatchlist() {
+  try { return JSON.parse(localStorage.getItem('sahamai_watchlist') || '[]'); } catch(e) { return []; }
+}
+function saveWatchlist(list) {
+  try { localStorage.setItem('sahamai_watchlist', JSON.stringify(list)); } catch(e) {}
+}
+function addToWatchlist(ticker) {
+  var list = getWatchlist();
+  if (!list.includes(ticker)) {
+    list.push(ticker);
+    saveWatchlist(list);
+    renderWatchlist();
+    showToast(ticker + ' ditambahkan ke watchlist', 'ok');
+  } else {
+    showToast(ticker + ' sudah ada di watchlist', '');
+  }
+}
+function removeFromWatchlist(ticker) {
+  var list = getWatchlist().filter(function(t) { return t !== ticker; });
+  saveWatchlist(list);
+  renderWatchlist();
+}
+function renderWatchlist() {
+  var list = getWatchlist();
+  var bar  = document.getElementById('watchlistBar');
+  var items = document.getElementById('watchlistItems');
+  if (!bar || !items) return;
+  if (!list.length) { bar.style.display = 'none'; return; }
+  bar.style.display = 'block';
+  items.innerHTML = list.map(function(t) {
+    return '<div class="wl-item" onclick="quickAnalyze('' + t + '')">' +
+      '<span class="wl-ticker">' + t + '</span>' +
+      '<span class="wl-remove" onclick="event.stopPropagation();removeFromWatchlist('' + t + '')" title="Hapus">×</span>' +
+      '</div>';
+  }).join('');
+}
+
+// ── SCAN SIGNALS RENDER ────────────────────────────────────────────
+function buildScanSignals(signals) {
+  if (!signals || !signals.length) return '';
+  return '<div class="scan-signals">' +
+    signals.map(function(s) {
+      var icon = s.type === 'breakout' ? '🚀' :
+                 s.type === 'volume_spike' ? '📊' :
+                 s.type === 'oversold' ? '🔻' :
+                 s.type === 'golden_cross' ? '✨' :
+                 s.type === 'accumulation' ? '📦' :
+                 s.type === 'macd_cross' ? '⚡' : '🔔';
+      return '<span class="scan-signal ' + (s.strength || 'medium') + '">' + icon + ' ' + esc(s.label) + '</span>';
+    }).join('') +
+    '</div>';
+}
+
+// Init watchlist on load
+document.addEventListener('DOMContentLoaded', renderWatchlist);
+
+</script>
 <style>
 :root {
   --g: #00c87a; --g2: #00a362; --gdim: rgba(0,200,122,0.1); --gdim2: rgba(0,200,122,0.18);
@@ -200,6 +258,35 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,12,16,0.92);backdrop-fil
   nav{padding:0 1rem}
 }
 
+
+/* WATCHLIST */
+.watchlist-bar{position:relative;z-index:1;max-width:980px;margin:0 auto 1.5rem;padding:0 1.5rem}
+.watchlist-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.7rem}
+.watchlist-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;font-family:'Syne',sans-serif}
+.watchlist-items{display:flex;flex-wrap:wrap;gap:7px}
+.wl-item{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--bg2);border:1px solid var(--border2);border-radius:20px;cursor:pointer;transition:all 0.15s}
+.wl-item:hover{border-color:var(--g)}
+.wl-ticker{font-size:11px;font-weight:700;font-family:'Syne',sans-serif;color:var(--text)}
+.wl-price{font-size:10px;color:var(--text3)}
+.wl-remove{font-size:12px;color:var(--text3);margin-left:2px;line-height:1}
+.wl-remove:hover{color:var(--red)}
+.wl-add-btn{font-size:11px;padding:6px 12px;background:var(--gdim);border:1px solid rgba(0,200,122,0.3);border-radius:20px;color:var(--g);cursor:pointer;font-weight:700;font-family:'Syne',sans-serif;transition:all 0.15s}
+.wl-add-btn:hover{background:rgba(0,200,122,0.2)}
+.wl-empty{font-size:12px;color:var(--text3)}
+
+/* SCAN SIGNALS */
+.scan-signals{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem;animation:fadeUp 0.3s ease both}
+.scan-signal{display:flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;font-family:'Syne',sans-serif;letter-spacing:0.5px}
+.scan-signal.high{background:var(--gdim);border:1px solid rgba(0,200,122,0.3);color:var(--g)}
+.scan-signal.medium{background:rgba(226,163,84,0.08);border:1px solid rgba(226,163,84,0.3);color:var(--gold)}
+.scan-signal.low{background:var(--bg3);border:1px solid var(--border);color:var(--text3)}
+
+/* BANDAR & SECTOR CONTEXT */
+.bandar-card{background:linear-gradient(135deg,rgba(88,166,255,0.07),rgba(88,166,255,0.02));border:1px solid rgba(88,166,255,0.2);border-radius:12px;padding:1rem 1.1rem;margin-bottom:1rem;animation:fadeUp 0.41s ease both}
+.bandar-lbl{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:6px;font-family:'Syne',sans-serif}
+.bandar-text{font-size:0.88rem;color:rgba(88,166,255,0.85);line-height:1.7}
+.sector-context-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem;margin-bottom:1rem;animation:fadeUp 0.43s ease both}
+
 footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:2rem 1.5rem;text-align:center;color:var(--text3);font-size:12px;line-height:2}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:var(--bg)}
@@ -240,6 +327,14 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:2r
   <span class="chip" onclick="quickAnalyze('BREN')">BREN</span>
   <span class="chip" onclick="quickAnalyze('AMMN')">AMMN</span>
   <span class="chip" onclick="quickAnalyze('IHSG')">IHSG</span>
+</div>
+
+
+<div class="watchlist-bar" id="watchlistBar" style="display:none">
+  <div class="watchlist-hdr">
+    <span class="watchlist-title">⭐ Watchlist</span>
+  </div>
+  <div class="watchlist-items" id="watchlistItems"></div>
 </div>
 
 <section id="resultsSection">
@@ -516,6 +611,7 @@ function buildResult(ticker, d) {
         <span class="conf-badge conf-${(sc.confidence||'medium').toLowerCase()}">${sc.confidence || 'Medium'}</span>
         ${sc.riskReward ? `<span class="rr-badge">R/R: ${sc.riskReward}</span>` : ''}
       </div>
+      ${!isIndex ? `<div style="margin-top:10px"><span class="wl-add-btn" onclick="addToWatchlist('${ticker}')">⭐ + Watchlist</span></div>` : ''}
     </div>
   </div>
 
@@ -596,7 +692,7 @@ function buildResult(ticker, d) {
       <div class="intel-hdr">🏗️ Fase Market</div>
       <span class="intel-badge ${phaseColor(str.phase)}">${str.phase?.toUpperCase()}</span>
       <div class="intel-sub">${esc(str.phaseLabel || '')}</div>
-      ${str.trend ? `<div style="margin-top:6px;font-size:11px;color:var(--text3)">${trendIcon(str.trend)} Tren: <strong style="color:var(--text)">${esc(str.trend)}</strong></div>` : ''}
+      ${str.trend ? `<div style="margin-top:6px;font-size:11px;color:var(--text3)">${trendIcon(str.trend && str.trend.direction)} Tren: <strong style="color:var(--text)">${esc(str.trend && str.trend.direction || "")}</strong></div>` : ''}
     </div>` : ''}
 
     ${vol.bias ? `
@@ -787,7 +883,25 @@ function buildResult(ticker, d) {
     </table>
   </div>`;
 
+  // ── SCAN SIGNALS ────────────────────────────────────────────────
+  const scanSignalsHtml = buildScanSignals(d.scanSignals);
+
+  // ── BANDAR ANALYSIS ──────────────────────────────────────────────
+  const bandarCard = (d.bandaAnalysis && !isIndex) ? `
+  <div class="bandar-card">
+    <div class="bandar-lbl">🎯 Bandar Analysis</div>
+    <div class="bandar-text">${esc(d.bandaAnalysis)}</div>
+  </div>` : '';
+
+  // ── SECTOR CONTEXT ───────────────────────────────────────────────
+  const sectorCtxCard = (d.sektorContext && !isIndex) ? `
+  <div class="sector-context-card">
+    <div class="card-hdr"><div class="ci ci-blue">🔄</div> Konteks Sektor</div>
+    <div class="summary-text">${esc(d.sektorContext)}</div>
+  </div>` : '';
+
   return `
+    ${scanSignalsHtml}
     ${priceSection}
     ${whyNow}
     ${scorePanel}
@@ -801,6 +915,8 @@ function buildResult(ticker, d) {
     ${metricsSection}
     ${krkSection}
     ${rekSaham}
+    ${bandarCard}
+    ${sectorCtxCard}
     ${infoCard}
   `;
 }
@@ -817,6 +933,64 @@ function buildSkeleton() {
   <div class="score-panel"><div class="sk" style="height:11px;width:120px;margin-bottom:14px"></div><div class="score-grid">${[1,2,3,4,5].map(() => `<div class="score-item"><div class="sk" style="height:10px;width:60%;margin-bottom:8px"></div><div class="sk" style="height:1.4rem;width:40%;margin-bottom:8px"></div><div class="sk" style="height:3px;margin-bottom:8px"></div></div>`).join('')}</div></div>
   <div class="card"><div class="sk" style="height:11px;width:100px;margin-bottom:14px"></div><div class="sk" style="height:14px;width:100%;margin-bottom:7px"></div><div class="sk" style="height:14px;width:92%;margin-bottom:7px"></div><div class="sk" style="height:14px;width:80%;margin-bottom:18px"></div><div class="sk" style="height:70px;border-radius:10px"></div></div>`;
 }
+
+// ── WATCHLIST ──────────────────────────────────────────────────────
+function getWatchlist() {
+  try { return JSON.parse(localStorage.getItem('sahamai_watchlist') || '[]'); } catch(e) { return []; }
+}
+function saveWatchlist(list) {
+  try { localStorage.setItem('sahamai_watchlist', JSON.stringify(list)); } catch(e) {}
+}
+function addToWatchlist(ticker) {
+  var list = getWatchlist();
+  if (!list.includes(ticker)) {
+    list.push(ticker);
+    saveWatchlist(list);
+    renderWatchlist();
+    showToast(ticker + ' ditambahkan ke watchlist', 'ok');
+  } else {
+    showToast(ticker + ' sudah ada di watchlist', '');
+  }
+}
+function removeFromWatchlist(ticker) {
+  var list = getWatchlist().filter(function(t) { return t !== ticker; });
+  saveWatchlist(list);
+  renderWatchlist();
+}
+function renderWatchlist() {
+  var list = getWatchlist();
+  var bar  = document.getElementById('watchlistBar');
+  var items = document.getElementById('watchlistItems');
+  if (!bar || !items) return;
+  if (!list.length) { bar.style.display = 'none'; return; }
+  bar.style.display = 'block';
+  items.innerHTML = list.map(function(t) {
+    return '<div class="wl-item" onclick="quickAnalyze('' + t + '')">' +
+      '<span class="wl-ticker">' + t + '</span>' +
+      '<span class="wl-remove" onclick="event.stopPropagation();removeFromWatchlist('' + t + '')" title="Hapus">×</span>' +
+      '</div>';
+  }).join('');
+}
+
+// ── SCAN SIGNALS RENDER ────────────────────────────────────────────
+function buildScanSignals(signals) {
+  if (!signals || !signals.length) return '';
+  return '<div class="scan-signals">' +
+    signals.map(function(s) {
+      var icon = s.type === 'breakout' ? '🚀' :
+                 s.type === 'volume_spike' ? '📊' :
+                 s.type === 'oversold' ? '🔻' :
+                 s.type === 'golden_cross' ? '✨' :
+                 s.type === 'accumulation' ? '📦' :
+                 s.type === 'macd_cross' ? '⚡' : '🔔';
+      return '<span class="scan-signal ' + (s.strength || 'medium') + '">' + icon + ' ' + esc(s.label) + '</span>';
+    }).join('') +
+    '</div>';
+}
+
+// Init watchlist on load
+document.addEventListener('DOMContentLoaded', renderWatchlist);
+
 </script>
 </body>
 </html>
