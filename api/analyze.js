@@ -11,6 +11,7 @@ var { callAI }                            = require('../lib/ai');
 var { cacheGet, cacheSet, TTL }           = require('../lib/cache');
 var { analyzeMarketContext }              = require('../lib/context');
 var { quickScan }                         = require('../lib/scanner');
+var { analyzeBandar }                     = require('../lib/bandar');
 
 // ── Rate Limiting ──────────────────────────────────────────────────
 var rateLimitMap = new Map();
@@ -197,11 +198,17 @@ module.exports = async function handler(req, res) {
     ? quickScan(ticker, candles, indicators, volumeData, structure, scoring)
     : null;
 
-  // ── 8. AI ──────────────────────────────────────────────────────
+  // ── 8. Bandar analysis ───────────────────────────────────────────
+  var bandarData = !isIndex && candles.length >= 20
+    ? analyzeBandar(candles, indicators, volumeData, priceData, metadata)
+    : null;
+  if (bandarData) console.log('[BANDAR]', ticker, 'score=' + bandarData.bandarScore, bandarData.smartMoney && bandarData.smartMoney.label);
+
+  // ── 9. AI ──────────────────────────────────────────────────────
   var priceContext = buildPriceContext(priceData);
   var parsed;
   try {
-    var rawAI = await callAI({ ticker: ticker, metadata: metadata, isIndex: isIndex, priceData: priceData, priceContext: priceContext, indicators: indicators, volumeData: volumeData, structure: structure, scoring: scoring });
+    var rawAI = await callAI({ ticker: ticker, metadata: metadata, isIndex: isIndex, priceData: priceData, priceContext: priceContext, indicators: indicators, volumeData: volumeData, structure: structure, scoring: scoring, bandarData: bandarData });
     var aiValidation = validateAIOutput(rawAI);
     if (!aiValidation.valid) {
       console.error('[AI PARSE]', ticker + ':', aiValidation.error);
@@ -268,6 +275,15 @@ module.exports = async function handler(req, res) {
       hhll:       structure.hhll
     } : null,
     scoringData:   scoring,
+    bandarData:    bandarData ? {
+      bandarScore: bandarData.bandarScore,
+      narrative:   bandarData.narrative,
+      smartMoney:  bandarData.smartMoney,
+      stealth:     bandarData.stealth,
+      distTrap:    bandarData.distTrap,
+      panic:       bandarData.panic,
+      stockType:   bandarData.stockType
+    } : null,
     marketContext: marketContext,
     scanSignals:   scanSignals ? scanSignals.signals : [],
     ticker:        ticker,
