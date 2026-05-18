@@ -1105,7 +1105,7 @@ function renderScanResults(data) {
       return '<span class="sc-sig ' + sigClass + '">' + icon + ' ' + esc(s.label) + '</span>';
     }).join('');
 
-    return '<div class="sc-card ' + cardClass + '" onclick="analyzeFromScanner('' + item.ticker + '')">' +
+    return '<div class="sc-card ' + cardClass + '" onclick="analyzeFromScanner("' + item.ticker + '")">' +
       '<div class="sc-card-top">' +
         '<div>' +
           '<div class="sc-ticker">' + esc(item.ticker) + '</div>' +
