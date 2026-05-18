@@ -85,6 +85,25 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,12,16,0.92);backdrop-fil
 .chart-type-tab{font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer;color:var(--text2);background:var(--bg3);border:1px solid var(--border);font-family:'Syne',sans-serif;font-weight:600;transition:all 0.15s}
 .chart-type-tab.active{background:rgba(88,166,255,0.1);border-color:rgba(88,166,255,0.4);color:var(--blue)}
 #tvChart{width:100%;height:320px;border-radius:8px;overflow:hidden}
+#rsiChart{width:100%;height:100px;border-radius:8px;overflow:hidden;margin-top:4px}
+#macdChart{width:100%;height:100px;border-radius:8px;overflow:hidden;margin-top:4px}
+.ind-toggles{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.ind-toggle{font-size:10px;padding:3px 10px;border-radius:10px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;letter-spacing:0.5px;border:1px solid;transition:all 0.15s;user-select:none}
+.ind-toggle.on-ma20{background:rgba(226,163,84,0.15);border-color:rgba(226,163,84,0.5);color:var(--gold)}
+.ind-toggle.off-ma20{background:transparent;border-color:var(--border);color:var(--text3)}
+.ind-toggle.on-ma50{background:rgba(88,166,255,0.12);border-color:rgba(88,166,255,0.4);color:var(--blue)}
+.ind-toggle.off-ma50{background:transparent;border-color:var(--border);color:var(--text3)}
+.ind-toggle.on-ema9{background:rgba(0,200,122,0.12);border-color:rgba(0,200,122,0.4);color:var(--g)}
+.ind-toggle.off-ema9{background:transparent;border-color:var(--border);color:var(--text3)}
+.ind-toggle.on-bb{background:rgba(168,85,247,0.12);border-color:rgba(168,85,247,0.4);color:#a855f7}
+.ind-toggle.off-bb{background:transparent;border-color:var(--border);color:var(--text3)}
+.ind-toggle.on-rsi{background:rgba(240,82,82,0.1);border-color:rgba(240,82,82,0.4);color:var(--red)}
+.ind-toggle.off-rsi{background:transparent;border-color:var(--border);color:var(--text3)}
+.ind-toggle.on-macd{background:rgba(0,200,122,0.08);border-color:rgba(0,200,122,0.3);color:var(--g)}
+.ind-toggle.off-macd{background:transparent;border-color:var(--border);color:var(--text3)}
+.subpanel{display:none;background:var(--bg3);border-radius:8px;padding:6px 8px;margin-top:4px}
+.subpanel.visible{display:block}
+.subpanel-lbl{font-size:9px;color:var(--text3);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;font-family:'Syne',sans-serif}
 
 /* SCORE PANEL */
 .score-panel{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:1rem;animation:fadeUp 0.36s ease both}
@@ -352,9 +371,17 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:2r
 let tvChart = null;
 let tvSeries = null;
 let tvVolSeries = null;
+let rsiChart = null;
+let rsiSeries = null;
+let macdChart = null;
+let macdHistSeries = null;
+let macdLineSeries = null;
+let macdSignalSeries = null;
 let currentCandles = [];
 let currentChartType = 'candle';
 let currentRange = '3mo';
+let activeIndicators = { ma20: true, ma50: true, ema9: true, bb: false, rsi: false, macd: false };
+let chartSeriesMap = {};
 
 // ── ANALYZE ────────────────────────────────────────────────────────
 async function analyzeStock() {
@@ -419,75 +446,186 @@ function quickAnalyze(code) {
 }
 
 // ── TRADINGVIEW CHART ──────────────────────────────────────────────
-function initTVChart(allCandles, type = 'candle') {
+function calcEMA(data, period) {
+  const k = 2 / (period + 1);
+  const result = [];
+  let ema = null;
+  for (let i = 0; i < data.length; i++) {
+    if (i < period - 1) { continue; }
+    if (ema === null) {
+      ema = data.slice(0, period).reduce((a, c) => a + c.close, 0) / period;
+    } else {
+      ema = data[i].close * k + ema * (1 - k);
+    }
+    result.push({ time: data[i].date, value: Math.round(ema) });
+  }
+  return result;
+}
+
+function calcSMA(data, period) {
+  const result = [];
+  for (let i = period - 1; i < data.length; i++) {
+    const avg = data.slice(i - period + 1, i + 1).reduce((a, c) => a + c.close, 0) / period;
+    result.push({ time: data[i].date, value: Math.round(avg) });
+  }
+  return result;
+}
+
+function calcBB(data, period = 20, mult = 2) {
+  const upper = [], middle = [], lower = [];
+  for (let i = period - 1; i < data.length; i++) {
+    const slice = data.slice(i - period + 1, i + 1);
+    const avg   = slice.reduce((a, c) => a + c.close, 0) / period;
+    const std   = Math.sqrt(slice.reduce((a, c) => a + Math.pow(c.close - avg, 2), 0) / period);
+    upper.push({ time: data[i].date, value: Math.round(avg + mult * std) });
+    middle.push({ time: data[i].date, value: Math.round(avg) });
+    lower.push({ time: data[i].date, value: Math.round(avg - mult * std) });
+  }
+  return { upper, middle, lower };
+}
+
+function calcRSI(data, period = 14) {
+  const result = [];
+  const closes = data.map(c => c.close);
+  if (closes.length < period + 1) return result;
+  const changes = closes.slice(1).map((v, i) => v - closes[i]);
+  let avgGain = changes.slice(0, period).filter(v => v > 0).reduce((a, b) => a + b, 0) / period;
+  let avgLoss = changes.slice(0, period).filter(v => v < 0).reduce((a, b) => a + Math.abs(b), 0) / period;
+  for (let i = period; i < changes.length; i++) {
+    const gain = changes[i] > 0 ? changes[i] : 0;
+    const loss = changes[i] < 0 ? Math.abs(changes[i]) : 0;
+    avgGain = (avgGain * (period - 1) + gain) / period;
+    avgLoss = (avgLoss * (period - 1) + loss) / period;
+    const rs  = avgLoss === 0 ? 100 : avgGain / avgLoss;
+    const rsi = Math.round(100 - 100 / (1 + rs));
+    result.push({ time: data[i].date, value: rsi });
+  }
+  return result;
+}
+
+function calcMACD(data, fast = 12, slow = 26, signal = 9) {
+  const kf = 2 / (fast + 1), ks = 2 / (slow + 1), kg = 2 / (signal + 1);
+  const closes = data.map(c => c.close);
+  if (closes.length < slow + signal) return { macd: [], signal: [], hist: [] };
+  let ef = closes.slice(0, fast).reduce((a, b) => a + b) / fast;
+  let es = closes.slice(0, slow).reduce((a, b) => a + b) / slow;
+  const macdLine = [];
+  for (let i = 1; i < fast; i++) ef = closes[i] * kf + ef * (1 - kf);
+  for (let i = slow; i < closes.length; i++) {
+    ef = closes[i] * kf + ef * (1 - kf);
+    es = closes[i] * ks + es * (1 - ks);
+    macdLine.push({ time: data[i].date, value: parseFloat((ef - es).toFixed(2)) });
+  }
+  if (macdLine.length < signal) return { macd: [], signal: [], hist: [] };
+  let sg = macdLine.slice(0, signal).reduce((a, b) => a + b.value, 0) / signal;
+  const sigLine = [], histLine = [];
+  for (let i = 0; i < macdLine.length; i++) {
+    if (i >= signal) sg = macdLine[i].value * kg + sg * (1 - kg);
+    if (i >= signal - 1) {
+      sigLine.push({ time: macdLine[i].time, value: parseFloat(sg.toFixed(2)) });
+      histLine.push({ time: macdLine[i].time, value: parseFloat((macdLine[i].value - sg).toFixed(2)),
+        color: (macdLine[i].value - sg) >= 0 ? 'rgba(0,200,122,0.5)' : 'rgba(240,82,82,0.5)' });
+    }
+  }
+  return { macd: macdLine.slice(signal - 1), signal: sigLine, hist: histLine };
+}
+
+function toggleIndicator(ind) {
+  activeIndicators[ind] = !activeIndicators[ind];
+  const btn = document.getElementById('tog-' + ind);
+  if (btn) {
+    btn.className = 'ind-toggle ' + (activeIndicators[ind] ? 'on-' : 'off-') + ind;
+  }
+  // Toggle subpanels
+  if (ind === 'rsi') {
+    const panel = document.getElementById('panel-rsi');
+    if (panel) panel.classList.toggle('visible', activeIndicators.rsi);
+  }
+  if (ind === 'macd') {
+    const panel = document.getElementById('panel-macd');
+    if (panel) panel.classList.toggle('visible', activeIndicators.macd);
+  }
+  // Re-render chart
+  if (currentCandles.length) initTVChart(currentCandles, currentChartType);
+}
+
+function initTVChart(allCandles, type) {
+  type = type || 'candle';
   const container = document.getElementById('tvChart');
-  if (!container || !allCandles?.length) return;
+  if (!container || !allCandles || !allCandles.length) return;
 
-  if (tvChart) { tvChart.remove(); tvChart = null; }
+  // Destroy existing charts
+  if (tvChart)   { tvChart.remove();   tvChart = null; }
+  if (rsiChart)  { rsiChart.remove();  rsiChart = null; }
+  if (macdChart) { macdChart.remove(); macdChart = null; }
+  chartSeriesMap = {};
 
+  const data = filterByRange(allCandles, currentRange);
+  if (!data.length) return;
+
+  const isUp = data[data.length - 1].close >= data[0].close;
+
+  // ── MAIN CHART ─────────────────────────────────────────────────
   tvChart = LightweightCharts.createChart(container, {
     width:  container.clientWidth,
     height: 320,
     layout: { background: { color: 'transparent' }, textColor: '#7a8a99' },
     grid:   { vertLines: { color: 'rgba(255,255,255,0.04)' }, horzLines: { color: 'rgba(255,255,255,0.04)' } },
     crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
-    rightPriceScale: { borderColor: 'rgba(255,255,255,0.06)', scaleMargins: { top: 0.1, bottom: 0.3 } },
+    rightPriceScale: { borderColor: 'rgba(255,255,255,0.06)', scaleMargins: { top: 0.08, bottom: 0.28 } },
     timeScale: { borderColor: 'rgba(255,255,255,0.06)', timeVisible: true, secondsVisible: false },
-    handleScroll: true,
-    handleScale:  true,
+    handleScroll: true, handleScale: true,
   });
-
-  const data = filterByRange(allCandles, currentRange);
-  const isUp = data.length > 1 && data[data.length - 1].close >= data[0].close;
 
   if (type === 'candle') {
     tvSeries = tvChart.addCandlestickSeries({
-      upColor:        '#00c87a', downColor:  '#f05252',
-      borderUpColor:  '#00c87a', borderDownColor: '#f05252',
-      wickUpColor:    '#00c87a', wickDownColor:   '#f05252',
+      upColor: '#00c87a', downColor: '#f05252',
+      borderUpColor: '#00c87a', borderDownColor: '#f05252',
+      wickUpColor: '#00c87a', wickDownColor: '#f05252',
     });
-    tvSeries.setData(data.map(c => ({
-      time:  c.date,
-      open:  c.open || c.close,
-      high:  c.high,
-      low:   c.low,
-      close: c.close
-    })));
+    tvSeries.setData(data.map(c => ({ time: c.date, open: c.open || c.close, high: c.high, low: c.low, close: c.close })));
   } else {
     tvSeries = tvChart.addAreaSeries({
-      lineColor:   isUp ? '#00c87a' : '#f05252',
-      topColor:    isUp ? 'rgba(0,200,122,0.25)' : 'rgba(240,82,82,0.2)',
+      lineColor: isUp ? '#00c87a' : '#f05252',
+      topColor:  isUp ? 'rgba(0,200,122,0.25)' : 'rgba(240,82,82,0.2)',
       bottomColor: isUp ? 'rgba(0,200,122,0)' : 'rgba(240,82,82,0)',
       lineWidth: 2,
     });
     tvSeries.setData(data.map(c => ({ time: c.date, value: c.close })));
   }
 
-  // MA20 overlay
-  if (data.length >= 20) {
-    const maSeries = tvChart.addLineSeries({ color: 'rgba(226,163,84,0.6)', lineWidth: 1, lineStyle: 1 });
-    const maData = [];
-    for (let i = 19; i < data.length; i++) {
-      const slice = data.slice(i - 19, i + 1);
-      const avg   = slice.reduce((a, c) => a + c.close, 0) / 20;
-      maData.push({ time: data[i].date, value: Math.round(avg) });
-    }
-    maSeries.setData(maData);
+  // ── EMA9 ───────────────────────────────────────────────────────
+  if (activeIndicators.ema9 && data.length >= 9) {
+    const ema9S = tvChart.addLineSeries({ color: 'rgba(0,200,122,0.8)', lineWidth: 1, lastValueVisible: false, priceLineVisible: false });
+    ema9S.setData(calcEMA(data, 9));
+    chartSeriesMap.ema9 = ema9S;
   }
 
-  // MA50 overlay
-  if (data.length >= 50) {
-    const ma50Series = tvChart.addLineSeries({ color: 'rgba(88,166,255,0.5)', lineWidth: 1, lineStyle: 1 });
-    const ma50Data = [];
-    for (let i = 49; i < data.length; i++) {
-      const slice = data.slice(i - 49, i + 1);
-      const avg   = slice.reduce((a, c) => a + c.close, 0) / 50;
-      ma50Data.push({ time: data[i].date, value: Math.round(avg) });
-    }
-    ma50Series.setData(ma50Data);
+  // ── MA20 ───────────────────────────────────────────────────────
+  if (activeIndicators.ma20 && data.length >= 20) {
+    const ma20S = tvChart.addLineSeries({ color: 'rgba(226,163,84,0.7)', lineWidth: 1, lineStyle: 1, lastValueVisible: false, priceLineVisible: false });
+    ma20S.setData(calcSMA(data, 20));
+    chartSeriesMap.ma20 = ma20S;
   }
 
-  // Volume bars
+  // ── MA50 ───────────────────────────────────────────────────────
+  if (activeIndicators.ma50 && data.length >= 50) {
+    const ma50S = tvChart.addLineSeries({ color: 'rgba(88,166,255,0.6)', lineWidth: 1, lineStyle: 1, lastValueVisible: false, priceLineVisible: false });
+    ma50S.setData(calcSMA(data, 50));
+    chartSeriesMap.ma50 = ma50S;
+  }
+
+  // ── BOLLINGER BANDS ────────────────────────────────────────────
+  if (activeIndicators.bb && data.length >= 20) {
+    const bb = calcBB(data, 20);
+    const bbU = tvChart.addLineSeries({ color: 'rgba(168,85,247,0.5)', lineWidth: 1, lastValueVisible: false, priceLineVisible: false });
+    const bbM = tvChart.addLineSeries({ color: 'rgba(168,85,247,0.3)', lineWidth: 1, lineStyle: 2, lastValueVisible: false, priceLineVisible: false });
+    const bbL = tvChart.addLineSeries({ color: 'rgba(168,85,247,0.5)', lineWidth: 1, lastValueVisible: false, priceLineVisible: false });
+    bbU.setData(bb.upper); bbM.setData(bb.middle); bbL.setData(bb.lower);
+    chartSeriesMap.bb = [bbU, bbM, bbL];
+  }
+
+  // ── VOLUME ─────────────────────────────────────────────────────
   tvVolSeries = tvChart.addHistogramSeries({
     color: 'rgba(255,255,255,0.08)',
     priceFormat: { type: 'volume' },
@@ -495,19 +633,69 @@ function initTVChart(allCandles, type = 'candle') {
     scaleMargins: { top: 0.75, bottom: 0 },
   });
   tvVolSeries.setData(data.map(c => ({
-    time:  c.date,
-    value: c.volume || 0,
+    time: c.date, value: c.volume || 0,
     color: (c.close >= (c.open || c.close)) ? 'rgba(0,200,122,0.3)' : 'rgba(240,82,82,0.25)'
   })));
 
   tvChart.timeScale().fitContent();
 
-  // Responsive resize
-  const ro = new ResizeObserver(() => {
-    if (tvChart && container) tvChart.applyOptions({ width: container.clientWidth });
-  });
-  ro.observe(container);
+  // ── RSI PANEL ─────────────────────────────────────────────────
+  if (activeIndicators.rsi) {
+    const rsiContainer = document.getElementById('rsiChart');
+    if (rsiContainer && data.length >= 15) {
+      rsiChart = LightweightCharts.createChart(rsiContainer, {
+        width: rsiContainer.clientWidth,
+        height: 100,
+        layout: { background: { color: 'transparent' }, textColor: '#7a8a99' },
+        grid:   { vertLines: { color: 'rgba(255,255,255,0.03)' }, horzLines: { color: 'rgba(255,255,255,0.03)' } },
+        rightPriceScale: { borderColor: 'rgba(255,255,255,0.06)', scaleMargins: { top: 0.1, bottom: 0.1 } },
+        timeScale: { borderColor: 'rgba(255,255,255,0.06)', timeVisible: false },
+        handleScroll: false, handleScale: false,
+        crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+      });
+      rsiSeries = rsiChart.addLineSeries({ color: '#f05252', lineWidth: 1, lastValueVisible: true, priceLineVisible: false });
+      rsiSeries.setData(calcRSI(data, 14));
+      // OB/OS lines
+      const ob = rsiChart.addLineSeries({ color: 'rgba(240,82,82,0.3)', lineWidth: 1, lineStyle: 2, lastValueVisible: false, priceLineVisible: false });
+      const os = rsiChart.addLineSeries({ color: 'rgba(0,200,122,0.3)', lineWidth: 1, lineStyle: 2, lastValueVisible: false, priceLineVisible: false });
+      const times = data.slice(-data.length).map(c => c.date);
+      ob.setData(times.map(t => ({ time: t, value: 70 })));
+      os.setData(times.map(t => ({ time: t, value: 30 })));
+      rsiChart.timeScale().fitContent();
+      new ResizeObserver(() => { if (rsiChart && rsiContainer) rsiChart.applyOptions({ width: rsiContainer.clientWidth }); }).observe(rsiContainer);
+    }
+  }
+
+  // ── MACD PANEL ────────────────────────────────────────────────
+  if (activeIndicators.macd) {
+    const macdContainer = document.getElementById('macdChart');
+    if (macdContainer && data.length >= 35) {
+      macdChart = LightweightCharts.createChart(macdContainer, {
+        width: macdContainer.clientWidth,
+        height: 100,
+        layout: { background: { color: 'transparent' }, textColor: '#7a8a99' },
+        grid:   { vertLines: { color: 'rgba(255,255,255,0.03)' }, horzLines: { color: 'rgba(255,255,255,0.03)' } },
+        rightPriceScale: { borderColor: 'rgba(255,255,255,0.06)', scaleMargins: { top: 0.1, bottom: 0.1 } },
+        timeScale: { borderColor: 'rgba(255,255,255,0.06)', timeVisible: false },
+        handleScroll: false, handleScale: false,
+        crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+      });
+      const macdData = calcMACD(data);
+      macdHistSeries  = macdChart.addHistogramSeries({ lastValueVisible: false, priceLineVisible: false });
+      macdLineSeries  = macdChart.addLineSeries({ color: '#00c87a', lineWidth: 1, lastValueVisible: true, priceLineVisible: false });
+      macdSignalSeries = macdChart.addLineSeries({ color: '#f05252', lineWidth: 1, lastValueVisible: true, priceLineVisible: false });
+      if (macdData.hist.length)   macdHistSeries.setData(macdData.hist);
+      if (macdData.macd.length)   macdLineSeries.setData(macdData.macd);
+      if (macdData.signal.length) macdSignalSeries.setData(macdData.signal);
+      macdChart.timeScale().fitContent();
+      new ResizeObserver(() => { if (macdChart && macdContainer) macdChart.applyOptions({ width: macdContainer.clientWidth }); }).observe(macdContainer);
+    }
+  }
+
+  // Responsive resize main chart
+  new ResizeObserver(() => { if (tvChart && container) tvChart.applyOptions({ width: container.clientWidth }); }).observe(container);
 }
+
 
 function filterByRange(candles, range) {
   if (!candles) return [];
@@ -628,7 +816,7 @@ function buildResult(ticker, d) {
   <div class="chart-card">
     <div class="chart-hdr">
       <div class="chart-title">📊 Grafik Harga
-        <span style="font-size:9px;color:var(--g);background:var(--gdim);padding:2px 6px;border-radius:4px">TV Chart · MA20 · MA50 · Vol</span>
+        <span style="font-size:9px;color:var(--g);background:var(--gdim);padding:2px 6px;border-radius:4px">TV Chart · Lightweight Charts</span>
       </div>
       <div class="chart-controls">
         <div class="chart-type-tabs">
@@ -644,6 +832,22 @@ function buildResult(ticker, d) {
       </div>
     </div>
     <div id="tvChart"></div>
+    <div class="ind-toggles">
+      <span class="ind-toggle on-ma20" id="tog-ma20" onclick="toggleIndicator('ma20')">MA20</span>
+      <span class="ind-toggle on-ma50" id="tog-ma50" onclick="toggleIndicator('ma50')">MA50</span>
+      <span class="ind-toggle on-ema9" id="tog-ema9" onclick="toggleIndicator('ema9')">EMA9</span>
+      <span class="ind-toggle off-bb"  id="tog-bb"   onclick="toggleIndicator('bb')">BB</span>
+      <span class="ind-toggle off-rsi" id="tog-rsi"  onclick="toggleIndicator('rsi')">RSI</span>
+      <span class="ind-toggle off-macd" id="tog-macd" onclick="toggleIndicator('macd')">MACD</span>
+    </div>
+    <div class="subpanel" id="panel-rsi">
+      <div class="subpanel-lbl">RSI(14)</div>
+      <div id="rsiChart"></div>
+    </div>
+    <div class="subpanel" id="panel-macd">
+      <div class="subpanel-lbl">MACD(12,26,9)</div>
+      <div id="macdChart"></div>
+    </div>
   </div>` : `
   <div class="price-card">
     <div class="price-left"><h2>${ticker}</h2><div class="company">${esc(d.namaLengkap||ticker)}</div></div>
