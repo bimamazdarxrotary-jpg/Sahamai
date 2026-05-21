@@ -15,6 +15,18 @@ var { analyzeBandar }                     = require('../lib/bandar');
 
 // ── Rate Limiting ──────────────────────────────────────────────────
 var rateLimitMap = new Map();
+
+// FIX 1: Bersihkan IP lama setiap 5 menit agar tidak memory leak
+setInterval(function() {
+  var now = Date.now();
+  var window = 60 * 1000;
+  rateLimitMap.forEach(function(hits, ip) {
+    var fresh = hits.filter(function(t) { return now - t < window; });
+    if (fresh.length === 0) rateLimitMap.delete(ip);
+    else rateLimitMap.set(ip, fresh);
+  });
+}, 5 * 60 * 1000);
+
 function isRateLimited(ip) {
   var now    = Date.now();
   var window = 60 * 1000;
@@ -23,6 +35,37 @@ function isRateLimited(ip) {
   hits.push(now);
   rateLimitMap.set(ip, hits);
   return hits.length > max;
+}
+
+// ── Fetch dengan retry (FIX 2: handle Yahoo 429) ──────────────────
+async function fetchWithRetry(url, options, maxRetries) {
+  maxRetries = maxRetries || 2;
+  var delay  = 1000; // mulai 1 detik
+  for (var attempt = 0; attempt <= maxRetries; attempt++) {
+    var res;
+    try {
+      res = await fetch(url, options);
+    } catch (e) {
+      if (attempt === maxRetries) throw e;
+      await sleep(delay);
+      delay *= 2;
+      continue;
+    }
+    // Kalau 429, tunggu lalu retry
+    if (res.status === 429) {
+      if (attempt === maxRetries) return res; // kembalikan apa adanya, caller handle
+      var retryAfter = parseInt(res.headers.get('Retry-After') || '0', 10) || delay / 1000;
+      console.warn('[YAHOO 429] retry ke-' + (attempt + 1) + ' tunggu ' + retryAfter + 's');
+      await sleep(retryAfter * 1000);
+      delay *= 2;
+      continue;
+    }
+    return res;
+  }
+}
+
+function sleep(ms) {
+  return new Promise(function(resolve) { setTimeout(resolve, ms); });
 }
 
 // ── Fetch harga dari Yahoo Finance ─────────────────────────────────
@@ -39,7 +82,7 @@ async function fetchPriceData(ticker, isIndex) {
 
   var res;
   try {
-    res = await fetch(url, {
+    res = await fetchWithRetry(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         'Accept': 'application/json'
@@ -220,13 +263,13 @@ module.exports = async function handler(req, res) {
     return res.status(502).json({ error: err.message || 'AI tidak merespons. Coba lagi.' });
   }
 
-  // ── 9. Override metadata IDX ───────────────────────────────────
+  // ── Override metadata IDX ──────────────────────────────────────
   if (metadata) {
     parsed.namaLengkap = 'PT ' + metadata.name;
     parsed.sektor      = metadata.sector + (metadata.subsector ? ' - ' + metadata.subsector : '');
   }
 
-  // ── 10. Build response ─────────────────────────────────────────
+  // ── Build response ─────────────────────────────────────────────
   var response = Object.assign({}, parsed, {
     priceData: priceData ? {
       current:   priceData.current,

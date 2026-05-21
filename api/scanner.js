@@ -18,7 +18,7 @@ var SCAN_UNIVERSE = [
   'TPIA','INCO','ANTM','MDKA','AMMN','BRMS',
   'BSDE','CTRA','SMRA','PWON',
   'JSMR','WIKA','WSKT','PTPP','ADHI',
-  'AMMN','MYOR','SIDO','AMRT',
+  'MYOR','SIDO','AMRT',
   'EXCL','ISAT','TBIG',
   'HMSP','KAEF','HEAL','MIKA',
   'ACES','ERAA','MAPI',
@@ -31,18 +31,35 @@ var SCAN_UNIVERSE = [
 // De-duplicate
 SCAN_UNIVERSE = SCAN_UNIVERSE.filter(function(v, i, a) { return a.indexOf(v) === i; });
 
-var CACHE_TTL = 10 * 60 * 1000; // 10 menit
+var CACHE_TTL       = 10 * 60 * 1000; // 10 menit
+var FETCH_TIMEOUT   = 5000;            // FIX 3: 5 detik timeout per saham
+var VERCEL_DEADLINE = 8500;            // berhenti fetch setelah 8.5 detik (batas Vercel 10 detik)
+
+// FIX 3: Fetch dengan timeout agar tidak nunggu Yahoo terlalu lama
+function fetchWithTimeout(url, options, timeoutMs) {
+  return new Promise(function(resolve) {
+    var timer = setTimeout(function() { resolve(null); }, timeoutMs);
+    fetch(url, options).then(function(res) {
+      clearTimeout(timer);
+      resolve(res);
+    }).catch(function() {
+      clearTimeout(timer);
+      resolve(null);
+    });
+  });
+}
 
 async function fetchCandles(ticker) {
   var url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + ticker + '.JK?interval=1d&range=3mo';
   try {
-    var res = await fetch(url, {
+    var res = await fetchWithTimeout(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         'Accept': 'application/json'
       }
-    });
-    if (!res.ok) return null;
+    }, FETCH_TIMEOUT);
+
+    if (!res || !res.ok) return null;
 
     var json       = await res.json();
     var result     = json && json.chart && json.chart.result && json.chart.result[0];
@@ -191,27 +208,33 @@ function scanOneTicker(ticker, candleData) {
   };
 }
 
+// FIX 3: Fetch SEMUA saham paralel, bukan per batch berurutan
+// Jauh lebih cepat — semua request jalan serentak, dibatasi deadline Vercel
 async function runScan(filter) {
-  var results   = [];
+  var startTime = Date.now();
   var universe  = SCAN_UNIVERSE;
-  var batchSize = 6;
 
-  for (var i = 0; i < universe.length; i += batchSize) {
-    var batch   = universe.slice(i, i + batchSize);
-    var fetched = await Promise.all(batch.map(fetchCandles));
+  // Fetch semua sekaligus (paralel penuh)
+  var fetchedAll = await Promise.all(universe.map(fetchCandles));
 
-    for (var j = 0; j < batch.length; j++) {
-      if (!fetched[j]) continue;
-      var result = scanOneTicker(batch[j], fetched[j]);
-      if (!result) continue;
-
-      if (filter && filter !== 'all') {
-        var match = result.signals.some(function(s) { return s.type === filter; });
-        if (!match) continue;
-      }
-
-      results.push(result);
+  var results = [];
+  for (var i = 0; i < universe.length; i++) {
+    // Berhenti proses jika sudah mendekati deadline Vercel
+    if (Date.now() - startTime > VERCEL_DEADLINE) {
+      console.warn('[SCANNER] Mendekati deadline, berhenti di indeks ' + i);
+      break;
     }
+
+    if (!fetchedAll[i]) continue;
+    var result = scanOneTicker(universe[i], fetchedAll[i]);
+    if (!result) continue;
+
+    if (filter && filter !== 'all') {
+      var match = result.signals.some(function(s) { return s.type === filter; });
+      if (!match) continue;
+    }
+
+    results.push(result);
   }
 
   results.sort(function(a, b) { return b.score - a.score; });
