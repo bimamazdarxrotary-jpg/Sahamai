@@ -205,6 +205,12 @@
     "subsector": "Asuransi",
     "board": "Pengembangan"
   },
+  "ASPR": {
+    "name": "Aspirasi Hidup Indonesia Tbk",
+    "sector": "Industri",
+    "subsector": "Kemasan",
+    "board": "Pengembangan"
+  },
   "ASRI": {
     "name": "Alam Sutera Realty Tbk",
     "sector": "Properti",
@@ -511,6 +517,12 @@
     "subsector": "Kimia Dasar",
     "board": "Utama"
   },
+  "BRRC": {
+    "name": "Raja Roti Cemerlang Tbk",
+    "sector": "Konsumer Primer",
+    "subsector": "Makanan & Minuman",
+    "board": "Pengembangan"
+  },
   "BSDE": {
     "name": "Bumi Serpong Damai Tbk",
     "sector": "Properti",
@@ -595,6 +607,18 @@
     "subsector": "Rumah Sakit",
     "board": "Pengembangan"
   },
+  "CBDK": {
+    "name": "Bangun Kosambi Sukses Tbk",
+    "sector": "Properti",
+    "subsector": "Kawasan Industri",
+    "board": "Utama"
+  },
+  "CDIA": {
+    "name": "Chandra Daya Investasi Tbk",
+    "sector": "Infrastruktur",
+    "subsector": "Investasi Infrastruktur",
+    "board": "Utama"
+  },
   "CEKA": {
     "name": "Wilmar Cahaya Indonesia Tbk",
     "sector": "Konsumer Primer",
@@ -648,6 +672,12 @@
     "sector": "Konsumer Primer",
     "subsector": "Produk Susu Olahan",
     "board": "Utama"
+  },
+  "COIN": {
+    "name": "Indokripto Koin Semesta Tbk",
+    "sector": "Keuangan",
+    "subsector": "Kripto & Digital Asset",
+    "board": "Pengembangan"
   },
   "COWL": {
     "name": "Cowell Development Tbk",
@@ -730,6 +760,12 @@
     "sector": "Barang Baku",
     "subsector": "Nikel",
     "board": "Utama"
+  },
+  "DKHH": {
+    "name": "Cipta Sarana Medika Tbk",
+    "sector": "Kesehatan",
+    "subsector": "Rumah Sakit",
+    "board": "Pengembangan"
   },
   "DLTA": {
     "name": "Delta Djakarta Tbk",
@@ -822,6 +858,12 @@
     "name": "Bakrieland Development Tbk",
     "sector": "Properti",
     "subsector": "Properti",
+    "board": "Utama"
+  },
+  "EMAS": {
+    "name": "Merdeka Gold Resources Tbk",
+    "sector": "Barang Baku",
+    "subsector": "Pertambangan Emas",
     "board": "Utama"
   },
   "EMDE": {
@@ -1065,6 +1107,12 @@
     "name": "Hero Supermarket Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Ritel"
+  },
+  "HGII": {
+    "name": "Hero Global Investment Tbk",
+    "sector": "Keuangan",
+    "subsector": "Investasi",
+    "board": "Pengembangan"
   },
   "HITS": {
     "name": "Humpuss Intermoda Transportasi Tbk",
@@ -1374,6 +1422,12 @@
     "subsector": "Farmasi",
     "board": "Utama"
   },
+  "KAQI": {
+    "name": "Jantra Grupo Indonesia Tbk",
+    "sector": "Infrastruktur",
+    "subsector": "Transportasi",
+    "board": "Pengembangan"
+  },
   "KARW": {
     "name": "ICTSI Jasa Prima Tbk",
     "sector": "Infrastruktur",
@@ -1473,6 +1527,12 @@
     "name": "Bangun Karya Perkasa Jaya Tbk",
     "sector": "Infrastruktur",
     "subsector": "Konstruksi",
+    "board": "Pengembangan"
+  },
+  "KSIX": {
+    "name": "Kentanix Supra International Tbk",
+    "sector": "Properti",
+    "subsector": "Properti",
     "board": "Pengembangan"
   },
   "LABA": {
@@ -1707,6 +1767,12 @@
     "subsector": "Rumah Sakit",
     "board": "Utama"
   },
+  "MINA": {
+    "name": "Sanurhasta Mitra Tbk",
+    "sector": "Properti",
+    "subsector": "Properti & Real Estate",
+    "board": "Pengembangan"
+  },
   "MIRA": {
     "name": "Mitra International Resources Tbk",
     "sector": "Infrastruktur",
@@ -1903,6 +1969,12 @@
     "subsector": "Energi Terbarukan",
     "board": "Pengembangan"
   },
+  "OBAT": {
+    "name": "Brigit Biofarmaka Teknologi Tbk",
+    "sector": "Kesehatan",
+    "subsector": "Farmasi & Bioteknologi",
+    "board": "Pengembangan"
+  },
   "OKAS": {
     "name": "Ancora Indonesia Resources Tbk",
     "sector": "Energi",
@@ -1925,6 +1997,12 @@
     "name": "Provident Agro Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Perkebunan Sawit",
+    "board": "Utama"
+  },
+  "PANI": {
+    "name": "Pantai Indah Kapuk Dua Tbk",
+    "sector": "Properti",
+    "subsector": "Properti & Real Estate",
     "board": "Utama"
   },
   "PANR": {
@@ -1973,6 +2051,12 @@
     "name": "Pelangi Indah Canindo Tbk",
     "sector": "Barang Baku",
     "subsector": "Logam",
+    "board": "Pengembangan"
+  },
+  "PJHB": {
+    "name": "Pelayaran Jaya Hidup Baru Tbk",
+    "sector": "Infrastruktur",
+    "subsector": "Pelayaran",
     "board": "Pengembangan"
   },
   "PKPK": {
@@ -2119,6 +2203,12 @@
     "subsector": "Rumah Makan",
     "board": "Utama"
   },
+  "RAJA": {
+    "name": "Rukun Raharja Tbk",
+    "sector": "Energi",
+    "subsector": "Minyak dan Gas",
+    "board": "Utama"
+  },
   "RALS": {
     "name": "Ramayana Lestari Sentosa Tbk",
     "sector": "Konsumer Non-Primer",
@@ -2129,6 +2219,12 @@
     "name": "Supra Boga Lestari Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Ritel Makanan"
+  },
+  "RATU": {
+    "name": "Raharja Energi Cepu Tbk",
+    "sector": "Energi",
+    "subsector": "Minyak dan Gas",
+    "board": "Utama"
   },
   "RBMS": {
     "name": "Ristia Bintang Mahkotasejati Tbk",
@@ -2146,6 +2242,12 @@
     "name": "Reliance Sekuritas Indonesia Tbk",
     "sector": "Keuangan",
     "subsector": "Sekuritas",
+    "board": "Pengembangan"
+  },
+  "RLCO": {
+    "name": "Abadi Lestari Indonesia Tbk",
+    "sector": "Konsumer Non-Primer",
+    "subsector": "Ritel",
     "board": "Pengembangan"
   },
   "RMKO": {
@@ -2467,6 +2569,12 @@
     "subsector": "Properti",
     "board": "Pengembangan"
   },
+  "TAPG": {
+    "name": "Triputra Agro Persada Tbk",
+    "sector": "Konsumer Primer",
+    "subsector": "Perkebunan Kelapa Sawit",
+    "board": "Utama"
+  },
   "TAXI": {
     "name": "Express Transindo Utama Tbk",
     "sector": "Infrastruktur",
@@ -2761,11 +2869,23 @@
     "subsector": "Internet",
     "board": "Pengembangan"
   },
+  "YOII": {
+    "name": "Asuransi Digital Bersama Tbk",
+    "sector": "Keuangan",
+    "subsector": "Asuransi Digital",
+    "board": "Pengembangan"
+  },
   "YPAS": {
     "name": "Yanaprima Hastapersada Tbk",
     "sector": "Barang Baku",
     "subsector": "Plastik",
     "board": "Pengembangan"
+  },
+  "YUPI": {
+    "name": "Yupi Indo Jelly Gum Tbk",
+    "sector": "Konsumer Primer",
+    "subsector": "Makanan & Minuman",
+    "board": "Utama"
   },
   "ZINC": {
     "name": "Kapuas Prima Coal Tbk",
