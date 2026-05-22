@@ -7,16 +7,17 @@ var { computeAll }                        = require('../lib/indicators');
 var { analyzeVolume }                     = require('../lib/volume');
 var { analyzeStructure }                  = require('../lib/structure');
 var { computeScore }                      = require('../lib/scoring');
-var { callAI }                            = require('../lib/ai');
+var { callAI, sanitizeAIOutput }          = require('../lib/ai');
 var { cacheGet, cacheSet, TTL }           = require('../lib/cache');
 var { analyzeMarketContext }              = require('../lib/context');
 var { quickScan }                         = require('../lib/scanner');
 var { analyzeBandar }                     = require('../lib/bandar');
+var { fetchAllNews }                      = require('../lib/news');
 
 // ── Rate Limiting ──────────────────────────────────────────────────
 var rateLimitMap = new Map();
 
-// FIX 1: Bersihkan IP lama setiap 5 menit agar tidak memory leak
+// Bersihkan IP lama setiap 5 menit — cegah memory leak
 setInterval(function() {
   var now = Date.now();
   var window = 60 * 1000;
@@ -37,10 +38,10 @@ function isRateLimited(ip) {
   return hits.length > max;
 }
 
-// ── Fetch dengan retry (FIX 2: handle Yahoo 429) ──────────────────
+// ── Fetch dengan retry (handle Yahoo 429) ─────────────────────────
 async function fetchWithRetry(url, options, maxRetries) {
   maxRetries = maxRetries || 2;
-  var delay  = 1000; // mulai 1 detik
+  var delay  = 1000;
   for (var attempt = 0; attempt <= maxRetries; attempt++) {
     var res;
     try {
@@ -51,9 +52,8 @@ async function fetchWithRetry(url, options, maxRetries) {
       delay *= 2;
       continue;
     }
-    // Kalau 429, tunggu lalu retry
     if (res.status === 429) {
-      if (attempt === maxRetries) return res; // kembalikan apa adanya, caller handle
+      if (attempt === maxRetries) return res;
       var retryAfter = parseInt(res.headers.get('Retry-After') || '0', 10) || delay / 1000;
       console.warn('[YAHOO 429] retry ke-' + (attempt + 1) + ' tunggu ' + retryAfter + 's');
       await sleep(retryAfter * 1000);
@@ -206,7 +206,7 @@ module.exports = async function handler(req, res) {
   var metadata = validation.metadata;
 
   // ── Cek cache analisis ─────────────────────────────────────────
-  var cacheKey      = 'analysis:' + ticker;
+  var cacheKey       = 'analysis:' + ticker;
   var cachedAnalysis = cacheGet(cacheKey);
   if (cachedAnalysis) {
     console.log('[CACHE HIT]', ticker);
@@ -241,23 +241,41 @@ module.exports = async function handler(req, res) {
     ? quickScan(ticker, candles, indicators, volumeData, structure, scoring)
     : null;
 
-  // ── 8. Bandar analysis ───────────────────────────────────────────
+  // ── 8. Bandar analysis ─────────────────────────────────────────
   var bandarData = !isIndex && candles.length >= 20
     ? analyzeBandar(candles, indicators, volumeData, priceData, metadata)
     : null;
   if (bandarData) console.log('[BANDAR]', ticker, 'score=' + bandarData.bandarScore, bandarData.smartMoney && bandarData.smartMoney.label);
 
-  // ── 9. AI ──────────────────────────────────────────────────────
+  // ── 9. Fetch berita terkini ────────────────────────────────────
+  var newsData = null;
+  try {
+    newsData = await fetchAllNews(ticker, metadata, isIndex);
+    console.log('[NEWS]', ticker, 'emiten=' + (newsData.emiten && newsData.emiten.length) + ' komods=' + (newsData.komoditas && newsData.komoditas.length));
+  } catch (e) {
+    console.warn('[NEWS ERROR]', e.message);
+    // Tidak fatal — lanjut tanpa berita
+  }
+
+  // ── 10. AI ────────────────────────────────────────────────────
   var priceContext = buildPriceContext(priceData);
   var parsed;
   try {
-    var rawAI = await callAI({ ticker: ticker, metadata: metadata, isIndex: isIndex, priceData: priceData, priceContext: priceContext, indicators: indicators, volumeData: volumeData, structure: structure, scoring: scoring, bandarData: bandarData });
+    var rawAI = await callAI({
+      ticker, metadata, isIndex, priceData, priceContext,
+      indicators, volumeData, structure, scoring, bandarData,
+      newsData
+    });
     var aiValidation = validateAIOutput(rawAI);
     if (!aiValidation.valid) {
       console.error('[AI PARSE]', ticker + ':', aiValidation.error);
       return res.status(502).json({ error: 'Format respons AI tidak valid. Coba lagi.' });
     }
     parsed = aiValidation.parsed;
+
+    // FIX: Sanitize angka target/SL/levelBeli dari AI
+    parsed = sanitizeAIOutput(parsed, priceData);
+
   } catch (err) {
     console.error('[AI ERROR]', ticker + ':', err.message);
     return res.status(502).json({ error: err.message || 'AI tidak merespons. Coba lagi.' });
@@ -269,7 +287,7 @@ module.exports = async function handler(req, res) {
     parsed.sektor      = metadata.sector + (metadata.subsector ? ' - ' + metadata.subsector : '');
   }
 
-  // ── Build response ─────────────────────────────────────────────
+  // ── Build response — include indikator baru di cache ───────────
   var response = Object.assign({}, parsed, {
     priceData: priceData ? {
       current:   priceData.current,
@@ -295,7 +313,14 @@ module.exports = async function handler(req, res) {
       atr:    indicators.atr,
       stoch:  indicators.stoch,
       trend:  indicators.trend,
-      levels: indicators.levels
+      levels: indicators.levels,
+      // NEW: indikator baru masuk cache
+      mfi:         indicators.mfi        || null,
+      divergence:  indicators.divergence || null,
+      fibonacci:   indicators.fibonacci  || null,
+      candlestick: indicators.candlestick || null,
+      relStrength: indicators.relStrength || null,
+      pivots:      indicators.pivots     || null
     },
     volumeData: volumeData ? {
       bias:         volumeData.accDist && volumeData.accDist.bias,
@@ -329,6 +354,11 @@ module.exports = async function handler(req, res) {
     } : null,
     marketContext: marketContext,
     scanSignals:   scanSignals ? scanSignals.signals : [],
+    newsData:      newsData ? {
+      emiten:    newsData.emiten    || [],
+      komoditas: newsData.komoditas || [],
+      makro:     newsData.makro     || []
+    } : null,
     ticker:        ticker,
     generatedAt:   new Date().toISOString(),
     latencyMs:     Date.now() - startTime,
