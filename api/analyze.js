@@ -138,6 +138,23 @@ async function fetchPriceData(ticker, isIndex) {
   var change    = lastClose - prevClose;
   var changePct = prevClose ? parseFloat((change / prevClose * 100).toFixed(2)) : 0;
 
+  // Filter data Yahoo yang tidak wajar (corporate action, stock split, dll)
+  // Kalau change > 25% dalam sehari, kemungkinan data salah — reset ke 0
+  if (Math.abs(changePct) > 25) {
+    var prevFromCandles = candles.length >= 2 ? candles[candles.length - 2].close : lastClose;
+    var changePctFromCandles = prevFromCandles ? parseFloat(((lastClose - prevFromCandles) / prevFromCandles * 100).toFixed(2)) : 0;
+    // Pakai data candle kalau lebih masuk akal
+    if (Math.abs(changePctFromCandles) <= 25) {
+      prevClose = prevFromCandles;
+      change    = lastClose - prevClose;
+      changePct = changePctFromCandles;
+    } else {
+      // Keduanya tidak wajar — kemungkinan corporate action, tampilkan 0
+      change    = 0;
+      changePct = 0;
+    }
+  }
+
   var priceData = {
     current:   Math.round(lastClose),
     prevClose: Math.round(prevClose),
