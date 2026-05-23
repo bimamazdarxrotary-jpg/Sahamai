@@ -119,6 +119,8 @@ nav{position:sticky;top:0;z-index:100;background:rgba(10,13,18,0.9);backdrop-fil
 .s-card-label.gold::before{background:var(--gold)}
 .s-card-label.blue::before{background:var(--blue)}
 .s-card-label.purple::before{background:var(--purple)}
+.news-item{padding:8px 0;border-bottom:1px solid var(--border)}
+.news-item:last-child{border-bottom:none}
 
 /* TICKER HEADER */
 .ticker-hdr{display:flex;align-items:flex-start;justify-content:space-between;
@@ -843,6 +845,134 @@ function buildResult(ticker,d){
   const sectorCtx=d.sektorContext&&!isIndex?`
   <div class="s-card"><div class="s-card-label blue">🔄 Konteks Sektor</div><div style="font-size:0.88rem;color:var(--text2);line-height:1.8;margin-top:0.75rem">${esc(d.sektorContext)}</div></div>`:'';
 
+  // NEW: INDIKATOR PRO
+  const ind2=d.indicators||{};
+
+  // Candlestick Pattern
+  const csCard=ind2.candlestick&&ind2.candlestick.patterns&&ind2.candlestick.patterns.length?`
+  <div class="s-card">
+    <div class="s-card-label gold">🕯️ Candlestick Pattern</div>
+    <div style="margin-top:0.75rem;display:flex;flex-wrap:wrap;gap:6px">
+      ${ind2.candlestick.patterns.map(p=>`
+      <div style="background:var(--bg3);border:1px solid ${p.type==='bullish'?'rgba(0,230,118,0.2)':p.type==='bearish'?'rgba(255,82,82,0.2)':'var(--border)'};border-radius:9px;padding:0.7rem 0.9rem;flex:1;min-width:200px">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+          <span style="font-size:11px;font-weight:700;font-family:var(--mono);color:${p.type==='bullish'?'var(--g)':p.type==='bearish'?'var(--red)':'var(--text2)'}">${esc(p.name)}</span>
+          <span class="pill ${p.strength==='high'?'pill-g':p.strength==='medium'?'pill-gold':'pill-gray'}">${p.strength}</span>
+          <span class="pill ${p.type==='bullish'?'pill-g':p.type==='bearish'?'pill-r':'pill-gray'}">${p.type}</span>
+        </div>
+        <div style="font-size:11px;color:var(--text2);line-height:1.6">${esc(p.signal)}</div>
+      </div>`).join('')}
+    </div>
+  </div>`:'';
+
+  // Fibonacci
+  const fibCard=ind2.fibonacci?`
+  <div class="s-card">
+    <div class="s-card-label purple">📐 Fibonacci Retracement</div>
+    <div style="margin-top:0.75rem">
+      ${ind2.fibonacci.atKeyLevel?`<div style="margin-bottom:8px"><span class="pill pill-gold">⚠️ HARGA DI LEVEL KUNCI FIB</span></div>`:''}
+      <div style="font-size:11px;color:var(--text2);margin-bottom:10px">${esc(ind2.fibonacci.narrative||'')}</div>
+      <div class="stat-grid">
+        <div class="stat-box"><div class="stat-lbl">HIGH RANGE</div><div class="stat-val g">${fmtPrice(ind2.fibonacci.high)}</div></div>
+        <div class="stat-box"><div class="stat-lbl">LOW RANGE</div><div class="stat-val r">${fmtPrice(ind2.fibonacci.low)}</div></div>
+        <div class="stat-box"><div class="stat-lbl">FIB SUPPORT</div><div class="stat-val g">${fmtPrice(ind2.fibonacci.nearSupport)}</div></div>
+        <div class="stat-box"><div class="stat-lbl">FIB RESIST</div><div class="stat-val r">${fmtPrice(ind2.fibonacci.nearResistance)}</div></div>
+        <div class="stat-box"><div class="stat-lbl">POSISI</div><div class="stat-val">${ind2.fibonacci.positionPct}%</div></div>
+        <div class="stat-box"><div class="stat-lbl">ZONE</div><div class="stat-val" style="font-size:0.75rem">${(ind2.fibonacci.zone||'').replace(/_/g,' ')}</div></div>
+      </div>
+      <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:5px">
+        ${ind2.fibonacci.levels?Object.entries(ind2.fibonacci.levels).filter(([k])=>k.startsWith('r')&&k!=='r0'&&k!=='r100').map(([k,v])=>`<span class="pill pill-gray">${k.replace('r','').replace('e','')}%: ${fmtPrice(v)}</span>`).join(''):''}
+      </div>
+    </div>
+  </div>`:'';
+
+  // MFI + Divergence + Relative Strength + Pivot
+  const proIndicators=(ind2.mfi||ind2.divergence||ind2.relStrength||ind2.pivots)?`
+  <div class="two-col">
+    ${ind2.mfi?`<div class="s-card" style="margin-bottom:0">
+      <div class="s-card-label blue">💧 Money Flow Index</div>
+      <div style="margin-top:0.75rem">
+        <div style="font-family:var(--mono);font-size:2rem;font-weight:700;color:${ind2.mfi.mfi<30?'var(--g)':ind2.mfi.mfi>70?'var(--red)':'var(--gold)'}">${ind2.mfi.mfi}<span style="font-size:1rem;color:var(--text3)">/100</span></div>
+        <span class="pill ${ind2.mfi.signal==='oversold'?'pill-g':ind2.mfi.signal==='overbought'?'pill-r':'pill-gold'}" style="margin-top:6px;display:inline-block">${(ind2.mfi.signal||'').toUpperCase()}</span>
+        ${ind2.mfi.divergenceHint?`<div style="font-size:11px;color:var(--gold);margin-top:6px">⚡ ${esc(ind2.mfi.divergenceHint.replace(/_/g,' '))}</div>`:''}
+      </div>
+    </div>`:'<div></div>'}
+    ${ind2.relStrength?`<div class="s-card" style="margin-bottom:0">
+      <div class="s-card-label">📊 Relative Strength</div>
+      <div style="margin-top:0.75rem">
+        <div style="font-family:var(--mono);font-size:2rem;font-weight:700;color:${ind2.relStrength.rsScore>=60?'var(--g)':ind2.relStrength.rsScore>=40?'var(--gold)':'var(--red)'}">${ind2.relStrength.rsScore}<span style="font-size:1rem;color:var(--text3)">/100</span></div>
+        <span class="pill ${ind2.relStrength.trend==='outperform'?'pill-g':ind2.relStrength.trend==='underperform'?'pill-r':'pill-gold'}" style="margin-top:6px;display:inline-block">${(ind2.relStrength.trend||'').toUpperCase()}</span>
+        <div style="font-size:11px;color:var(--text2);margin-top:6px">${esc(ind2.relStrength.narrative||'')}</div>
+      </div>
+    </div>`:'<div></div>'}
+  </div>
+  <div style="margin-bottom:10px"></div>
+  ${ind2.divergence&&ind2.divergence.detected?`
+  <div class="s-card" style="background:${ind2.divergence.bias==='bullish'?'linear-gradient(135deg,rgba(0,230,118,0.07),transparent)':'linear-gradient(135deg,rgba(255,82,82,0.07),transparent)'};border-color:${ind2.divergence.bias==='bullish'?'rgba(0,230,118,0.2)':'rgba(255,82,82,0.2)'}">
+    <div class="s-card-label ${ind2.divergence.bias==='bullish'?'':'red'}">⚡ Divergence Terdeteksi</div>
+    <div style="margin-top:0.75rem">
+      <span class="pill ${ind2.divergence.bias==='bullish'?'pill-g':'pill-r'}" style="margin-bottom:8px;display:inline-block">${esc(ind2.divergence.summary)}</span>
+      ${(ind2.divergence.divergences||[]).map(dv=>`<div style="font-size:11px;color:var(--text2);margin-top:5px;padding:5px 8px;background:var(--bg3);border-radius:6px">
+        <span style="font-family:var(--mono);font-weight:700;color:${dv.type==='bullish'?'var(--g)':'var(--red)'}">${dv.indicator}</span> — ${esc(dv.signal)}
+      </div>`).join('')}
+    </div>
+  </div>`:''}
+  ${ind2.pivots?`
+  <div class="s-card">
+    <div class="s-card-label">🎯 Pivot Points Classic</div>
+    <div style="margin-top:0.75rem">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:10px;font-family:var(--mono)">${esc(ind2.pivots.position||'').replace(/_/g,' ').toUpperCase()}</div>
+      <div class="three-col" style="margin-bottom:0">
+        <div class="stat-box"><div class="stat-lbl">R2</div><div class="stat-val r">${fmtPrice(ind2.pivots.R2)}</div></div>
+        <div class="stat-box"><div class="stat-lbl">R1</div><div class="stat-val r">${fmtPrice(ind2.pivots.R1)}</div></div>
+        <div class="stat-box" style="border-color:rgba(255,255,255,0.15)"><div class="stat-lbl">PIVOT</div><div class="stat-val gold">${fmtPrice(ind2.pivots.P)}</div></div>
+        <div class="stat-box"><div class="stat-lbl">S1</div><div class="stat-val g">${fmtPrice(ind2.pivots.S1)}</div></div>
+        <div class="stat-box"><div class="stat-lbl">S2</div><div class="stat-val g">${fmtPrice(ind2.pivots.S2)}</div></div>
+        <div class="stat-box"><div class="stat-lbl">S3</div><div class="stat-val g">${fmtPrice(ind2.pivots.S3)}</div></div>
+      </div>
+    </div>
+  </div>`:''}
+  `:'';
+
+  // NEW: BERITA
+  const nd=d.newsData||{};
+  const hasNews=(nd.emiten&&nd.emiten.length)||(nd.komoditas&&nd.komoditas.length)||(nd.makro&&nd.makro.length);
+  const newsCard=hasNews?`
+  <div class="s-card">
+    <div class="s-card-hdr">
+      <div class="s-card-label blue">📰 Berita Terkini</div>
+      <span style="font-size:9px;color:var(--text3);font-family:var(--mono)">Google News · CNBC · Detik · Kontan</span>
+    </div>
+    ${nd.emiten&&nd.emiten.length?`
+    <div style="margin-bottom:1rem">
+      <div style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;font-family:var(--mono);margin-bottom:8px">📌 BERITA EMITEN</div>
+      ${nd.emiten.map(n=>`
+      <div style="padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="font-size:12px;font-weight:600;color:var(--text);line-height:1.5;margin-bottom:3px">${esc(n.title)}</div>
+        ${n.description?`<div style="font-size:11px;color:var(--text3);line-height:1.5">${esc(n.description)}</div>`:''}
+        <div style="font-size:10px;color:var(--text3);margin-top:3px;font-family:var(--mono)">${esc(n.source)} · ${esc(n.date)}</div>
+      </div>`).join('')}
+    </div>`:''}
+    ${nd.komoditas&&nd.komoditas.length?nd.komoditas.map(c=>`
+    <div style="margin-bottom:1rem">
+      <div style="font-size:9px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1.5px;font-family:var(--mono);margin-bottom:8px">⛏️ ${esc(c.komoditas.toUpperCase())}</div>
+      ${c.items.map(n=>`
+      <div style="padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="font-size:12px;font-weight:600;color:var(--text);line-height:1.5">${esc(n.title)}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:3px;font-family:var(--mono)">${esc(n.source)} · ${esc(n.date)}</div>
+      </div>`).join('')}
+    </div>`).join(''):''}
+    ${nd.makro&&nd.makro.length?`
+    <div>
+      <div style="font-size:9px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:1.5px;font-family:var(--mono);margin-bottom:8px">🌏 SENTIMEN MARKET</div>
+      ${nd.makro.map(n=>`
+      <div style="padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="font-size:12px;font-weight:600;color:var(--text);line-height:1.5">${esc(n.title)}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:3px;font-family:var(--mono)">${esc(n.source)} · ${esc(n.date)}</div>
+      </div>`).join('')}
+    </div>`:''}
+  </div>`:'';
+
   // INFO
   const infoCard=`
   <div class="s-card">
@@ -854,6 +984,7 @@ function buildResult(ticker,d){
       <tr><td>Dianalisis pada</td><td>${today}</td></tr>
       ${d.latencyMs?`<tr><td>Waktu analisis</td><td>${d.latencyMs}ms</td></tr>`:''}
       ${d.fromCache?`<tr><td>Data</td><td>⚡ Cache</td></tr>`:''}
+      ${hasNews?`<tr><td>Berita</td><td style="color:var(--g)">✓ Tersedia</td></tr>`:`<tr><td>Berita</td><td style="color:var(--text3)">Tidak tersedia</td></tr>`}
     </table>
   </div>`;
 
@@ -868,6 +999,9 @@ function buildResult(ticker,d){
     ${intelGrid}
     ${srCard}
     ${setupsSection}
+    ${csCard}
+    ${fibCard}
+    ${proIndicators}
     ${smCard}
     ${mainCard}
     ${thesis}
@@ -877,6 +1011,7 @@ function buildResult(ticker,d){
     ${rekSaham}
     ${bandarCard}
     ${sectorCtx}
+    ${newsCard}
     ${infoCard}
   `;
 }
