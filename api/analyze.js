@@ -11,10 +11,9 @@ var { callAI, sanitizeAIOutput }          = require('../lib/ai');
 var { cacheGet, cacheSet, TTL }           = require('../lib/cache');
 var { analyzeMarketContext }              = require('../lib/context');
 var { quickScan }                         = require('../lib/scanner');
-var { analyzeBandar }                     = require("../lib/bandar");
-var { fetchAllNews }                      = require("../lib/news");
-var log                                   = require("../lib/logger");
+var { analyzeBandar }                     = require('../lib/bandar');
 var { fetchAllNews }                      = require('../lib/news');
+var log                                   = require('../lib/logger');
 
 // ── Rate Limiting ──────────────────────────────────────────────────
 var rateLimitMap = new Map();
@@ -41,15 +40,25 @@ function isRateLimited(ip) {
 }
 
 // ── Fetch dengan retry (handle Yahoo 429) ─────────────────────────
+var YAHOO_TIMEOUT = 8000; // 8 detik — cegah hang saat Yahoo lambat
+
 async function fetchWithRetry(url, options, maxRetries) {
   maxRetries = maxRetries || 2;
   var delay  = 1000;
   for (var attempt = 0; attempt <= maxRetries; attempt++) {
     var res;
     try {
-      res = await fetch(url, options);
+      var controller = new AbortController();
+      var timer = setTimeout(function() { controller.abort(); }, YAHOO_TIMEOUT);
+      res = await fetch(url, Object.assign({}, options, { signal: controller.signal }));
+      clearTimeout(timer);
     } catch (e) {
-      if (attempt === maxRetries) throw e;
+      if (e.name === 'AbortError') {
+        log.warn('analyze', '[YAHOO TIMEOUT]', url);
+        if (attempt === maxRetries) throw new Error('Yahoo Finance timeout setelah ' + YAHOO_TIMEOUT + 'ms');
+      } else {
+        if (attempt === maxRetries) throw e;
+      }
       await sleep(delay);
       delay *= 2;
       continue;
