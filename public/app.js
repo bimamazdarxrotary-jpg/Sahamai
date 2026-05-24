@@ -104,7 +104,7 @@ function buildResult(ticker,d){
 
   // SCAN SIGNALS
   const scanSignalsHtml=(d.scanSignals&&d.scanSignals.length)?'<div class="scan-signals">'+
-    d.scanSignals.map(s=>{const icon=s.type==='breakout'?'🚀':s.type==='volume_spike'?'📊':s.type==='oversold'?'🔻':s.type==='golden_cross'?'✨':s.type==='accumulation'?'📦':s.type==='macd_cross'?'⚡':'🔔';return'<span class="scan-signal '+(s.strength||'medium')+'">'+icon+' '+esc(s.label)+'</span>';}).join('')+'</div>':'';
+    d.scanSignals.map(s=>{const icon=s.type==='breakout'?'🚀':s.type==='volume_spike'?'📊':s.type==='oversold'?'🔻':s.type==='golden_cross'?'✨':s.type==='accumulation'?'📦':s.type==='macd_cross'?'⚡':s.type==='ready_pump'?'🎯':'🔔';return'<span class="scan-signal '+(s.strength||'medium')+'">'+icon+' '+esc(s.label)+'</span>';}).join('')+'</div>':'';
 
   // PRICE HEADER CARD
   const priceCard=pd.current?`
@@ -604,6 +604,22 @@ async function runScanner(){
         total:0
       });
       data.total=data.results.length;
+    } else if(currentScanFilter==='ready_pump'){
+      // Filter saham dengan setup matang untuk naik:
+      // Score >= 6, RSI < 45 (belum overbought), ada sinyal bullish, tidak downtrend berat
+      data=Object.assign({},data,{
+        results:data.results.filter(item=>{
+          const hasBullishSignal=item.signals&&item.signals.some(s=>
+            s.direction==='long'&&(s.strength==='high'||s.strength==='medium')
+          );
+          const rsiOk=item.rsi==null||(item.rsi<45&&item.rsi>10);
+          const scoreOk=item.score>=6;
+          const notDeathCross=!item.signals||!item.signals.some(s=>s.type==='death_cross');
+          return hasBullishSignal&&rsiOk&&scoreOk&&notDeathCross;
+        }).sort((a,b)=>b.score-a.score),
+        total:0
+      });
+      data.total=data.results.length;
     }
 
     renderScanResults(data,currentScanFilter);
@@ -628,6 +644,7 @@ function renderScanResults(data, filter){
   if(!data.results||!data.results.length){
     const msg=filter==='bullish'?'Tidak ada saham bullish saat ini (skor ≥ 6).':
               filter==='naik'?'Tidak ada saham yang naik hari ini.':
+              filter==='ready_pump'?'Tidak ada saham dengan setup Ready to Pump saat ini.':
               'Tidak ada setup terdeteksi untuk filter ini.';
     res.innerHTML=`<div class="scanner-empty">🔍 ${msg}<br><span style="font-size:11px;color:var(--text3);margin-top:8px;display:block">Coba filter lain atau scan ulang.</span></div>`;
     return;
@@ -656,7 +673,7 @@ function renderScanResults(data, filter){
     const borderColor=isShort?'var(--red)':topStrength==='high'?'var(--g)':'rgba(255,171,64,0.5)';
     const sigBadges=item.signals.slice(0,4).map(s=>{
       const sc=s.strength==='high'?'high':s.direction==='short'?'short':'medium';
-      const icon=s.type==='breakout'?'🚀':s.type==='volume_spike'?'📊':s.type==='oversold'?'🔻':s.type==='golden_cross'?'✨':s.type==='accumulation'?'📦':s.type==='death_cross'?'💀':s.type==='mfi_oversold'?'💧':s.type==='divergence'?'⚡':s.type==='candlestick'?'🕯️':s.type==='fib_level'?'📐':'🔔';
+      const icon=s.type==='breakout'?'🚀':s.type==='volume_spike'?'📊':s.type==='oversold'?'🔻':s.type==='golden_cross'?'✨':s.type==='accumulation'?'📦':s.type==='death_cross'?'💀':s.type==='mfi_oversold'?'💧':s.type==='divergence'?'⚡':s.type==='candlestick'?'🕯️':s.type==='fib_level'?'📐':s.type==='ready_pump'?'🎯':'🔔';
       return`<span class="sc-sig ${sc}">${icon} ${esc(s.label)}</span>`;
     }).join('');
     return`<div class="sc-card-new" style="border-left-color:${borderColor}" onclick="analyzeFromScanner('${item.ticker}')">
