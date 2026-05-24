@@ -650,29 +650,42 @@ function renderScanResults(data, filter){
   const cards=data.results.map(item=>{
     const topStrength=item.topSignal?item.topSignal.strength:'medium';
     const isNaik=item.isUp&&item.changePct>0;
-    const cardClass=(topStrength==='high'?'high':item.topSignal&&item.topSignal.direction==='short'?'short':'medium')+(isNaik&&filter==='naik'?' is-naik':'');
+    const isShort=item.topSignal&&item.topSignal.direction==='short';
     const scoreColor=item.score>=7?'var(--g)':item.score>=5?'var(--gold)':'var(--red)';
-    const sigBadges=item.signals.slice(0,3).map(s=>{
+    const scoreGrad=item.score>=7?'linear-gradient(90deg,#00c853,#00e676)':item.score>=5?'linear-gradient(90deg,#e65100,#ffab40)':'linear-gradient(90deg,#b71c1c,#ff5252)';
+    const borderColor=isShort?'var(--red)':topStrength==='high'?'var(--g)':'rgba(255,171,64,0.5)';
+    const sigBadges=item.signals.slice(0,4).map(s=>{
       const sc=s.strength==='high'?'high':s.direction==='short'?'short':'medium';
-      const icon=s.type==='breakout'?'🚀':s.type==='volume_spike'?'📊':s.type==='oversold'?'🔻':s.type==='golden_cross'?'✨':s.type==='accumulation'?'📦':s.type==='death_cross'?'💀':'⚡';
+      const icon=s.type==='breakout'?'🚀':s.type==='volume_spike'?'📊':s.type==='oversold'?'🔻':s.type==='golden_cross'?'✨':s.type==='accumulation'?'📦':s.type==='death_cross'?'💀':s.type==='mfi_oversold'?'💧':s.type==='divergence'?'⚡':s.type==='candlestick'?'🕯️':s.type==='fib_level'?'📐':'🔔';
       return`<span class="sc-sig ${sc}">${icon} ${esc(s.label)}</span>`;
     }).join('');
-    return`<div class="sc-card ${cardClass}" onclick="analyzeFromScanner('${item.ticker}')">
-      <div class="sc-card-top">
-        <div><div class="sc-ticker">${esc(item.ticker)}</div><div style="font-size:9px;color:var(--text3);margin-top:1px;font-family:var(--mono)">${esc(item.sector||'')}</div></div>
-        <div style="text-align:right"><div class="sc-score" style="color:${scoreColor}">${item.score}/10</div><div style="font-size:9px;color:var(--text3);font-family:var(--mono)">${esc(item.recommendation||'')}</div></div>
+    return`<div class="sc-card-new" style="border-left-color:${borderColor}" onclick="analyzeFromScanner('${item.ticker}')">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div>
+            <div style="font-family:var(--mono);font-size:1.1rem;font-weight:700;letter-spacing:-0.5px;line-height:1">${esc(item.ticker)}</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:var(--mono)">${esc(item.sector||'')}</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:var(--mono);font-size:1.4rem;font-weight:700;color:${scoreColor};line-height:1">${item.score}<span style="font-size:0.75rem;color:var(--text3)">/10</span></div>
+          <div style="font-size:9px;font-weight:700;font-family:var(--mono);color:${scoreColor};margin-top:1px">${esc(item.recommendation||'')}</div>
+        </div>
       </div>
-      <div class="sc-name">${esc(item.name||item.ticker)}</div>
-      <div class="sc-price-row">
-        <span class="sc-price">Rp ${item.lastClose?item.lastClose.toLocaleString('id-ID'):'N/A'}</span>
-        <span class="sc-chg ${item.isUp?'up':'down'}">${item.isUp?'+':''}${item.changePct||0}%</span>
-        ${item.rsi!=null?`<span style="font-size:9px;color:var(--text3);margin-left:3px;font-family:var(--mono)">RSI ${item.rsi}</span>`:''}
+      <div style="font-size:12px;color:var(--text2);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(item.name||item.ticker)}</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <span style="font-family:var(--mono);font-size:1rem;font-weight:700">Rp ${item.lastClose?item.lastClose.toLocaleString('id-ID'):'N/A'}</span>
+        <span style="font-size:11px;font-weight:700;font-family:var(--mono);color:${item.isUp?'var(--g)':'var(--red)'}">${item.isUp?'+':''}${item.changePct||0}%</span>
+        ${item.rsi!=null?`<span style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-left:auto">RSI <span style="color:${item.rsi<30?'var(--g)':item.rsi>70?'var(--red)':'var(--text2)'};font-weight:700">${item.rsi}</span></span>`:''}
       </div>
-      <div class="sc-signals">${sigBadges}</div>
+      <div style="height:2px;background:var(--bg3);border-radius:1px;overflow:hidden;margin-bottom:8px">
+        <div style="height:100%;width:${item.score*10}%;background:${scoreGrad};border-radius:1px;transition:width 0.8s ease"></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px">${sigBadges}</div>
     </div>`;
   }).join('');
 
-  res.innerHTML=statsBar+'<div class="scanner-grid">'+cards+'</div>';
+  res.innerHTML=statsBar+'<div class="scanner-list">'+cards+'</div>';
 }
 
 function analyzeFromScanner(ticker){

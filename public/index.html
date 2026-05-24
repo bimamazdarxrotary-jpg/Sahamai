@@ -336,7 +336,10 @@ nav{position:sticky;top:0;z-index:100;background:rgba(10,13,18,0.9);backdrop-fil
 .scanner-hdr{margin-bottom:1.25rem}
 .scanner-title{font-size:1.2rem;font-weight:700;letter-spacing:-0.5px;margin-bottom:3px}
 .scanner-sub{font-size:12px;color:var(--text3);font-family:var(--mono)}
-.scanner-filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1.25rem;align-items:center}
+.scanner-filters{display:flex;gap:6px;margin-bottom:1.25rem;align-items:center;
+  overflow-x:auto;padding-bottom:4px;scrollbar-width:none;white-space:nowrap;
+  -webkit-overflow-scrolling:touch}
+.scanner-filters::-webkit-scrollbar{display:none}
 .sf-btn{font-size:10px;padding:5px 12px;border-radius:6px;cursor:pointer;color:var(--text2);
   background:var(--bg2);border:1px solid var(--border2);font-family:var(--mono);
   font-weight:700;letter-spacing:0.5px;transition:all 0.15s}
@@ -351,6 +354,13 @@ nav{position:sticky;top:0;z-index:100;background:rgba(10,13,18,0.9);backdrop-fil
 .scanner-run-btn:hover{background:#1aff84}
 .scanner-run-btn:disabled{opacity:0.4;cursor:not-allowed}
 .scanner-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px}
+/* NEW: 1 kolom list */
+.scanner-list{display:flex;flex-direction:column;gap:8px}
+.sc-card-new{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--g);
+  border-radius:var(--card-radius);padding:1rem 1.1rem;cursor:pointer;
+  transition:all 0.2s;position:relative}
+.sc-card-new:hover{border-color:var(--g);transform:translateX(3px);
+  box-shadow:0 2px 16px rgba(0,230,118,0.06)}
 
 /* SCANNER CARD */
 .sc-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--card-radius);
