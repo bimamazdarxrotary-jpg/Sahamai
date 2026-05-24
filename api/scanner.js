@@ -11,21 +11,39 @@ var { cacheGet, cacheSet } = require('../lib/cache');
 var IDX_STOCKS           = require('../data/idx-stocks.json');
 
 var SCAN_UNIVERSE = [
-  'BBCA','BBRI','BMRI','BBNI','BRIS','BBTN',
-  'TLKM','ASII','UNVR','ICBP','KLBF',
-  'ADRO','PTBA','ITMG','BREN','PGAS','HRUM','GEMS',
-  'GOTO','BUKA','EMTK',
-  'TPIA','INCO','ANTM','MDKA','AMMN','BRMS',
-  'BSDE','CTRA','SMRA','PWON',
-  'JSMR','WIKA','WSKT','PTPP','ADHI',
-  'MYOR','SIDO','AMRT',
-  'EXCL','ISAT','TBIG',
-  'HMSP','KAEF','HEAL','MIKA',
-  'ACES','ERAA','MAPI',
-  'SMGR','INTP',
-  'INKP','TKIM',
-  'JPFA','CPIN',
-  'AALI','LSIP'
+  // Perbankan (20)
+  'BBCA','BBRI','BMRI','BBNI','BRIS','BBTN','BNGA','BDMN','BJBR','BJTM',
+  'PNBN','MEGA','NISP','BTPN','BTPS','BSIM','BNLI','BVIC','NOBU','AGRO',
+  // Energi & Tambang Batubara (18)
+  'ADRO','PTBA','ITMG','BREN','PGAS','HRUM','GEMS','BYAN','CUAN','TOBA',
+  'DSSA','MBAP','MEDC','ELSA','ESSA','RAJA','RATU','AADI',
+  // Barang Baku & Mineral (17)
+  'TPIA','INCO','ANTM','MDKA','AMMN','BRMS','NCKL','BRPT','INKP','TKIM',
+  'SMGR','INTP','WTON','ARNA','NIKL','ISSP','FASW',
+  // Konsumer Primer (19)
+  'UNVR','ICBP','MYOR','SIDO','AMRT','INDF','GGRM','HMSP','ROTI','ULTJ',
+  'DLTA','CLEO','GOOD','CMRY','HOKI','SKBM','STTP','MLBI','CAMP',
+  // Teknologi & Digital (9)
+  'GOTO','BUKA','EMTK','MLPT','VKTR','WIFI','DMMX','NFCX','CASH',
+  // Properti (17)
+  'BSDE','CTRA','SMRA','PWON','DMAS','LPKR','PANI','CBDK','KIJA',
+  'BEST','MKPI','JRPT','DUTI','PPRO','APLN','ASRI','MDLN',
+  // Infrastruktur & Telko (13)
+  'JSMR','TLKM','EXCL','ISAT','TBIG','TOWR','MTEL','ADHI','WSKT','PTPP',
+  'WIKA','META','CMNP',
+  // Kesehatan (14)
+  'KLBF','HEAL','MIKA','KAEF','TSPC','DVLA','SOHO','BMHS',
+  'PRDA','SILO','SAME','IRRA','MERK','PEHA',
+  // Otomotif & Industri (7)
+  'ASII','AUTO','SMSM','DRMA','GJTL','IMAS','BIRD',
+  // Retail (8)
+  'ACES','ERAA','MAPI','LPPF','RALS','MIDI','RANC','MCAS',
+  // Agrikultur (8)
+  'AALI','LSIP','TAPG','SSMS','DSNG','BWPT','JPFA','CPIN',
+  // Keuangan Non-Bank (6)
+  'ADMF','WOMF','MFIN','PANS','TRIM','SMMA',
+  // Diversified (3)
+  'DOID','INDY','MLPL'
 ];
 
 // De-duplicate
