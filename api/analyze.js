@@ -91,7 +91,7 @@ async function fetchPriceData(ticker, isIndex) {
 
   const url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + symbol + '?interval=1d&range=6mo';
 
-  const res;
+  let res;
   try {
     res = await fetchWithRetry(url, {
       headers: {
@@ -109,7 +109,7 @@ async function fetchPriceData(ticker, isIndex) {
     return null;
   }
 
-  const json;
+  let json;
   try { json = await res.json(); }
   catch (e) { log.error('analyze', '[YAHOO JSON PARSE]', e.message); return null; }
 
@@ -287,7 +287,7 @@ module.exports = async function handler(req, res) {
 
   // ── 10. AI ────────────────────────────────────────────────────
   const priceContext = buildPriceContext(priceData);
-  const parsed;
+  let parsed;
   try {
     const rawAI = await callAI({
       ticker, metadata, isIndex, priceData, priceContext,
