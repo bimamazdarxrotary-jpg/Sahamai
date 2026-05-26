@@ -145,9 +145,9 @@ async function fetchPriceData(ticker, isIndex) {
   if (!candles.length) return null;
 
   const lastClose = meta.regularMarketPrice || candles[candles.length - 1].close;
-  const prevClose = meta.chartPreviousClose  || (candles[candles.length - 2] && candles[candles.length - 2].close) || lastClose;
-  const change    = lastClose - prevClose;
-  const changePct = prevClose ? parseFloat((change / prevClose * 100).toFixed(2)) : 0;
+  let prevClose = meta.chartPreviousClose  || (candles[candles.length - 2] && candles[candles.length - 2].close) || lastClose;
+  let change    = lastClose - prevClose;
+  let changePct = prevClose ? parseFloat((change / prevClose * 100).toFixed(2)) : 0;
 
   // Filter data Yahoo yang tidak wajar (corporate action, stock split, dll)
   // Kalau change > 25% dalam sehari, kemungkinan data salah — reset ke 0
@@ -276,7 +276,7 @@ module.exports = async function handler(req, res) {
   if (bandarData) log.info('analyze', '[BANDAR]', ticker, 'score=' + bandarData.bandarScore, bandarData.smartMoney && bandarData.smartMoney.label);
 
   // ── 9. Fetch berita terkini ────────────────────────────────────
-  const newsData = null;
+  let newsData = null;
   try {
     newsData = await fetchAllNews(ticker, metadata, isIndex);
     log.info('analyze', '[NEWS]', ticker, 'emiten=' + (newsData.emiten && newsData.emiten.length) + ' komods=' + (newsData.komoditas && newsData.komoditas.length));
