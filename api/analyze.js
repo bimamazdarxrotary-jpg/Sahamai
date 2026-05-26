@@ -130,7 +130,7 @@ async function fetchPriceData(ticker, isIndex) {
   const volumes = quotes.volume;
 
   const candles = [];
-  for (const i = 0; i < timestamps.length; i++) {
+  for (let i = 0; i < timestamps.length; i++) {
     if (closes[i] == null) continue;
     candles.push({
       date:   new Date(timestamps[i] * 1000).toISOString().split('T')[0],
