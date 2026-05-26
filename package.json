@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "node server.js",
     "start": "node server.js",
-    "lint": "node --check api/analyze.js api/scanner.js lib/ai.js lib/indicators.js lib/scoring.js"
+    "lint": "node --check api/analyze.js api/scanner.js lib/ai.js lib/indicators.js lib/scoring.js",
+    "test": "node tests/run.js"
   },
   "dependencies": {
     "node-fetch": "^3.3.2"
