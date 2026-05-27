@@ -8,7 +8,7 @@ Platform AI analisis saham Indonesia dengan indikator teknikal matematis, volume
 - **Bandar Detection** — Stealth accumulation, distribution trap, retail panic, smart money footprint
 - **Berita Terkini** — Berita emiten, komoditas terkait, dan sentimen market IHSG dari Google News
 - **Scanner** — Scan 50+ saham IHSG untuk setup breakout, volume spike, oversold, golden cross, dan lebih
-- **AI Analysis** — Powered by Llama 4 Scout via Groq
+- **AI Analysis** — Powered by openai/gpt-oss-120b via Groq
 
 ## Setup
 
@@ -51,7 +51,7 @@ npm run dev
 ├── data/
 │   └── idx-stocks.json # Database 489 emiten IDX
 ├── lib/
-│   ├── ai.js           # AI engine (Groq/Llama)
+│   ├── ai.js           # AI engine (Groq/gpt-oss-120b)
 │   ├── bandar.js       # Bandar detection
 │   ├── cache.js        # In-memory cache
 │   ├── context.js      # Market context
@@ -75,7 +75,7 @@ npm run dev
 
 - **Backend**: Node.js (CommonJS), Vercel Serverless
 - **Frontend**: Vanilla JS, HTML, CSS
-- **AI**: Llama 4 Scout via Groq API
+- **AI**: openai/gpt-oss-120b via Groq API
 - **Data**: Yahoo Finance API, Google News RSS
 - **Chart**: Lightweight Charts (TradingView)
 

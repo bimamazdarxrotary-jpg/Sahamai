@@ -20,5 +20,13 @@
   ],
   "env": {
     "NODE_ENV": "production"
+  },
+  "functions": {
+    "api/analyze.js": {
+      "maxDuration": 30
+    },
+    "api/scanner.js": {
+      "maxDuration": 30
+    }
   }
 }
