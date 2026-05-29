@@ -41,7 +41,8 @@ const MIME = {
 // API handlers
 const handlers = {
   '/api/analyze': require('./api/analyze'),
-  '/api/scanner': require('./api/scanner')
+  '/api/scanner': require('./api/scanner'),
+  '/api/health':  require('./api/health')
 };
 
 // Parse body helper
