@@ -9,7 +9,10 @@ const path = require('path');
 const tests = [
   'tests/indicators.test.js',
   'tests/scoring.test.js',
-  'tests/bandar.test.js'
+  'tests/bandar.test.js',
+  'tests/volume.test.js',
+  'tests/structure.test.js',
+  'tests/context.test.js'
 ];
 
 let totalPassed = 0, totalFailed = 0;
@@ -25,19 +28,12 @@ tests.forEach(file => {
     });
     console.log(output);
     const match = output.match(/Hasil: (\d+) passed, (\d+) failed/);
-    if (match) {
-      totalPassed += parseInt(match[1]);
-      totalFailed += parseInt(match[2]);
-    }
+    if (match) { totalPassed += parseInt(match[1]); totalFailed += parseInt(match[2]); }
   } catch (e) {
     console.log(e.stdout || e.message);
     const match = (e.stdout || '').match(/Hasil: (\d+) passed, (\d+) failed/);
-    if (match) {
-      totalPassed += parseInt(match[1]);
-      totalFailed += parseInt(match[2]);
-    } else {
-      totalFailed++;
-    }
+    if (match) { totalPassed += parseInt(match[1]); totalFailed += parseInt(match[2]); }
+    else totalFailed++;
   }
 });
 
