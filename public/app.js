@@ -515,125 +515,187 @@ function trendIcon(d) {
 
 // ── BUILD RESULT ───────────────────────────────────────────────────
 function buildResult(ticker, d) {
-  const pd = d.priceData || {},
-    ind = d.indicators || {},
-    vol = d.volumeData || {},
-    str = d.structureData || {},
-    sc = d.scoringData || {};
-  const isIndex = ['IHSG', 'LQ45'].includes(ticker);
+  const pd  = d.priceData     || {};
+  const ind = d.indicators    || {};
+  const vol = d.volumeData    || {};
+  const str = d.structureData || {};
+  const sc  = d.scoringData   || {};
+  const isIndex = ['IHSG','LQ45'].includes(ticker);
   const sentiment = safe(d.sentiment, 'TAHAN');
-  const today = new Date().toLocaleDateString('id-ID', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
-  const finalScore = sc.final ?? extractNum(d.scoreTeknikal);
+  const today = new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+  const finalScore = sc.final ?? extractNum(d.scoreTeknikal) ?? 5;
+  const hasNews = !!(d.newsData && (d.newsData.emiten?.length || d.newsData.makro?.length));
 
-  // SCAN SIGNALS
-  const scanSignalsHtml =
-    d.scanSignals && d.scanSignals.length
-      ? '<div class="scan-signals">' +
-        d.scanSignals
-          .map((s) => {
-            const icon =
-              s.type === 'breakout'
-                ? '🚀'
-                : s.type === 'volume_spike'
-                  ? '📊'
-                  : s.type === 'oversold'
-                    ? '🔻'
-                    : s.type === 'golden_cross'
-                      ? '✨'
-                      : s.type === 'accumulation'
-                        ? '📦'
-                        : s.type === 'macd_cross'
-                          ? '⚡'
-                          : s.type === 'ready_pump'
-                            ? '🎯'
-                            : '🔔';
-            return (
-              '<span class="scan-signal ' +
-              (s.strength || 'medium') +
-              '">' +
-              icon +
-              ' ' +
-              esc(s.label) +
-              '</span>'
-            );
-          })
-          .join('') +
-        '</div>'
-      : '';
+  // ── SIGNAL STRIP ─────────────────────────────────────────────────
+  const signalsHtml = d.scanSignals && d.scanSignals.length
+    ? `<div class="signals">${d.scanSignals.map(s => {
+        const icons = {breakout:'🚀',volume_spike:'📊',oversold:'🔻',golden_cross:'✨',
+          accumulation:'📦',macd_cross:'⚡',ready_pump:'🎯',death_cross:'💀',
+          divergence:'🔁',mfi_oversold:'💧',candlestick:'🕯️',fib_level:'📐'};
+        return `<span class="sig ${s.strength||'medium'}">${icons[s.type]||'🔔'} ${esc(s.label)}</span>`;
+      }).join('')}</div>` : '';
 
-  // PRICE HEADER CARD
-  const priceCard = pd.current
-    ? `
-  <div class="s-card" style="margin-bottom:10px">
+  // ── TICKER HEADER ─────────────────────────────────────────────────
+  const tickerCard = `
+  <div class="card" style="margin-bottom:8px">
     <div class="ticker-hdr">
-      <div class="ticker-left">
-        <div class="ticker-code">${ticker}</div>
-        <div class="ticker-name">${esc(d.namaLengkap || ticker)}</div>
-        <span class="ticker-sector">${esc(d.sektor || 'IDX')}</span>
+      <div>
+        <div class="t-code">${ticker}</div>
+        <div class="t-name">${esc(d.namaLengkap || ticker)}</div>
+        <span class="t-sector">${esc(d.sektor || 'IDX')}</span>
       </div>
-      <div class="ticker-right">
-        <div class="ticker-price">${fmtPrice(pd.current)}</div>
-        <div class="ticker-change ${pd.isUp ? 'up' : 'down'}">${pd.isUp ? '+' : ''}${fmtPrice(pd.change)} (${pd.isUp ? '+' : ''}${pd.changePct}%)</div>
-        <div style="display:flex;align-items:center;gap:6px;margin-top:6px;justify-content:flex-end;flex-wrap:wrap">
-          <span class="sent-badge ${getBadgeClass(sentiment)}">${sentiment}</span>
-          <span class="conf-badge conf-${(sc.confidence || 'medium').toLowerCase()}">${sc.confidence || 'Medium'}</span>
-          ${sc.riskReward ? `<span class="rr-badge">${sc.riskReward}</span>` : ''}
+      <div>
+        ${pd.current ? `
+        <div class="t-price">${fmtPrice(pd.current)}</div>
+        <div class="t-chg ${pd.isUp?'up':'down'}">${pd.isUp?'+':''}${fmtPrice(pd.change)} (${pd.isUp?'+':''}${pd.changePct}%)</div>` : ''}
+        <div style="display:flex;align-items:center;gap:5px;margin-top:7px;justify-content:flex-end;flex-wrap:wrap">
+          <span class="badge ${getBadgeClass(sentiment)}">${sentiment}</span>
+          <span class="conf conf-${(sc.confidence||'medium').toLowerCase()}">${sc.confidence||'Medium'}</span>
         </div>
-        ${!isIndex ? `<div style="text-align:right;margin-top:8px"><span class="wl-add-btn" onclick="addToWatchlist('${ticker}')">⭐ Watchlist</span></div>` : ''}
+        ${!isIndex ? `<div style="text-align:right;margin-top:7px"><span class="wl-add-btn" onclick="addToWatchlist('${ticker}')">⭐ Watchlist</span></div>` : ''}
       </div>
     </div>
-    <!-- SKOR BAR -->
-    <div style="border-top:1px solid var(--border);padding-top:1rem;margin-top:0.5rem">
-      <div style="font-size:9px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">SKOR SENTIMEN</div>
-      <div class="skor-row">
-        <div class="skor-num" style="color:${getScoreColor(finalScore)}">${finalScore}<span style="font-size:1rem;color:var(--text3)">/10</span></div>
-        <div class="skor-bar-wrap">
-          <div class="skor-bar-track"><div class="skor-bar-fill" style="width:${finalScore * 10}%;background:${getScoreGrad(finalScore)}"></div></div>
-          <div class="skor-label">${esc(sc.recommendation || 'TAHAN')} · ${esc(sc.confidence || 'Medium')} Confidence</div>
+    <div style="border-top:1px solid var(--bdr);padding-top:.9rem;margin-top:.5rem">
+      <div style="font-size:8px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:2px;margin-bottom:7px">SKOR SENTIMEN</div>
+      <div class="score-hero">
+        <div class="score-num" style="color:${getScoreColor(finalScore)}">${finalScore}<span class="score-denom">/10</span></div>
+        <div class="score-meta">
+          <div class="score-track"><div class="score-fill" style="width:${finalScore*10}%;background:${getScoreGrad(finalScore)}"></div></div>
+          <div class="score-lbl">${esc(sc.recommendation||'TAHAN')} · ${esc(sc.confidence||'Medium')} Confidence · R/R: ${esc(sc.riskReward||'—')}</div>
         </div>
       </div>
-    </div>
-  </div>`
-    : `<div class="s-card" style="margin-bottom:10px">
-    <div class="ticker-hdr">
-      <div class="ticker-left"><div class="ticker-code">${ticker}</div><div class="ticker-name">${esc(d.namaLengkap || ticker)}</div></div>
-      <div class="ticker-right"><div style="font-size:11px;color:var(--text3);margin-bottom:6px;font-family:var(--mono)">Data harga tidak tersedia</div><span class="sent-badge ${getBadgeClass(sentiment)}">${sentiment}</span></div>
     </div>
   </div>`;
 
-  // STAT ROW
-  const statRow = pd.current
-    ? `
-  <div class="stat-grid">
-    <div class="stat-box"><div class="stat-lbl">52W HIGH</div><div class="stat-val g">${fmtPrice(pd.high52w)}</div></div>
-    <div class="stat-box"><div class="stat-lbl">52W LOW</div><div class="stat-val">${fmtPrice(pd.low52w)}</div></div>
-    <div class="stat-box"><div class="stat-lbl">MA 20</div><div class="stat-val ${ind.ma20 && pd.current > ind.ma20 ? 'g' : 'r'}">${fmtPrice(ind.ma20)}</div></div>
-    <div class="stat-box"><div class="stat-lbl">MA 50</div><div class="stat-val ${ind.ma50 && pd.current > ind.ma50 ? 'g' : 'r'}">${fmtPrice(ind.ma50)}</div></div>
-    <div class="stat-box"><div class="stat-lbl">RSI(14)</div><div class="stat-val ${ind.rsi < 30 ? 'g' : ind.rsi > 70 ? 'r' : 'gold'}">${ind.rsi ?? '—'}</div></div>
-    <div class="stat-box"><div class="stat-lbl">VOLUME</div><div class="stat-val">${fmtVol(pd.volume)}</div></div>
-  </div>`
-    : '';
+  // ── 4-PANEL GRID (Stocksly-style) ─────────────────────────────────
+  // Panel 1: Score Sentimen visual
+  const smfData = vol.smartMoneyFlow || {};
+  const obvTrend = vol.obv ? vol.obv.trend : 'unknown';
+  const smfRatio = smfData.ratio || 50;
+  const smfBull = smfData.bias === 'strong_buying' || smfData.bias === 'mild_buying';
 
-  // CHART
-  const chartCard = pd.current
-    ? `
+  const p1 = `
+  <div class="panel-score">
+    <div class="panel-lbl g">📊 Score Sentimen</div>
+    <div class="panel-big g">${finalScore}<span style="font-size:1rem;color:var(--text3)">/10</span></div>
+    <div class="panel-sub">${esc(sc.recommendation||'TAHAN')} · ${esc(sc.riskReward||'Moderate')}</div>
+    <div style="margin-top:.5rem;display:flex;flex-wrap:wrap;gap:3px">
+      ${sc.breakdown ? `
+        <span class="pill pill-${sc.breakdown.trend?.score>=6?'g':'r'}">Tren ${sc.breakdown.trend?.score||'—'}</span>
+        <span class="pill pill-${sc.breakdown.volume?.score>=6?'g':'r'}">Vol ${sc.breakdown.volume?.score||'—'}</span>
+        <span class="pill pill-${sc.breakdown.momentum?.score>=6?'g':'r'}">Mom ${sc.breakdown.momentum?.score||'—'}</span>
+      ` : ''}
+    </div>
+  </div>`;
+
+  // Panel 2: Smart Money Flow (pengganti Dana Asing)
+  const p2 = `
+  <div class="panel-smf">
+    <div class="panel-lbl gold">🧠 Smart Money Flow</div>
+    <div class="panel-big ${smfBull?'gold':'r'}">${smfRatio}<span style="font-size:.9rem">%</span></div>
+    <div class="panel-sub">${esc(smfData.label||'—')}</div>
+    <div class="smf-bar">
+      <div class="smf-row">
+        <span class="smf-lbl" style="color:var(--emerald)">BUY</span>
+        <div class="smf-track"><div class="smf-fill-g" style="width:${smfRatio}%"></div></div>
+        <span class="smf-val" style="color:var(--emerald)">${smfRatio}%</span>
+      </div>
+      <div class="smf-row">
+        <span class="smf-lbl" style="color:var(--red)">SELL</span>
+        <div class="smf-track"><div class="smf-fill-r" style="width:${100-smfRatio}%"></div></div>
+        <span class="smf-val" style="color:var(--red)">${100-smfRatio}%</span>
+      </div>
+    </div>
+    <div style="margin-top:.4rem"><span class="pill ${obvTrend==='rising'?'pill-g':'pill-r'}">OBV ${esc(obvTrend)}</span> ${vol.accDist ? `<span class="pill ${vol.accDist.bias==='accumulation'?'pill-g':'pill-r'}">${esc(vol.accDist.bias||'').toUpperCase()}</span>` : ''}</div>
+  </div>`;
+
+  // Panel 3: Kondisi Harga
+  const ma20ok = ind.ma && pd.current && ind.ma.ma20 && pd.current > ind.ma.ma20;
+  const ma50ok = ind.ma && pd.current && ind.ma.ma50 && pd.current > ind.ma.ma50;
+  const macdOk = ind.macd && ind.macd.trend === 'bullish';
+  const volOk  = vol.spike ? !vol.spike.isSpike || vol.accDist?.bias === 'accumulation' : true;
+
+  const p3 = `
+  <div class="panel-kondisi">
+    <div class="panel-lbl text2">⚡ Kondisi Harga</div>
+    <div style="display:flex;align-items:baseline;gap:5px;margin:.3rem 0">
+      <span style="font-family:var(--mono);font-size:1.5rem;font-weight:800">${ind.rsi??'—'}</span>
+      <span style="font-size:9px;color:var(--text3);font-family:var(--mono)">RSI</span>
+      <span style="font-size:1.1rem;font-weight:700;font-family:var(--mono);margin-left:8px">${ind.ma?.ma20?fmtPrice(ind.ma.ma20):'—'}</span>
+      <span style="font-size:9px;color:var(--text3);font-family:var(--mono)">MA20</span>
+    </div>
+    <div class="cond-chips">
+      <span class="cond-chip ${ma20ok?'cond-ok':'cond-bad'}">MA20 ${ma20ok?'✓':'✗'}</span>
+      <span class="cond-chip ${ma50ok?'cond-ok':'cond-bad'}">MA50 ${ma50ok?'✓':'✗'}</span>
+      <span class="cond-chip ${macdOk?'cond-ok':'cond-warn'}">MACD ${macdOk?'BULL':'BEAR'}</span>
+      <span class="cond-chip ${volOk?'cond-ok':'cond-warn'}">VOL ${volOk?'OK':'SPIKE'}</span>
+      ${ind.atr ? `<span class="cond-chip ${ind.atr.atrPct>4?'cond-bad':ind.atr.atrPct>2?'cond-warn':'cond-ok'}">ATR ${ind.atr.atrPct}%</span>` : ''}
+    </div>
+  </div>`;
+
+  // Panel 4: Entry Area
+  const p4 = `
+  <div class="panel-entry">
+    <div class="panel-lbl b">🎯 Entry Area</div>
+    <div class="entry-range">${esc(d.levelBeli||'—')}</div>
+    <div class="entry-sub">RECOMMENDED ZONE</div>
+    <div style="display:flex;gap:6px;margin-top:.5rem;flex-wrap:wrap">
+      ${d.stopLoss ? `<span class="pill pill-r">SL: ${esc(d.stopLoss)}</span>` : ''}
+      ${d.targetHarga ? `<span class="pill pill-g">TP: ${esc(d.targetHarga)}</span>` : ''}
+    </div>
+    ${vol.vwap ? `<div style="margin-top:.4rem;font-size:9px;color:var(--text3);font-family:var(--mono)">VWAP: ${fmtPrice(vol.vwap)}</div>` : ''}
+  </div>`;
+
+  const panelGrid = !isIndex ? `
+  <div class="grid-2" style="margin-bottom:8px">
+    ${p1}${p2}
+  </div>
+  <div class="grid-2" style="margin-bottom:8px">
+    ${p3}${p4}
+  </div>` : `
+  <div class="grid-2" style="margin-bottom:8px">
+    ${p1}${p2}
+  </div>`;
+
+  // ── RISK MANAGEMENT ────────────────────────────────────────────────
+  const riskPanel = !isIndex && (d.targetHarga || d.stopLoss || d.levelBeli) ? `
+  <div class="risk-panel">
+    <div class="card-lbl" style="margin-bottom:.75rem">⚠️ MANAJEMEN RISIKO</div>
+    <div class="risk-grid">
+      <div class="risk-item">
+        <div class="risk-lbl">STOP LOSS</div>
+        <div class="risk-val r">${esc(d.stopLoss||'—')}</div>
+        <div class="risk-note">Batas cut loss</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-lbl">TARGET 1</div>
+        <div class="risk-val g">${esc(d.targetHarga||'—')}</div>
+        <div class="risk-note">Profit taking</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-lbl">HARGA WAJAR</div>
+        <div class="risk-val gold">${esc(d.priceEst||'—')}</div>
+        <div class="risk-note">Fair value est.</div>
+      </div>
+    </div>
+    ${sc.riskReward ? `<div style="margin-top:.6rem;font-size:9px;color:var(--text3);font-family:var(--mono)">Risk/Reward: ${esc(sc.riskReward)}</div>` : ''}
+  </div>` : '';
+
+  // ── CHART ──────────────────────────────────────────────────────────
+  const chartCard = pd.current ? `
   <div class="chart-card">
     <div class="chart-hdr">
       <div class="chart-title">📊 PRICE CHART</div>
-      <div class="chart-controls">
-        <div class="chart-type-tabs">
-          <span class="chart-type-tab active" onclick="setChartType('candle',this)">Candle</span>
-          <span class="chart-type-tab" onclick="setChartType('area',this)">Area</span>
+      <div class="chart-ctrls">
+        <div style="display:flex;gap:2px">
+          <span class="ctab ctab-type active" onclick="setChartType('candle',this)">Candle</span>
+          <span class="ctab ctab-type" onclick="setChartType('area',this)">Area</span>
         </div>
-        <div class="chart-tabs">
-          <span class="chart-tab" onclick="setRange('1mo',this)">1B</span>
-          <span class="chart-tab active" onclick="setRange('3mo',this)">3B</span>
-          <span class="chart-tab" onclick="setRange('6mo',this)">6B</span>
-          <span class="chart-tab" onclick="setRange('all',this)">Max</span>
+        <div style="display:flex;gap:2px">
+          <span class="ctab" onclick="setRange('1mo',this)">1B</span>
+          <span class="ctab active" onclick="setRange('3mo',this)">3B</span>
+          <span class="ctab" onclick="setRange('6mo',this)">6B</span>
+          <span class="ctab" onclick="setRange('all',this)">Max</span>
         </div>
       </div>
     </div>
@@ -642,501 +704,216 @@ function buildResult(ticker, d) {
       <span class="ind-toggle on-ma20" id="tog-ma20" onclick="toggleIndicator('ma20')">MA20</span>
       <span class="ind-toggle on-ma50" id="tog-ma50" onclick="toggleIndicator('ma50')">MA50</span>
       <span class="ind-toggle on-ema9" id="tog-ema9" onclick="toggleIndicator('ema9')">EMA9</span>
-      <span class="ind-toggle off-bb"  id="tog-bb"   onclick="toggleIndicator('bb')">BB</span>
-      <span class="ind-toggle off-rsi" id="tog-rsi"  onclick="toggleIndicator('rsi')">RSI</span>
+      <span class="ind-toggle off-bb"   id="tog-bb"   onclick="toggleIndicator('bb')">BB</span>
+      <span class="ind-toggle off-rsi"  id="tog-rsi"  onclick="toggleIndicator('rsi')">RSI</span>
       <span class="ind-toggle off-macd" id="tog-macd" onclick="toggleIndicator('macd')">MACD</span>
     </div>
     <div class="subpanel" id="panel-rsi"><div class="subpanel-lbl">RSI(14)</div><div id="rsiChart"></div></div>
     <div class="subpanel" id="panel-macd"><div class="subpanel-lbl">MACD(12,26,9)</div><div id="macdChart"></div></div>
-  </div>`
-    : '';
+  </div>` : '';
 
-  // TWO-COLUMN: Ringkasan Strategi + Kondisi Harga (like Stockly)
-  const strategyCard = `
-  <div class="two-col">
-    <div class="s-card" style="margin-bottom:0">
-      <div class="s-card-label">Ringkasan Strategi</div>
-      <div style="margin-top:0.75rem">
-        ${
-          sc.breakdown
-            ? `
-        <div style="font-size:11px;color:var(--text3);margin-bottom:10px;font-family:var(--mono)">
-          Trend ${sc.breakdown.trend?.score ?? '—'}/10 &nbsp;·&nbsp; Volume ${sc.breakdown.volume?.score ?? '—'}/10 &nbsp;·&nbsp; Momentum ${sc.breakdown.momentum?.score ?? '—'}/10
-        </div>`
-            : ''
-        }
-        <div style="font-size:11px;color:var(--text2);line-height:1.7">${esc(d.whyNow || d.summary || '—')}</div>
-      </div>
-    </div>
-    <div class="s-card" style="margin-bottom:0">
-      <div class="s-card-label ${str.phase === 'markup' ? '' : 'gold'}">Kondisi & Fase Market</div>
-      <div style="margin-top:0.75rem">
-        ${str.phase ? `<span class="pill pill-${phaseColor(str.phase)}" style="margin-bottom:8px;display:inline-block">${str.phase?.toUpperCase()}</span>` : ''}
-        ${vol.bias ? `<span class="pill pill-${vol.bias === 'accumulation' ? 'g' : vol.bias === 'distribution' ? 'r' : 'gold'}" style="margin:0 4px 8px;display:inline-block">${vol.bias?.toUpperCase()}</span>` : ''}
-        ${vol.isSpike ? `<span class="pill pill-gold" style="margin-bottom:8px;display:inline-block">SPIKE ${vol.spikeRatio}×</span>` : ''}
-        <div style="font-size:11px;color:var(--text2);line-height:1.7;margin-top:4px">${esc(str.phaseLabel || vol.narrative || '—')}</div>
-        ${str.trend ? `<div style="margin-top:6px;font-size:10px;color:var(--text3);font-family:var(--mono)">${trendIcon(str.trend?.direction)} ${esc(str.trend?.direction || '')} · ADX ${str.trend?.adx ?? '—'} · ${esc(str.trend?.strength || '')}</div>` : ''}
-      </div>
-    </div>
-  </div>`;
+  // ── STAT ROW ───────────────────────────────────────────────────────
+  const statRow = pd.current ? `
+  <div class="grid-4" style="margin-bottom:8px">
+    <div class="stat"><div class="stat-l">52W HIGH</div><div class="stat-v g">${fmtPrice(pd.high52w)}</div></div>
+    <div class="stat"><div class="stat-l">52W LOW</div><div class="stat-v">${fmtPrice(pd.low52w)}</div></div>
+    <div class="stat"><div class="stat-l">RSI(14)</div><div class="stat-v ${ind.rsi<30?'g':ind.rsi>70?'r':'gold'}">${ind.rsi??'—'}</div></div>
+    <div class="stat"><div class="stat-l">VOLUME</div><div class="stat-v">${fmtVol(pd.volume)}</div></div>
+  </div>` : '';
 
-  // SCORE BREAKDOWN
-  const scorePanel = sc.breakdown
-    ? `
-  <div class="s-card">
-    <div class="s-card-hdr">
-      <div class="s-card-label">Scoring Deterministik</div>
-      <div style="font-family:var(--mono);font-size:1.4rem;font-weight:700;color:${getScoreColor(finalScore)}">${finalScore}<span style="font-size:0.9rem;color:var(--text3)">/10</span></div>
+  // ── WHY NOW ────────────────────────────────────────────────────────
+  const whyNow = d.whyNow ? `
+  <div class="why-now">
+    <div class="why-lbl">⚡ WHY NOW</div>
+    <div class="why-text">${esc(d.whyNow)}</div>
+  </div>` : '';
+
+  // ── SCORE BREAKDOWN ────────────────────────────────────────────────
+  const scorePanel = sc.breakdown ? `
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-lbl">Scoring Deterministik</div>
+      <div style="font-family:var(--mono);font-size:1.3rem;font-weight:700;color:${getScoreColor(finalScore)}">${finalScore}<span style="font-size:.8rem;color:var(--text3)">/10</span></div>
     </div>
-    <div class="score-grid">
-      ${['trend', 'volume', 'momentum', 'risk', 'setup']
-        .map((k) => {
-          const item = sc.breakdown[k];
-          if (!item) return '';
-          const isRisk = k === 'risk',
-            ds = isRisk ? 10 - item.score : item.score;
-          return `<div class="score-item">
-          <div class="score-item-lbl">${{ trend: 'TREN', volume: 'VOLUME', momentum: 'MOMENTUM', risk: 'SAFETY', setup: 'SETUP' }[k]}</div>
-          <div class="score-item-val" style="color:${getScoreColor(ds)}">${ds}</div>
-          <div class="score-bar"><div class="score-fill" style="width:${ds * 10}%;background:${getScoreGrad(ds)}"></div></div>
-          <div class="score-reasons">${(item.reasons || [])
-            .slice(0, 2)
-            .map((r) => '• ' + esc(r))
-            .join('<br>')}</div>
+    <div class="breakdown-grid">
+      ${['trend','volume','momentum','risk','setup'].map(k => {
+        const item = sc.breakdown[k];
+        if (!item) return '';
+        const isRisk = k === 'risk';
+        const ds = isRisk ? 10-item.score : item.score;
+        const labels = {trend:'TREN',volume:'VOLUME',momentum:'MOMENTUM',risk:'SAFETY',setup:'SETUP'};
+        return `<div class="bk-item">
+          <div class="bk-lbl">${labels[k]}</div>
+          <div class="bk-num" style="color:${getScoreColor(ds)}">${ds}</div>
+          <div class="bk-bar"><div class="bk-fill" style="width:${ds*10}%;background:${getScoreGrad(ds)}"></div></div>
+          <div class="bk-reasons">${(item.reasons||[]).slice(0,2).map(r=>'• '+esc(r)).join('<br>')}</div>
         </div>`;
-        })
-        .join('')}
+      }).join('')}
     </div>
-  </div>`
+  </div>` : '';
+
+  // ── INTEL GRID ─────────────────────────────────────────────────────
+  const intelGrid = ind.bb || ind.macd || ind.stoch || ind.atr ? `
+  <div class="grid-2" style="margin-bottom:8px">
+    ${ind.bb ? `<div class="intel"><div class="intel-l">BOLLINGER BANDS</div><div class="intel-v" style="color:${ind.bb.position==='overbought_zone'?'var(--red)':ind.bb.position==='oversold_zone'?'var(--emerald)':'var(--text)'}">${(ind.bb.position||'').replace(/_/g,' ')}</div><div class="intel-s">BW: ${ind.bb.bandwidth}% · U: ${fmtPrice(ind.bb.upper)} / L: ${fmtPrice(ind.bb.lower)}</div></div>` : ''}
+    ${ind.macd ? `<div class="intel"><div class="intel-l">MACD</div><span class="pill pill-${ind.macd.trend==='bullish'?'g':'r'}">${(ind.macd.trend||'').toUpperCase()}</span>${ind.macd.crossover?`<span class="pill pill-gold" style="margin-left:3px">${ind.macd.crossover.replace(/_/g,' ').toUpperCase()}</span>`:''}<div class="intel-s" style="margin-top:4px">Hist: ${ind.macd.histogram??'—'}</div></div>` : ''}
+    ${ind.stoch ? `<div class="intel"><div class="intel-l">STOCHASTIC</div><span class="pill pill-${ind.stoch.signal==='oversold'?'g':ind.stoch.signal==='overbought'?'r':'gold'}">${(ind.stoch.signal||'').toUpperCase()}</span><div class="intel-s" style="margin-top:4px">K: ${ind.stoch.k} · D: ${ind.stoch.d}</div></div>` : ''}
+    ${ind.atr ? `<div class="intel"><div class="intel-l">VOLATILITAS ATR</div><div class="intel-v">${fmtPrice(ind.atr.atr)}</div><div class="intel-s">${ind.atr.atrPct}% — ${ind.atr.atrPct>4?'⚠️ Sangat Volatil':ind.atr.atrPct>2?'Volatil':'Stabil'}</div></div>` : ''}
+  </div>` : '';
+
+  // ── S&R ────────────────────────────────────────────────────────────
+  const srCard = ind.levels && (ind.levels.support?.length || ind.levels.resistance?.length) ? `
+  <div class="grid-2" style="margin-bottom:8px">
+    <div class="card" style="margin-bottom:0"><div class="card-lbl">Support</div><div style="margin-top:.6rem">${(ind.levels.support||[]).map(l=>`<div style="font-family:var(--mono);font-size:.88rem;font-weight:700;color:var(--emerald);margin-bottom:3px">${fmtPrice(l)}</div>`).join('')||'<span style="color:var(--text3);font-size:11px">—</span>'}</div></div>
+    <div class="card" style="margin-bottom:0"><div class="card-lbl red">Resistance</div><div style="margin-top:.6rem">${(ind.levels.resistance||[]).map(l=>`<div style="font-family:var(--mono);font-size:.88rem;font-weight:700;color:var(--red);margin-bottom:3px">${fmtPrice(l)}</div>`).join('')||'<span style="color:var(--text3);font-size:11px">—</span>'}</div></div>
+  </div>` : '';
+
+  // ── SETUPS ─────────────────────────────────────────────────────────
+  const setupsSection = safeArr(str.setups).length ? `
+  <div class="card">
+    <div class="card-lbl">Setup Terdeteksi</div>
+    <div style="margin-top:.75rem">
+      ${safeArr(str.setups).map(s => `
+      <div class="setup ${s.confidence}">
+        <div class="setup-type" style="color:${s.direction==='long'?'var(--emerald)':s.direction==='short'?'var(--red)':'var(--text2)'}">${esc(s.type?.replace(/_/g,' '))} · ${esc(s.direction)} · ${esc(s.confidence)}</div>
+        <div class="setup-reason">${esc(s.reason)}</div>
+      </div>`).join('')}
+    </div>
+  </div>` : '';
+
+  // ── SMART MONEY ────────────────────────────────────────────────────
+  const smCard = (d.bandarSmartMoney || d.smartMoneySignal) && (d.bandarSmartMoney||d.smartMoneySignal) !== 'Tidak terdeteksi.'
+    ? `<div class="smoney-card"><div class="smoney-lbl">🧠 Smart Money & Bandar</div><div class="smoney-text">${esc(d.bandarSmartMoney||d.smartMoneySignal)}</div></div>`
     : '';
 
-  // INTEL GRID
-  const intelGrid =
-    ind.bb || ind.macd || ind.stoch || ind.atr
-      ? `
-  <div class="intel-grid">
-    ${ind.bb ? `<div class="intel-box"><div class="intel-box-lbl">BOLLINGER BANDS</div><div class="intel-box-val" style="color:${ind.bb.position === 'overbought_zone' ? 'var(--red)' : ind.bb.position === 'oversold_zone' ? 'var(--g)' : 'var(--text)'}">${(ind.bb.position || '').replace(/_/g, ' ')}</div><div class="intel-box-sub">BW: ${ind.bb.bandwidth}% · Pos: ${ind.bb.bandPct}%<br>U: ${fmtPrice(ind.bb.upper)} / L: ${fmtPrice(ind.bb.lower)}</div></div>` : ''}
-    ${ind.macd ? `<div class="intel-box"><div class="intel-box-lbl">MACD</div><span class="pill pill-${ind.macd.trend === 'bullish' ? 'g' : 'r'}" style="margin-bottom:6px;display:inline-block">${(ind.macd.trend || '').toUpperCase()}</span>${ind.macd.crossover ? `<span class="pill pill-gold" style="margin-left:4px;display:inline-block">${ind.macd.crossover.replace(/_/g, ' ').toUpperCase()}</span>` : ''}<div class="intel-box-sub" style="margin-top:5px">MACD: ${ind.macd.macd ?? '—'} / Hist: ${ind.macd.histogram ?? '—'}</div></div>` : ''}
-    ${ind.stoch ? `<div class="intel-box"><div class="intel-box-lbl">STOCHASTIC</div><span class="pill pill-${ind.stoch.signal === 'oversold' ? 'g' : ind.stoch.signal === 'overbought' ? 'r' : 'gold'}" style="margin-bottom:6px;display:inline-block">${(ind.stoch.signal || '').toUpperCase()}</span><div class="intel-box-sub">K: ${ind.stoch.k} · D: ${ind.stoch.d}</div></div>` : ''}
-    ${ind.atr ? `<div class="intel-box"><div class="intel-box-lbl">VOLATILITAS ATR</div><div class="intel-box-val">${fmtPrice(ind.atr.atr)}</div><div class="intel-box-sub">${ind.atr.atrPct}% — ${ind.atr.atrPct > 4 ? '⚠️ Sangat Volatil' : ind.atr.atrPct > 2 ? 'Volatil' : 'Stabil'}</div></div>` : ''}
-  </div>`
-      : '';
-
-  // S&R
-  const srCard =
-    ind.levels && (ind.levels.support?.length || ind.levels.resistance?.length)
-      ? `
-  <div class="two-col">
-    <div class="s-card" style="margin-bottom:0">
-      <div class="s-card-label">Support</div>
-      <div style="margin-top:0.75rem">${(ind.levels.support || []).map((l) => `<div class="sr-item" style="color:var(--g)">${fmtPrice(l)}</div>`).join('') || '<div style="color:var(--text3);font-size:12px">—</div>'}</div>
-    </div>
-    <div class="s-card" style="margin-bottom:0">
-      <div class="s-card-label red">Resistance</div>
-      <div style="margin-top:0.75rem">${(ind.levels.resistance || []).map((l) => `<div class="sr-item" style="color:var(--red)">${fmtPrice(l)}</div>`).join('') || '<div style="color:var(--text3);font-size:12px">—</div>'}</div>
-    </div>
-  </div>
-  <div style="margin-bottom:10px"></div>`
-      : '';
-
-  // SETUPS
-  const setupsSection = safeArr(str.setups).length
-    ? `
-  <div class="s-card">
-    <div class="s-card-label">Setup Terdeteksi</div>
-    <div style="margin-top:0.75rem">
-    ${safeArr(str.setups)
-      .map(
-        (s) => `
-    <div class="setup-card ${s.confidence}">
-      <div class="setup-type" style="color:${s.direction === 'long' ? 'var(--g)' : s.direction === 'short' ? 'var(--red)' : 'var(--text2)'}">${esc(s.type?.replace(/_/g, ' '))} · ${esc(s.direction)} · ${esc(s.confidence)}</div>
-      <div class="setup-reason">${esc(s.reason)}</div>
-    </div>`,
-      )
-      .join('')}
-    </div>
-  </div>`
-    : '';
-
-  // SMART MONEY
-  const smCard =
-    d.smartMoneySignal && d.smartMoneySignal !== 'Tidak terdeteksi.'
-      ? `
-  <div class="smart-money"><div class="sm-lbl">🧠 Smart Money Signal</div><div class="sm-text">${esc(d.smartMoneySignal)}</div></div>`
-      : '';
-
-  // BANDAR
-  const bandarCard =
-    d.bandaAnalysis && !isIndex
-      ? `
-  <div class="bandar-card"><div class="bandar-lbl">🎯 Bandar Analysis</div><div class="bandar-text">${esc(d.bandaAnalysis)}</div></div>`
-      : '';
-
-  // MAIN AI CARD
+  // ── MAIN AI CARD ───────────────────────────────────────────────────
   const mainCard = `
-  <div class="s-card">
-    <div class="s-card-hdr"><div class="s-card-label">Analisis AI Mendalam</div></div>
-    <div style="font-size:0.9rem;color:var(--text2);line-height:1.9;font-weight:400;margin-bottom:1rem">${esc(d.summary)}</div>
-    <div class="rec-box">
-      <div class="rec-lbl">Rekomendasi Aksi</div>
-      <div class="rec-text">${esc(d.rekomendasi)}</div>
-      ${
-        !isIndex && (d.targetHarga || d.stopLoss || d.levelBeli)
-          ? `
-      <div class="target-row">
-        <div class="target-item"><div class="target-lbl">TARGET</div><div class="target-val g">${esc(d.targetHarga || '—')}</div></div>
-        <div class="target-item"><div class="target-lbl">ZONA BELI</div><div class="target-val gold">${esc(d.levelBeli || '—')}</div></div>
-        <div class="target-item"><div class="target-lbl">STOP LOSS</div><div class="target-val r">${esc(d.stopLoss || '—')}</div></div>
-      </div>`
-          : ''
-      }
+  <div class="card">
+    <div class="card-hdr"><div class="card-lbl">Analisis AI Mendalam</div></div>
+    <div style="font-size:.88rem;color:var(--text2);line-height:1.9;margin-bottom:1rem">${esc(d.summary)}</div>
+    <div style="background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;padding:.9rem">
+      <div style="font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--emerald);margin-bottom:5px;font-family:var(--mono)">REKOMENDASI AKSI</div>
+      <div style="font-size:.86rem;color:var(--text2);line-height:1.8">${esc(d.rekomendasi)}</div>
     </div>
   </div>`;
 
-  // BULL/BEAR
-  const thesis =
-    safeArr(d.bullThesis).length || safeArr(d.bearThesis).length
-      ? `
-  <div class="two-col">
-    <div class="s-card" style="margin-bottom:0"><div class="s-card-label">🐂 Bull Thesis</div><div class="tags">${safeArr(
-      d.bullThesis,
-    )
-      .map((t) => `<span class="tag g">${esc(t)}</span>`)
-      .join('')}</div></div>
-    <div class="s-card" style="margin-bottom:0"><div class="s-card-label red">🐻 Bear Thesis</div><div class="tags">${safeArr(
-      d.bearThesis,
-    )
-      .map((t) => `<span class="tag r">${esc(t)}</span>`)
-      .join('')}</div></div>
-  </div><div style="margin-bottom:10px"></div>`
-      : '';
+  // ── BULL/BEAR ──────────────────────────────────────────────────────
+  const thesis = safeArr(d.bullThesis).length || safeArr(d.bearThesis).length ? `
+  <div class="grid-2" style="margin-bottom:8px">
+    <div class="card" style="margin-bottom:0"><div class="card-lbl">🐂 Bull Thesis</div><div class="tags">${safeArr(d.bullThesis).map(t=>`<span class="tag g">${esc(t)}</span>`).join('')}</div></div>
+    <div class="card" style="margin-bottom:0"><div class="card-lbl red">🐻 Bear Thesis</div><div class="tags">${safeArr(d.bearThesis).map(t=>`<span class="tag r">${esc(t)}</span>`).join('')}</div></div>
+  </div>` : '';
 
-  // TEKNIKAL/FUNDAMENTAL
-  const analysisCards = !isIndex
-    ? `
-  <div class="two-col">
-    <div class="s-card" style="margin-bottom:0"><div class="s-card-label blue">📈 Teknikal</div><div style="font-size:0.88rem;color:var(--text2);line-height:1.8;margin-top:0.75rem">${esc(d.analisisTeknikal)}</div></div>
-    <div class="s-card" style="margin-bottom:0"><div class="s-card-label gold">📊 Fundamental</div><div style="font-size:0.88rem;color:var(--text2);line-height:1.8;margin-top:0.75rem">${esc(d.analisisFundamental)}</div></div>
-  </div><div style="margin-bottom:10px"></div>`
-    : `
-  <div class="two-col">
-    <div class="s-card" style="margin-bottom:0"><div class="s-card-label">💪 Sektor Kuat</div><div class="tags">${safeArr(
-      d.sektorKuat,
-    )
-      .map((s) => `<span class="tag g">${esc(s)}</span>`)
-      .join('')}</div></div>
-    <div class="s-card" style="margin-bottom:0"><div class="s-card-label red">📉 Sektor Lemah</div><div class="tags">${safeArr(
-      d.sektorLemah,
-    )
-      .map((s) => `<span class="tag r">${esc(s)}</span>`)
-      .join('')}</div></div>
-  </div><div style="margin-bottom:10px"></div>`;
-
-  // POSISI KOMPETITIF
-  const kompetitifCard =
-    !isIndex && d.posisiKompetitif
-      ? `<div class="s-card" style="margin-bottom:10px"><div class="s-card-label blue">🏆 Posisi Kompetitif</div><div style="font-size:0.88rem;color:var(--text2);line-height:1.8;margin-top:0.75rem">${esc(d.posisiKompetitif)}</div></div>`
-      : '';
-
-  // METRICS
-  const metricsSection = `
-  <div class="stat-grid" style="margin-bottom:10px">
-    <div class="stat-box"><div class="stat-lbl">HARGA WAJAR</div><div class="stat-val g">${esc(safe(d.priceEst))}</div></div>
-    <div class="stat-box"><div class="stat-lbl">P/E RATIO</div><div class="stat-val">${esc(safe(d.pe))}</div></div>
-    <div class="stat-box"><div class="stat-lbl">P/BV</div><div class="stat-val">${esc(safe(d.pbv))}</div></div>
-    <div class="stat-box"><div class="stat-lbl">DIV. YIELD</div><div class="stat-val">${esc(safe(d.divYield))}</div></div>
-    <div class="stat-box"><div class="stat-lbl">BETA</div><div class="stat-val">${esc(safe(d.beta))}</div></div>
+  // ── ANALYSIS CARDS ─────────────────────────────────────────────────
+  const analysisCards = !isIndex ? `
+  <div class="grid-2" style="margin-bottom:8px">
+    <div class="card" style="margin-bottom:0"><div class="card-lbl blue">📈 Teknikal</div><div style="font-size:.86rem;color:var(--text2);line-height:1.8;margin-top:.6rem">${esc(d.analisisTeknikal)}</div></div>
+    <div class="card" style="margin-bottom:0"><div class="card-lbl gold">📊 Fundamental</div><div style="font-size:.86rem;color:var(--text2);line-height:1.8;margin-top:.6rem">${esc(d.analisisFundamental)}</div></div>
+  </div>` : `
+  <div class="grid-2" style="margin-bottom:8px">
+    <div class="card" style="margin-bottom:0"><div class="card-lbl">💪 Sektor Kuat</div><div class="tags">${safeArr(d.sektorKuat).map(s=>`<span class="tag g">${esc(s)}</span>`).join('')}</div></div>
+    <div class="card" style="margin-bottom:0"><div class="card-lbl red">📉 Sektor Lemah</div><div class="tags">${safeArr(d.sektorLemah).map(s=>`<span class="tag r">${esc(s)}</span>`).join('')}</div></div>
   </div>`;
 
-  // KRK
+  // ── KRK ────────────────────────────────────────────────────────────
   const krkSection = `
-  <div class="two-col">
-    <div class="s-card" style="margin-bottom:0"><div class="s-card-label">✅ Keunggulan</div><div class="tags">${safeArr(
-      d.keunggulan,
-    )
-      .map((k) => `<span class="tag g">${esc(k)}</span>`)
-      .join('')}</div></div>
-    <div class="s-card" style="margin-bottom:0"><div class="s-card-label red">⚠️ Risiko</div><div class="tags">${safeArr(
-      d.risiko,
-    )
-      .map((r) => `<span class="tag r">${esc(r)}</span>`)
-      .join('')}</div></div>
+  <div class="grid-2" style="margin-bottom:8px">
+    <div class="card" style="margin-bottom:0"><div class="card-lbl">✅ Keunggulan</div><div class="tags">${safeArr(d.keunggulan).map(k=>`<span class="tag g">${esc(k)}</span>`).join('')}</div></div>
+    <div class="card" style="margin-bottom:0"><div class="card-lbl red">⚠️ Risiko</div><div class="tags">${safeArr(d.risiko).map(r=>`<span class="tag r">${esc(r)}</span>`).join('')}</div></div>
   </div>
-  <div style="margin-bottom:10px"></div>
-  <div class="s-card"><div class="s-card-label gold">🚀 Katalis</div><div class="tags">${safeArr(
-    d.katalis,
-  )
-    .map((k, i) => {
-      const neg = /risiko|waspada|ancaman|negatif|turun|melemah|tekanan/i.test(k);
-      return `<span class="tag ${neg ? 'r' : i === 0 ? 'g' : ''}">${esc(k)}</span>`;
-    })
-    .join('')}</div></div>`;
+  <div class="card" style="margin-bottom:8px"><div class="card-lbl gold">🚀 Katalis</div><div class="tags">${safeArr(d.katalis).map((k,i)=>{const neg=/risiko|waspada|ancaman|negatif|turun|melemah|tekanan/i.test(k);return `<span class="tag ${neg?'r':i===0?'g':''}">${esc(k)}</span>`;}).join('')}</div></div>`;
 
-  // REKOMENDASI SAHAM IHSG
-  const rekSaham =
-    isIndex && safeArr(d.rekomendasiSaham).length
-      ? `
-  <div class="s-card"><div class="s-card-label blue">⭐ Saham Pilihan</div><div class="tags">${safeArr(
-    d.rekomendasiSaham,
-  )
-    .map((s) => `<span class="tag gold">${esc(s)}</span>`)
-    .join('')}</div></div>`
-      : '';
+  // ── METRICS ────────────────────────────────────────────────────────
+  const metricsRow = `
+  <div class="grid-4" style="margin-bottom:8px">
+    <div class="stat"><div class="stat-l">P/E</div><div class="stat-v">${esc(safe(d.pe))}</div></div>
+    <div class="stat"><div class="stat-l">P/BV</div><div class="stat-v">${esc(safe(d.pbv))}</div></div>
+    <div class="stat"><div class="stat-l">DIV YIELD</div><div class="stat-v gold">${esc(safe(d.divYield))}</div></div>
+    <div class="stat"><div class="stat-l">BETA</div><div class="stat-v">${esc(safe(d.beta))}</div></div>
+  </div>`;
 
-  // SEKTOR CONTEXT
-  const sectorCtx =
-    d.sektorContext && !isIndex
-      ? `
-  <div class="s-card"><div class="s-card-label blue">🔄 Konteks Sektor</div><div style="font-size:0.88rem;color:var(--text2);line-height:1.8;margin-top:0.75rem">${esc(d.sektorContext)}</div></div>`
-      : '';
+  // ── POSISI KOMPETITIF ──────────────────────────────────────────────
+  const kompCard = !isIndex && d.posisiKompetitif ? `
+  <div class="card" style="margin-bottom:8px"><div class="card-lbl blue">🏆 Posisi Kompetitif</div><div style="font-size:.86rem;color:var(--text2);line-height:1.8;margin-top:.6rem">${esc(d.posisiKompetitif)}</div></div>` : '';
 
-  // NEW: INDIKATOR PRO
+  // ── SEKTOR CTX ─────────────────────────────────────────────────────
+  const sectorCtx = d.sektorContext && !isIndex ? `
+  <div class="card" style="margin-bottom:8px"><div class="card-lbl blue">🔄 Konteks Sektor</div><div style="font-size:.86rem;color:var(--text2);line-height:1.8;margin-top:.6rem">${esc(d.sektorContext)}</div></div>` : '';
+
+  // ── REKOMENADSI SAHAM ──────────────────────────────────────────────
+  const rekSaham = isIndex && safeArr(d.rekomendasiSaham).length ? `
+  <div class="card" style="margin-bottom:8px"><div class="card-lbl blue">⭐ Saham Pilihan</div><div class="tags">${safeArr(d.rekomendasiSaham).map(s=>`<span class="tag gold">${esc(s)}</span>`).join('')}</div></div>` : '';
+
+  // ── NEWS ───────────────────────────────────────────────────────────
+  const newsCard = d.newsData && (safeArr(d.newsData.emiten).length || safeArr(d.newsData.makro).length) ? `
+  <div class="card" style="margin-bottom:8px">
+    <div class="card-lbl">📰 Berita Terkini</div>
+    <div style="margin-top:.75rem">
+      ${safeArr(d.newsData.emiten).slice(0,3).map(n=>`
+      <div style="padding:7px 0;border-bottom:1px solid var(--bdr)">
+        <div style="font-size:11px;color:var(--text);line-height:1.5;margin-bottom:2px">${esc(n.title)}</div>
+        <div style="font-size:9px;color:var(--text3);font-family:var(--mono)">${esc(n.date)} · ${esc(n.source)}</div>
+      </div>`).join('')}
+      ${safeArr(d.newsData.makro).slice(0,2).map(n=>`
+      <div style="padding:7px 0;border-bottom:1px solid var(--bdr)">
+        <div style="font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:2px">${esc(n.title)}</div>
+        <div style="font-size:9px;color:var(--text3);font-family:var(--mono)">${esc(n.date)} · MAKRO</div>
+      </div>`).join('')}
+    </div>
+  </div>` : '';
+
+  // ── PRO INDICATORS ─────────────────────────────────────────────────
   const ind2 = d.indicators || {};
+  const proInds = [];
+  if (ind2.divergence?.detected) proInds.push(`<span class="pill pill-${ind2.divergence.bias==='bullish'?'g':'r'}">${ind2.divergence.bias==='bullish'?'Bullish':'Bearish'} Divergence</span>`);
+  if (ind2.candlestick?.topPattern) proInds.push(`<span class="pill pill-gold">${esc(ind2.candlestick.topPattern.name)}</span>`);
+  if (ind2.fibonacci?.atKeyLevel) proInds.push(`<span class="pill pill-b">Fib Level Kunci</span>`);
+  if (ind2.relStrength?.trend==='outperform') proInds.push(`<span class="pill pill-g">RS Outperform ${ind2.relStrength.rsScore}</span>`);
 
-  // Candlestick Pattern
-  const csCard =
-    ind2.candlestick && ind2.candlestick.patterns && ind2.candlestick.patterns.length
-      ? `
-  <div class="s-card">
-    <div class="s-card-label gold">🕯️ Candlestick Pattern</div>
-    <div style="margin-top:0.75rem;display:flex;flex-wrap:wrap;gap:6px">
-      ${ind2.candlestick.patterns
-        .map(
-          (p) => `
-      <div style="background:var(--bg3);border:1px solid ${p.type === 'bullish' ? 'rgba(0,230,118,0.2)' : p.type === 'bearish' ? 'rgba(255,82,82,0.2)' : 'var(--border)'};border-radius:9px;padding:0.7rem 0.9rem;flex:1;min-width:200px">
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
-          <span style="font-size:11px;font-weight:700;font-family:var(--mono);color:${p.type === 'bullish' ? 'var(--g)' : p.type === 'bearish' ? 'var(--red)' : 'var(--text2)'}">${esc(p.name)}</span>
-          <span class="pill ${p.strength === 'high' ? 'pill-g' : p.strength === 'medium' ? 'pill-gold' : 'pill-gray'}">${p.strength}</span>
-          <span class="pill ${p.type === 'bullish' ? 'pill-g' : p.type === 'bearish' ? 'pill-r' : 'pill-gray'}">${p.type}</span>
-        </div>
-        <div style="font-size:11px;color:var(--text2);line-height:1.6">${esc(p.signal)}</div>
-      </div>`,
-        )
-        .join('')}
-    </div>
-  </div>`
-      : '';
+  const proSection = proInds.length ? `
+  <div class="card" style="margin-bottom:8px">
+    <div class="card-lbl">🔬 Indikator Pro</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:.6rem">${proInds.join('')}</div>
+    ${ind2.fibonacci ? `<div style="font-size:10px;color:var(--text2);margin-top:.5rem;line-height:1.6">${esc(ind2.fibonacci.narrative||'')}</div>` : ''}
+  </div>` : '';
 
-  // Fibonacci
-  const fibCard = ind2.fibonacci
-    ? `
-  <div class="s-card">
-    <div class="s-card-label purple">📐 Fibonacci Retracement</div>
-    <div style="margin-top:0.75rem">
-      ${ind2.fibonacci.atKeyLevel ? `<div style="margin-bottom:8px"><span class="pill pill-gold">⚠️ HARGA DI LEVEL KUNCI FIB</span></div>` : ''}
-      <div style="font-size:11px;color:var(--text2);margin-bottom:10px">${esc(ind2.fibonacci.narrative || '')}</div>
-      <div class="stat-grid">
-        <div class="stat-box"><div class="stat-lbl">HIGH RANGE</div><div class="stat-val g">${fmtPrice(ind2.fibonacci.high)}</div></div>
-        <div class="stat-box"><div class="stat-lbl">LOW RANGE</div><div class="stat-val r">${fmtPrice(ind2.fibonacci.low)}</div></div>
-        <div class="stat-box"><div class="stat-lbl">FIB SUPPORT</div><div class="stat-val g">${fmtPrice(ind2.fibonacci.nearSupport)}</div></div>
-        <div class="stat-box"><div class="stat-lbl">FIB RESIST</div><div class="stat-val r">${fmtPrice(ind2.fibonacci.nearResistance)}</div></div>
-        <div class="stat-box"><div class="stat-lbl">POSISI</div><div class="stat-val">${ind2.fibonacci.positionPct}%</div></div>
-        <div class="stat-box"><div class="stat-lbl">ZONE</div><div class="stat-val" style="font-size:0.75rem">${(ind2.fibonacci.zone || '').replace(/_/g, ' ')}</div></div>
-      </div>
-      <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:5px">
-        ${
-          ind2.fibonacci.levels
-            ? Object.entries(ind2.fibonacci.levels)
-                .filter(([k]) => k.startsWith('r') && k !== 'r0' && k !== 'r100')
-                .map(
-                  ([k, v]) =>
-                    `<span class="pill pill-gray">${k.replace('r', '').replace('e', '')}%: ${fmtPrice(v)}</span>`,
-                )
-                .join('')
-            : ''
-        }
-      </div>
-    </div>
-  </div>`
-    : '';
-
-  // MFI + Divergence + Relative Strength + Pivot
-  const proIndicators =
-    ind2.mfi || ind2.divergence || ind2.relStrength || ind2.pivots
-      ? `
-  <div class="two-col">
-    ${
-      ind2.mfi
-        ? `<div class="s-card" style="margin-bottom:0">
-      <div class="s-card-label blue">💧 Money Flow Index</div>
-      <div style="margin-top:0.75rem">
-        <div style="font-family:var(--mono);font-size:2rem;font-weight:700;color:${ind2.mfi.mfi < 30 ? 'var(--g)' : ind2.mfi.mfi > 70 ? 'var(--red)' : 'var(--gold)'}">${ind2.mfi.mfi}<span style="font-size:1rem;color:var(--text3)">/100</span></div>
-        <span class="pill ${ind2.mfi.signal === 'oversold' ? 'pill-g' : ind2.mfi.signal === 'overbought' ? 'pill-r' : 'pill-gold'}" style="margin-top:6px;display:inline-block">${(ind2.mfi.signal || '').toUpperCase()}</span>
-        ${ind2.mfi.divergenceHint ? `<div style="font-size:11px;color:var(--gold);margin-top:6px">⚡ ${esc(ind2.mfi.divergenceHint.replace(/_/g, ' '))}</div>` : ''}
-      </div>
-    </div>`
-        : '<div></div>'
-    }
-    ${
-      ind2.relStrength
-        ? `<div class="s-card" style="margin-bottom:0">
-      <div class="s-card-label">📊 Relative Strength</div>
-      <div style="margin-top:0.75rem">
-        <div style="font-family:var(--mono);font-size:2rem;font-weight:700;color:${ind2.relStrength.rsScore >= 60 ? 'var(--g)' : ind2.relStrength.rsScore >= 40 ? 'var(--gold)' : 'var(--red)'}">${ind2.relStrength.rsScore}<span style="font-size:1rem;color:var(--text3)">/100</span></div>
-        <span class="pill ${ind2.relStrength.trend === 'outperform' ? 'pill-g' : ind2.relStrength.trend === 'underperform' ? 'pill-r' : 'pill-gold'}" style="margin-top:6px;display:inline-block">${(ind2.relStrength.trend || '').toUpperCase()}</span>
-        <div style="font-size:11px;color:var(--text2);margin-top:6px">${esc(ind2.relStrength.narrative || '')}</div>
-      </div>
-    </div>`
-        : '<div></div>'
-    }
-  </div>
-  <div style="margin-bottom:10px"></div>
-  ${
-    ind2.divergence && ind2.divergence.detected
-      ? `
-  <div class="s-card" style="background:${ind2.divergence.bias === 'bullish' ? 'linear-gradient(135deg,rgba(0,230,118,0.07),transparent)' : 'linear-gradient(135deg,rgba(255,82,82,0.07),transparent)'};border-color:${ind2.divergence.bias === 'bullish' ? 'rgba(0,230,118,0.2)' : 'rgba(255,82,82,0.2)'}">
-    <div class="s-card-label ${ind2.divergence.bias === 'bullish' ? '' : 'red'}">⚡ Divergence Terdeteksi</div>
-    <div style="margin-top:0.75rem">
-      <span class="pill ${ind2.divergence.bias === 'bullish' ? 'pill-g' : 'pill-r'}" style="margin-bottom:8px;display:inline-block">${esc(ind2.divergence.summary)}</span>
-      ${(ind2.divergence.divergences || [])
-        .map(
-          (
-            dv,
-          ) => `<div style="font-size:11px;color:var(--text2);margin-top:5px;padding:5px 8px;background:var(--bg3);border-radius:6px">
-        <span style="font-family:var(--mono);font-weight:700;color:${dv.type === 'bullish' ? 'var(--g)' : 'var(--red)'}">${dv.indicator}</span> — ${esc(dv.signal)}
-      </div>`,
-        )
-        .join('')}
-    </div>
-  </div>`
-      : ''
-  }
-  ${
-    ind2.pivots
-      ? `
-  <div class="s-card">
-    <div class="s-card-label">🎯 Pivot Points Classic</div>
-    <div style="margin-top:0.75rem">
-      <div style="font-size:11px;color:var(--text2);margin-bottom:10px;font-family:var(--mono)">${esc(
-        ind2.pivots.position || '',
-      )
-        .replace(/_/g, ' ')
-        .toUpperCase()}</div>
-      <div class="three-col" style="margin-bottom:0">
-        <div class="stat-box"><div class="stat-lbl">R2</div><div class="stat-val r">${fmtPrice(ind2.pivots.R2)}</div></div>
-        <div class="stat-box"><div class="stat-lbl">R1</div><div class="stat-val r">${fmtPrice(ind2.pivots.R1)}</div></div>
-        <div class="stat-box" style="border-color:rgba(255,255,255,0.15)"><div class="stat-lbl">PIVOT</div><div class="stat-val gold">${fmtPrice(ind2.pivots.P)}</div></div>
-        <div class="stat-box"><div class="stat-lbl">S1</div><div class="stat-val g">${fmtPrice(ind2.pivots.S1)}</div></div>
-        <div class="stat-box"><div class="stat-lbl">S2</div><div class="stat-val g">${fmtPrice(ind2.pivots.S2)}</div></div>
-        <div class="stat-box"><div class="stat-lbl">S3</div><div class="stat-val g">${fmtPrice(ind2.pivots.S3)}</div></div>
-      </div>
-    </div>
-  </div>`
-      : ''
-  }
-  `
-      : '';
-
-  // NEW: BERITA
-  const nd = d.newsData || {};
-  const hasNews =
-    (nd.emiten && nd.emiten.length) ||
-    (nd.komoditas && nd.komoditas.length) ||
-    (nd.makro && nd.makro.length);
-  const newsCard = hasNews
-    ? `
-  <div class="s-card">
-    <div class="s-card-hdr">
-      <div class="s-card-label blue">📰 Berita Terkini</div>
-      <span style="font-size:9px;color:var(--text3);font-family:var(--mono)">Google News · CNBC · Detik · Kontan</span>
-    </div>
-    ${
-      nd.emiten && nd.emiten.length
-        ? `
-    <div style="margin-bottom:1rem">
-      <div style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;font-family:var(--mono);margin-bottom:8px">📌 BERITA EMITEN</div>
-      ${nd.emiten
-        .map(
-          (n) => `
-      <div style="padding:8px 0;border-bottom:1px solid var(--border)">
-        <div style="font-size:12px;font-weight:600;color:var(--text);line-height:1.5;margin-bottom:3px">${esc(n.title)}</div>
-        ${n.description ? `<div style="font-size:11px;color:var(--text3);line-height:1.5">${esc(n.description)}</div>` : ''}
-        <div style="font-size:10px;color:var(--text3);margin-top:3px;font-family:var(--mono)">${esc(n.source)} · ${esc(n.date)}</div>
-      </div>`,
-        )
-        .join('')}
-    </div>`
-        : ''
-    }
-    ${
-      nd.komoditas && nd.komoditas.length
-        ? nd.komoditas
-            .map(
-              (c) => `
-    <div style="margin-bottom:1rem">
-      <div style="font-size:9px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1.5px;font-family:var(--mono);margin-bottom:8px">⛏️ ${esc(c.komoditas.toUpperCase())}</div>
-      ${c.items
-        .map(
-          (n) => `
-      <div style="padding:8px 0;border-bottom:1px solid var(--border)">
-        <div style="font-size:12px;font-weight:600;color:var(--text);line-height:1.5">${esc(n.title)}</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:3px;font-family:var(--mono)">${esc(n.source)} · ${esc(n.date)}</div>
-      </div>`,
-        )
-        .join('')}
-    </div>`,
-            )
-            .join('')
-        : ''
-    }
-    ${
-      nd.makro && nd.makro.length
-        ? `
-    <div>
-      <div style="font-size:9px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:1.5px;font-family:var(--mono);margin-bottom:8px">🌏 SENTIMEN MARKET</div>
-      ${nd.makro
-        .map(
-          (n) => `
-      <div style="padding:8px 0;border-bottom:1px solid var(--border)">
-        <div style="font-size:12px;font-weight:600;color:var(--text);line-height:1.5">${esc(n.title)}</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:3px;font-family:var(--mono)">${esc(n.source)} · ${esc(n.date)}</div>
-      </div>`,
-        )
-        .join('')}
-    </div>`
-        : ''
-    }
-  </div>`
-    : '';
-
-  // INFO
+  // ── INFO ───────────────────────────────────────────────────────────
   const infoCard = `
-  <div class="s-card">
-    <div class="s-card-label">📋 Informasi</div>
-    <table class="info-table" style="margin-top:0.75rem">
-      <tr><td>Kode Saham</td><td>${ticker}${!isIndex ? '.JK' : ''}</td></tr>
-      <tr><td>Sektor</td><td>${esc(safe(d.sektor, 'IDX'))}</td></tr>
+  <div class="card">
+    <div class="card-lbl">📋 Informasi</div>
+    <table class="info-table" style="margin-top:.75rem">
+      <tr><td>Kode Saham</td><td>${ticker}${!isIndex?'.JK':''}</td></tr>
+      <tr><td>Sektor</td><td>${esc(safe(d.sektor,'IDX'))}</td></tr>
       <tr><td>Bursa</td><td>IDX / Bursa Efek Indonesia</td></tr>
-      <tr><td>Dianalisis pada</td><td>${today}</td></tr>
-      ${d.latencyMs ? `<tr><td>Waktu analisis</td><td>${d.latencyMs}ms</td></tr>` : ''}
-      ${d.fromCache ? `<tr><td>Data</td><td>⚡ Cache</td></tr>` : ''}
-      ${hasNews ? `<tr><td>Berita</td><td style="color:var(--g)">✓ Tersedia</td></tr>` : `<tr><td>Berita</td><td style="color:var(--text3)">Tidak tersedia</td></tr>`}
+      <tr><td>Dianalisis</td><td>${today}</td></tr>
+      ${d.latencyMs?`<tr><td>Waktu analisis</td><td>${d.latencyMs}ms</td></tr>`:''}
+      ${d.fromCache?`<tr><td>Data</td><td style="color:var(--emerald)">⚡ Cache</td></tr>`:''}
+      ${hasNews?`<tr><td>Berita</td><td style="color:var(--emerald)">✓ Tersedia</td></tr>`:`<tr><td>Berita</td><td style="color:var(--text3)">Tidak tersedia</td></tr>`}
     </table>
   </div>`;
 
+  // ── ASSEMBLE ───────────────────────────────────────────────────────
   return `
-    ${scanSignalsHtml}
-    ${priceCard}
-    ${statRow}
+    ${signalsHtml}
+    ${tickerCard}
+    ${panelGrid}
+    ${riskPanel}
     ${chartCard}
-    ${strategyCard}
-    <div style="margin-bottom:10px"></div>
+    ${statRow}
+    ${whyNow}
     ${scorePanel}
     ${intelGrid}
     ${srCard}
     ${setupsSection}
-    ${csCard}
-    ${fibCard}
-    ${proIndicators}
+    ${proSection}
     ${smCard}
     ${mainCard}
     ${thesis}
     ${analysisCards}
-    ${kompetitifCard}
-    ${metricsSection}
+    ${kompCard}
+    ${metricsRow}
     ${krkSection}
     ${rekSaham}
-    ${bandarCard}
     ${sectorCtx}
     ${newsCard}
     ${infoCard}
@@ -1146,12 +923,12 @@ function buildResult(ticker, d) {
 // ── SKELETON ───────────────────────────────────────────────────────
 function buildSkeleton() {
   return `
-  <div class="s-card"><div style="display:flex;justify-content:space-between"><div><div class="sk" style="height:2rem;width:120px;margin-bottom:10px"></div><div class="sk" style="height:12px;width:200px"></div></div><div><div class="sk" style="height:1.8rem;width:110px;margin-bottom:8px;margin-left:auto"></div><div class="sk" style="height:12px;width:80px;margin-left:auto"></div></div></div></div>
-  <div class="stat-grid">${[1, 2, 3, 4, 5, 6].map(() => `<div class="stat-box"><div class="sk" style="height:9px;width:60%;margin-bottom:7px"></div><div class="sk" style="height:1rem;width:80%"></div></div>`).join('')}</div>
+  <div class="card"><div style="display:flex;justify-content:space-between"><div><div class="sk" style="height:2rem;width:120px;margin-bottom:10px"></div><div class="sk" style="height:12px;width:200px"></div></div><div><div class="sk" style="height:1.8rem;width:110px;margin-bottom:8px;margin-left:auto"></div><div class="sk" style="height:12px;width:80px;margin-left:auto"></div></div></div></div>
+  <div class="grid-4">${[1, 2, 3, 4, 5, 6].map(() => `<div class="stat-box"><div class="sk" style="height:9px;width:60%;margin-bottom:7px"></div><div class="sk" style="height:1rem;width:80%"></div></div>`).join('')}</div>
   <div class="chart-card"><div class="sk" style="height:300px;border-radius:7px"></div></div>
-  <div class="two-col"><div class="s-card" style="margin-bottom:0"><div class="sk" style="height:9px;width:100px;margin-bottom:12px"></div>${[1, 2, 3].map(() => `<div class="sk" style="height:12px;width:100%;margin-bottom:6px"></div>`).join('')}</div><div class="s-card" style="margin-bottom:0"><div class="sk" style="height:9px;width:100px;margin-bottom:12px"></div>${[1, 2, 3].map(() => `<div class="sk" style="height:12px;width:100%;margin-bottom:6px"></div>`).join('')}</div></div>
+  <div class="two-col"><div class="card" style="margin-bottom:0"><div class="sk" style="height:9px;width:100px;margin-bottom:12px"></div>${[1, 2, 3].map(() => `<div class="sk" style="height:12px;width:100%;margin-bottom:6px"></div>`).join('')}</div><div class="card" style="margin-bottom:0"><div class="sk" style="height:9px;width:100px;margin-bottom:12px"></div>${[1, 2, 3].map(() => `<div class="sk" style="height:12px;width:100%;margin-bottom:6px"></div>`).join('')}</div></div>
   <div style="margin-bottom:10px"></div>
-  <div class="s-card"><div class="sk" style="height:9px;width:120px;margin-bottom:12px"></div><div class="score-grid">${[1, 2, 3, 4, 5].map(() => `<div class="score-item"><div class="sk" style="height:9px;width:60%;margin-bottom:7px"></div><div class="sk" style="height:1.2rem;width:40%;margin-bottom:6px"></div><div class="sk" style="height:2px;margin-bottom:6px"></div></div>`).join('')}</div></div>`;
+  <div class="card"><div class="sk" style="height:9px;width:120px;margin-bottom:12px"></div><div class="breakdown-grid">${[1, 2, 3, 4, 5].map(() => `<div class="bk-item"><div class="sk" style="height:9px;width:60%;margin-bottom:7px"></div><div class="sk" style="height:1.2rem;width:40%;margin-bottom:6px"></div><div class="sk" style="height:2px;margin-bottom:6px"></div></div>`).join('')}</div></div>`;
 }
 
 // ── WATCHLIST ──────────────────────────────────────────────────────
@@ -1367,113 +1144,76 @@ async function runScanner() {
 }
 
 function renderScanResults(data, filter) {
-  const res = document.getElementById('scannerResults');
-  if (!res) return;
+  const el = document.getElementById('scannerResults');
+  if (!data || !data.results) { el.innerHTML = '<div class="scanner-empty">Tidak ada hasil.</div>'; return; }
 
-  if (!data.results || !data.results.length) {
-    const msg =
-      filter === 'bullish'
-        ? 'Tidak ada saham bullish saat ini (skor ≥ 6).'
-        : filter === 'naik'
-          ? 'Tidak ada saham yang naik hari ini.'
-          : filter === 'ready_pump'
-            ? 'Tidak ada saham dengan setup Ready to Pump saat ini.'
-            : 'Tidak ada setup terdeteksi untuk filter ini.';
-    res.innerHTML = `<div class="scanner-empty">🔍 ${msg}<br><span style="font-size:11px;color:var(--text3);margin-top:8px;display:block">Coba filter lain atau scan ulang.</span></div>`;
+  let results = data.results;
+
+  // Client-side filter tambahan
+  if (filter === 'bullish') results = results.filter(r => r.score >= 6);
+  if (filter === 'naik') results = results.filter(r => r.isUp);
+
+  if (!results.length) {
+    el.innerHTML = '<div class="scanner-empty">Tidak ada saham yang cocok dengan filter ini.</div>';
+    document.getElementById('scanUniverse').textContent = data.universe || '50+';
     return;
   }
 
-  // Stats bar
-  const totalNaik = data.results.filter((i) => i.isUp).length;
-  const totalTurun = data.results.filter((i) => !i.isUp).length;
-  const avgScore = (data.results.reduce((a, i) => a + i.score, 0) / data.results.length).toFixed(1);
+  const bullCount = results.filter(r => r.score >= 6).length;
+  const bearCount = results.filter(r => r.score <= 4).length;
 
-  const statsBar = `
-  <div class="scan-stats" style="margin-bottom:1rem">
-    <div class="scan-stat"><span class="scan-stat-num" style="color:var(--g)">${data.results.length}</span><span class="scan-stat-lbl">Setup Ditemukan</span></div>
-    <div class="scan-stat"><span class="scan-stat-num" style="color:var(--g)">${totalNaik}</span><span class="scan-stat-lbl">Naik</span></div>
-    <div class="scan-stat"><span class="scan-stat-num" style="color:var(--red)">${totalTurun}</span><span class="scan-stat-lbl">Turun</span></div>
-    <div class="scan-stat"><span class="scan-stat-num">${avgScore}</span><span class="scan-stat-lbl">Rata² Skor</span></div>
-    <div class="scan-stat" style="margin-left:auto"><span style="font-size:10px;color:var(--text3);font-family:var(--mono)">dari ${data.universe} saham</span></div>
+  const stats = `
+  <div class="scan-stats">
+    <div class="scan-stat"><span class="scan-stat-num" style="color:var(--emerald)">${bullCount}</span><span class="scan-stat-lbl">Bullish</span></div>
+    <div class="scan-stat"><span class="scan-stat-num">${results.length}</span><span class="scan-stat-lbl">Total</span></div>
+    <div class="scan-stat"><span class="scan-stat-num" style="color:var(--red)">${bearCount}</span><span class="scan-stat-lbl">Bearish</span></div>
   </div>`;
 
-  const cards = data.results
-    .map((item) => {
-      const topStrength = item.topSignal ? item.topSignal.strength : 'medium';
-      const isNaik = item.isUp && item.changePct > 0;
-      const isShort = item.topSignal && item.topSignal.direction === 'short';
-      const scoreColor =
-        item.score >= 7 ? 'var(--g)' : item.score >= 5 ? 'var(--gold)' : 'var(--red)';
-      const scoreGrad =
-        item.score >= 7
-          ? 'linear-gradient(90deg,#00c853,#00e676)'
-          : item.score >= 5
-            ? 'linear-gradient(90deg,#e65100,#ffab40)'
-            : 'linear-gradient(90deg,#b71c1c,#ff5252)';
-      const borderColor = isShort
-        ? 'var(--red)'
-        : topStrength === 'high'
-          ? 'var(--g)'
-          : 'rgba(255,171,64,0.5)';
-      const sigBadges = item.signals
-        .slice(0, 4)
-        .map((s) => {
-          const sc = s.strength === 'high' ? 'high' : s.direction === 'short' ? 'short' : 'medium';
-          const icon =
-            s.type === 'breakout'
-              ? '🚀'
-              : s.type === 'volume_spike'
-                ? '📊'
-                : s.type === 'oversold'
-                  ? '🔻'
-                  : s.type === 'golden_cross'
-                    ? '✨'
-                    : s.type === 'accumulation'
-                      ? '📦'
-                      : s.type === 'death_cross'
-                        ? '💀'
-                        : s.type === 'mfi_oversold'
-                          ? '💧'
-                          : s.type === 'divergence'
-                            ? '⚡'
-                            : s.type === 'candlestick'
-                              ? '🕯️'
-                              : s.type === 'fib_level'
-                                ? '📐'
-                                : s.type === 'ready_pump'
-                                  ? '🎯'
-                                  : '🔔';
-          return `<span class="sc-sig ${sc}">${icon} ${esc(s.label)}</span>`;
-        })
-        .join('');
-      return `<div class="sc-card-new" style="border-left-color:${borderColor}" onclick="analyzeFromScanner('${item.ticker}')">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <div style="display:flex;align-items:center;gap:10px">
-          <div>
-            <div style="font-family:var(--mono);font-size:1.1rem;font-weight:700;letter-spacing:-0.5px;line-height:1">${esc(item.ticker)}</div>
-            <div style="font-size:10px;color:var(--text3);margin-top:2px;font-family:var(--mono)">${esc(item.sector || '')}</div>
-          </div>
-        </div>
-        <div style="text-align:right">
-          <div style="font-family:var(--mono);font-size:1.4rem;font-weight:700;color:${scoreColor};line-height:1">${item.score}<span style="font-size:0.75rem;color:var(--text3)">/10</span></div>
-          <div style="font-size:9px;font-weight:700;font-family:var(--mono);color:${scoreColor};margin-top:1px">${esc(item.recommendation || '')}</div>
-        </div>
-      </div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(item.name || item.ticker)}</div>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-        <span style="font-family:var(--mono);font-size:1rem;font-weight:700">Rp ${item.lastClose ? item.lastClose.toLocaleString('id-ID') : 'N/A'}</span>
-        <span style="font-size:11px;font-weight:700;font-family:var(--mono);color:${item.isUp ? 'var(--g)' : 'var(--red)'}">${item.isUp ? '+' : ''}${item.changePct || 0}%</span>
-        ${item.rsi != null ? `<span style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-left:auto">RSI <span style="color:${item.rsi < 30 ? 'var(--g)' : item.rsi > 70 ? 'var(--red)' : 'var(--text2)'};font-weight:700">${item.rsi}</span></span>` : ''}
-      </div>
-      <div style="height:2px;background:var(--bg3);border-radius:1px;overflow:hidden;margin-bottom:8px">
-        <div style="height:100%;width:${item.score * 10}%;background:${scoreGrad};border-radius:1px;transition:width 0.8s ease"></div>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:4px">${sigBadges}</div>
-    </div>`;
-    })
-    .join('');
+  const rows = results.slice(0, 50).map(r => {
+    const topSig = r.signals && r.signals[0];
+    const dir = r.score >= 7 ? 'bull' : r.score <= 3 ? 'bear' : 'neutral';
+    const scoreColor = getScoreColor(r.score);
 
-  res.innerHTML = statsBar + '<div class="scanner-list">' + cards + '</div>';
+    // Action badge
+    const actionBadge = r.recommendation === 'BELI' || r.recommendation === 'AKUMULASI'
+      ? `<span class="pill pill-g">${r.recommendation}</span>`
+      : r.recommendation === 'JUAL' || r.recommendation === 'KURANGI'
+      ? `<span class="pill pill-r">${r.recommendation}</span>`
+      : `<span class="pill pill-gray">${r.recommendation||'TAHAN'}</span>`;
+
+    // Avatar initials
+    const initials = r.ticker.slice(0,2);
+
+    const sigs = (r.signals||[]).slice(0,2).map(s =>
+      `<span class="sc-sig ${s.strength||'medium'}">${esc(s.label)}</span>`
+    ).join('');
+
+    return `
+    <div class="sc-row ${dir}" onclick="analyzeFromScanner('${esc(r.ticker)}')">
+      <div class="sc-avatar">${initials}</div>
+      <div class="sc-info">
+        <div class="sc-ticker">${esc(r.ticker)}</div>
+        <div class="sc-name">${esc(r.name||r.ticker)}</div>
+        <div class="sc-sigs" style="margin-top:3px">${sigs}</div>
+      </div>
+      <div class="sc-price-col">
+        <div class="sc-price">${fmtPrice(r.lastClose)}</div>
+        <div class="sc-chg ${r.isUp?'up':'down'}">${r.isUp?'+':''}${r.changePct}%</div>
+      </div>
+      <div class="sc-action">${actionBadge}</div>
+      <div class="sc-score-col">
+        <div class="sc-score-val" style="color:${scoreColor}">${r.score}</div>
+        <div class="sc-score-lbl">/ 10</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = stats + '<div class="scan-list">' + rows + '</div>';
+  document.getElementById('scanUniverse').textContent = data.universe || '50+';
+  if (data.scannedAt) {
+    const t = new Date(data.scannedAt);
+    document.getElementById('scanLastRun').textContent = 'Update: ' + t.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) + (data.fromCache ? ' (cache)' : '');
+  }
 }
 
 function analyzeFromScanner(ticker) {
