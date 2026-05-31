@@ -7,7 +7,7 @@ Platform AI analisis saham Indonesia dengan indikator teknikal matematis, volume
 - **18 Indikator Teknikal** — RSI, MACD, Bollinger Bands, ATR, MFI, Fibonacci, Divergence, Candlestick Pattern, Pivot Points, Relative Strength, dan lainnya
 - **Bandar Detection** — Stealth accumulation, distribution trap, retail panic, smart money footprint
 - **Berita Terkini** — Berita emiten, komoditas terkait, dan sentimen market IHSG dari Google News
-- **Scanner** — Scan 50+ saham IHSG untuk setup breakout, volume spike, oversold, golden cross, dan lebih
+- **Scanner** — Scan 200+ saham IHSG untuk setup breakout, volume spike, oversold, golden cross, dan lebih
 - **AI Analysis** — Powered by openai/gpt-oss-120b via Groq
 
 ## Setup
@@ -49,7 +49,7 @@ npm run dev
 │   ├── analyze.js      # Main analysis endpoint
 │   └── scanner.js      # Scanner endpoint
 ├── data/
-│   └── idx-stocks.json # Database 489 emiten IDX
+│   └── idx-stocks.json # Database 621 emiten IDX
 ├── lib/
 │   ├── ai.js           # AI engine (Groq/gpt-oss-120b)
 │   ├── bandar.js       # Bandar detection
