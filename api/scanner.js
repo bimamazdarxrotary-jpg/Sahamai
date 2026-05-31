@@ -13,44 +13,23 @@ const { quickScan }        = require('../lib/scanner');
 const { cacheGet, cacheSet } = require('../lib/cache');
 const IDX_STOCKS           = require('../data/idx-stocks.json');
 
-let SCAN_UNIVERSE = [
-  // Perbankan (20)
-  'BBCA','BBRI','BMRI','BBNI','BRIS','BBTN','BNGA','BDMN','BJBR','BJTM',
-  'PNBN','MEGA','NISP','BTPN','BTPS','BSIM','BNLI','BVIC','NOBU','AGRO',
-  // Energi & Tambang Batubara (18)
-  'ADRO','PTBA','ITMG','BREN','PGAS','HRUM','GEMS','BYAN','CUAN','TOBA',
-  'DSSA','MBAP','MEDC','ELSA','ESSA','RAJA','RATU','AADI',
-  // Barang Baku & Mineral (17)
-  'TPIA','INCO','ANTM','MDKA','AMMN','BRMS','NCKL','BRPT','INKP','TKIM',
-  'SMGR','INTP','WTON','ARNA','NIKL','ISSP','FASW',
-  // Konsumer Primer (19)
-  'UNVR','ICBP','MYOR','SIDO','AMRT','INDF','GGRM','HMSP','ROTI','ULTJ',
-  'DLTA','CLEO','GOOD','CMRY','HOKI','SKBM','STTP','MLBI','CAMP',
-  // Teknologi & Digital (9)
-  'GOTO','BUKA','EMTK','MLPT','VKTR','WIFI','DMMX','NFCX','CASH',
-  // Properti (17)
-  'BSDE','CTRA','SMRA','PWON','DMAS','LPKR','PANI','CBDK','KIJA',
-  'BEST','MKPI','JRPT','DUTI','PPRO','APLN','ASRI','MDLN',
-  // Infrastruktur & Telko (13)
-  'JSMR','TLKM','EXCL','ISAT','TBIG','TOWR','MTEL','ADHI','WSKT','PTPP',
-  'WIKA','META','CMNP',
-  // Kesehatan (14)
-  'KLBF','HEAL','MIKA','KAEF','TSPC','DVLA','SOHO','BMHS',
-  'PRDA','SILO','SAME','IRRA','MERK','PEHA',
-  // Otomotif & Industri (7)
-  'ASII','AUTO','SMSM','DRMA','GJTL','IMAS','BIRD',
-  // Retail (8)
-  'ACES','ERAA','MAPI','LPPF','RALS','MIDI','RANC','MCAS',
-  // Agrikultur (8)
-  'AALI','LSIP','TAPG','SSMS','DSNG','BWPT','JPFA','CPIN',
-  // Keuangan Non-Bank (6)
-  'ADMF','WOMF','MFIN','PANS','TRIM','SMMA',
-  // Diversified (3)
-  'DOID','INDY','MLPL'
-];
-
-// De-duplicate
-SCAN_UNIVERSE = SCAN_UNIVERSE.filter(function(v, i, a) { return a.indexOf(v) === i; });
+// Bangun SCAN_UNIVERSE dari idx-stocks.json — selalu sync dengan database
+// Filter: hanya board Utama dan Pengembangan (exclude Indeks)
+// Prioritaskan saham Utama dulu, lalu Pengembangan, max 200 saham
+const _buildScanUniverse = function() {
+  const utama = [];
+  const pengembangan = [];
+  for (const ticker of Object.keys(IDX_STOCKS)) {
+    const data = IDX_STOCKS[ticker];
+    if (!data || data.sector === 'Indeks') continue;
+    if (data.board === 'Utama') utama.push(ticker);
+    else if (data.board === 'Pengembangan') pengembangan.push(ticker);
+  }
+  // Prioritas Utama semua + Pengembangan sampai max 200
+  const combined = utama.concat(pengembangan);
+  return combined.slice(0, 200);
+};
+const SCAN_UNIVERSE = _buildScanUniverse();
 
 const CACHE_TTL       = 10 * 60 * 1000; // 10 menit
 const FETCH_TIMEOUT   = 5000;            // FIX 3: 5 detik timeout per saham
