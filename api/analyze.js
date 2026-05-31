@@ -16,29 +16,21 @@ const { fetchAllNews }                      = require('../lib/news');
 const log                                   = require('../lib/logger');
 
 // ── Rate Limiting ──────────────────────────────────────────────────
-// CATATAN: rateLimitMap in-memory — tidak persist antar Vercel cold start
-// Untuk rate limit yang persist, gunakan Redis atau Vercel KV
-const rateLimitMap = new Map();
-
-// Bersihkan IP lama setiap 5 menit — cegah memory leak
-setInterval(function() {
-  const now = Date.now();
-  const window = 60 * 1000;
-  rateLimitMap.forEach(function(hits, ip) {
-    const fresh = hits.filter(function(t) { return now - t < window; });
-    if (fresh.length === 0) rateLimitMap.delete(ip);
-    else rateLimitMap.set(ip, fresh);
-  });
-}, 5 * 60 * 1000);
+// Pakai lib/cache.js (TTL-based) agar tidak perlu setInterval
+// Vercel serverless: setiap cold start bersih — rate limit per-instance
+// Untuk rate limit persist gunakan Vercel KV / Redis
+const { cacheGet: rlGet, cacheSet: rlSet } = require('../lib/cache');
+const RL_WINDOW = 60 * 1000; // 1 menit
+const RL_MAX    = 10;         // max 10 request/menit/IP
 
 function isRateLimited(ip) {
-  const now    = Date.now();
-  const window = 60 * 1000;
-  const max    = 10;
-  const hits   = (rateLimitMap.get(ip) || []).filter(function(t) { return now - t < window; });
+  const key  = 'rl:' + (ip || 'unknown');
+  const now  = Date.now();
+  // Ambil hits dari cache — sudah TTL otomatis, tidak perlu cleanup manual
+  const hits = (rlGet(key) || []).filter(function(t) { return now - t < RL_WINDOW; });
   hits.push(now);
-  rateLimitMap.set(ip, hits);
-  return hits.length > max;
+  rlSet(key, hits, RL_WINDOW);
+  return hits.length > RL_MAX;
 }
 
 // ── Fetch dengan retry (handle Yahoo 429) ─────────────────────────
@@ -303,8 +295,8 @@ module.exports = async function handler(req, res) {
     }
     parsed = aiValidation.parsed;
 
-    // FIX: Sanitize angka target/SL/levelBeli dari AI
-    parsed = sanitizeAIOutput(parsed, priceData);
+    // FIX: Sanitize angka target/SL/levelBeli dari AI — pakai ATR jika tersedia
+    parsed = sanitizeAIOutput(parsed, priceData, indicators);
 
   } catch (err) {
     log.error('analyze', '[AI ERROR]', ticker + ':', err.message);
@@ -313,7 +305,10 @@ module.exports = async function handler(req, res) {
 
   // ── Override metadata IDX ──────────────────────────────────────
   if (metadata) {
-    parsed.namaLengkap = 'PT ' + metadata.name;
+    const name = metadata.name || '';
+    // Jangan tambah 'PT' jika nama sudah punya prefix (PT, Bank, Indeks, dll)
+    const hasPrefix = /^(PT|Bank|Indeks|Index|BRI|BNI|BCA|BTN)\s/i.test(name);
+    parsed.namaLengkap = hasPrefix ? name : 'PT ' + name;
     parsed.sektor      = metadata.sector + (metadata.subsector ? ' - ' + metadata.subsector : '');
   }
 
@@ -353,16 +348,17 @@ module.exports = async function handler(req, res) {
       pivots:      indicators.pivots     || null
     },
     volumeData: volumeData ? {
-      bias:         volumeData.accDist && volumeData.accDist.bias,
-      isSpike:      volumeData.spike && volumeData.spike.isSpike,
-      spikeRatio:   volumeData.spike && volumeData.spike.ratio,
-      narrative:    volumeData.narrative,
-      score:        volumeData.score,
-      accDist:      volumeData.accDist,
-      spike:        volumeData.spike,
-      obv:          volumeData.obv,
-      vwap:         volumeData.vwap,
-      confirmation: volumeData.confirmation
+      bias:           volumeData.accDist && volumeData.accDist.bias,
+      isSpike:        volumeData.spike && volumeData.spike.isSpike,
+      spikeRatio:     volumeData.spike && volumeData.spike.ratio,
+      narrative:      volumeData.narrative,
+      score:          volumeData.score,
+      accDist:        volumeData.accDist,
+      spike:          volumeData.spike,
+      obv:            volumeData.obv,
+      vwap:           volumeData.vwap,
+      confirmation:   volumeData.confirmation,
+      smartMoneyFlow: volumeData.smartMoneyFlow || null  // FIX: was missing
     } : null,
     structureData: structure ? {
       phase:      structure.phase,
