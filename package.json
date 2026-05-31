@@ -1,16 +1,22 @@
 {
   "name": "sahamai",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Platform AI Analisis Saham IHSG",
   "private": true,
   "engines": {
     "node": ">=18"
   },
   "scripts": {
-    "dev": "node server.js",
+    "dev":   "node server.js",
     "start": "node server.js",
-    "lint": "node --check api/analyze.js api/scanner.js lib/ai.js lib/bandar.js lib/cache.js lib/context.js lib/indicators.js lib/logger.js lib/news.js lib/scanner.js lib/scoring.js lib/structure.js lib/validation.js lib/volume.js",
-    "test": "node tests/run.js"
+    "test":  "node tests/run.js",
+    "test:indicators": "node tests/indicators.test.js",
+    "test:scoring":    "node tests/scoring.test.js",
+    "test:volume":     "node tests/volume.test.js",
+    "test:structure":  "node tests/structure.test.js",
+    "test:bandar":     "node tests/bandar.test.js",
+    "test:context":    "node tests/context.test.js",
+    "lint": "node --check api/analyze.js api/scanner.js api/health.js lib/ai.js lib/bandar.js lib/cache.js lib/context.js lib/indicators.js lib/logger.js lib/news.js lib/scanner.js lib/scoring.js lib/structure.js lib/validation.js lib/volume.js server.js"
   },
   "dependencies": {
     "node-fetch": "^3.3.2"
