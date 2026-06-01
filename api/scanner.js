@@ -92,11 +92,29 @@ async function fetchCandles(ticker) {
     }
     if (candles.length < 20) return null;
 
+    // Gunakan regularMarketPrice dari meta sebagai harga terakhir yang akurat
+    // (lebih fresh dari candle terakhir yang bisa saja data kemarin)
+    const lastClose = meta.regularMarketPrice
+      ? Math.round(meta.regularMarketPrice)
+      : candles[candles.length - 1].close;
+
+    // Gunakan chartPreviousClose dari meta sebagai harga penutupan sebelumnya
+    // (akurat untuk hitung changePct hari ini)
+    const prevClose = meta.chartPreviousClose
+      ? Math.round(meta.chartPreviousClose)
+      : (candles.length >= 2 ? candles[candles.length - 2].close : lastClose);
+
+    // Sanity check: jika changePct > 25% kemungkinan data error, fallback ke candle
+    const rawChangePct = prevClose ? ((lastClose - prevClose) / prevClose * 100) : 0;
+    const finalPrevClose = Math.abs(rawChangePct) > 25
+      ? (candles.length >= 2 ? candles[candles.length - 2].close : lastClose)
+      : prevClose;
+
     return {
       ticker,
       candles,
-      lastClose: candles[candles.length - 1].close,
-      prevClose: candles.length >= 2 ? candles[candles.length - 2].close : candles[candles.length - 1].close
+      lastClose,
+      prevClose: finalPrevClose
     };
   } catch (e) {
     console.warn('[SCANNER] fetchCandles gagal:', e.message);
