@@ -13,29 +13,41 @@ const { quickScan }        = require('../lib/scanner');
 const { cacheGet, cacheSet } = require('../lib/cache');
 const IDX_STOCKS           = require('../data/idx-stocks.json');
 
-// Bangun SCAN_UNIVERSE dari idx-stocks.json — selalu sync dengan database
-// Filter: hanya board Utama dan Pengembangan (exclude Indeks)
-// Prioritaskan saham Utama dulu, lalu Pengembangan, max 200 saham
-const _buildScanUniverse = function() {
-  const utama = [];
-  const pengembangan = [];
+// ── Bangun universe dari idx-stocks.json ──────────────────────────
+// Utama: SEMUA (349 saham) — likuid, layak di-scan selalu
+// Pengembangan: di-rotasi per batch agar semua 270 saham
+//   terjangkau tanpa melebihi batas waktu Vercel
+const _buildUniverses = function() {
+  const utama = [], pengembangan = [];
   for (const ticker of Object.keys(IDX_STOCKS)) {
     const data = IDX_STOCKS[ticker];
     if (!data || data.sector === 'Indeks') continue;
     if (data.board === 'Utama') utama.push(ticker);
     else if (data.board === 'Pengembangan') pengembangan.push(ticker);
   }
-  // Prioritas Utama semua + Pengembangan sampai max 200
-  const combined = utama.concat(pengembangan);
-  return combined.slice(0, 200);
+  return { utama, pengembangan };
 };
-const SCAN_UNIVERSE = _buildScanUniverse();
+const { utama: UTAMA_UNIVERSE, pengembangan: PENGEMBANGAN_UNIVERSE } = _buildUniverses();
+
+// Pengembangan dirotasi: setiap request ambil batch berbeda
+// sehingga dalam ~3 request, semua 270 saham Pengembangan terjangkau
+const PENGEMBANGAN_BATCH_SIZE = 80;
+let _pengembangBatchIdx = 0;
+function getPengembanganBatch() {
+  const start = (_pengembangBatchIdx * PENGEMBANGAN_BATCH_SIZE) % PENGEMBANGAN_UNIVERSE.length;
+  _pengembangBatchIdx++;
+  const batch = [];
+  for (let i = 0; i < PENGEMBANGAN_BATCH_SIZE; i++) {
+    batch.push(PENGEMBANGAN_UNIVERSE[(start + i) % PENGEMBANGAN_UNIVERSE.length]);
+  }
+  return batch;
+}
 
 const CACHE_TTL       = 10 * 60 * 1000; // 10 menit
-const FETCH_TIMEOUT   = 5000;            // FIX 3: 5 detik timeout per saham
-const VERCEL_DEADLINE = 8500;            // berhenti fetch setelah 8.5 detik (batas Vercel 10 detik)
+const FETCH_TIMEOUT   = 4000;            // 4 detik per saham (lebih ketat)
+const VERCEL_DEADLINE = 24000;           // 24 detik — batas aman dari maxDuration 30s
 
-// FIX 3: Fetch dengan timeout agar tidak nunggu Yahoo terlalu lama
+// ── Fetch dengan timeout ──────────────────────────────────────────
 function fetchWithTimeout(url, options, timeoutMs) {
   return new Promise(function(resolve) {
     const timer = setTimeout(function() { resolve(null); }, timeoutMs);
@@ -44,7 +56,7 @@ function fetchWithTimeout(url, options, timeoutMs) {
       resolve(res);
     }).catch(function(e) {
       clearTimeout(timer);
-      console.warn('[SCANNER] Fetch timeout/error:', e && e.message);
+      console.warn('[SCANNER] Fetch error:', e && e.message);
       resolve(null);
     });
   });
@@ -54,10 +66,7 @@ async function fetchCandles(ticker) {
   const url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + ticker + '.JK?interval=1d&range=3mo';
   try {
     const res = await fetchWithTimeout(url, {
-      headers: {
-        'User-Agent': USER_AGENT,
-        'Accept': 'application/json'
-      }
+      headers: { 'User-Agent': USER_AGENT, 'Accept': 'application/json' }
     }, FETCH_TIMEOUT);
 
     if (!res || !res.ok) return null;
@@ -74,9 +83,9 @@ async function fetchCandles(ticker) {
       if (!quotes.close[i]) continue;
       candles.push({
         date:   new Date(timestamps[i] * 1000).toISOString().split('T')[0],
-        open:   Math.round(quotes.open  && quotes.open[i]   ? quotes.open[i]   : quotes.close[i]),
-        high:   Math.round(quotes.high  && quotes.high[i]   ? quotes.high[i]   : quotes.close[i]),
-        low:    Math.round(quotes.low   && quotes.low[i]    ? quotes.low[i]    : quotes.close[i]),
+        open:   Math.round(quotes.open   && quotes.open[i]   ? quotes.open[i]   : quotes.close[i]),
+        high:   Math.round(quotes.high   && quotes.high[i]   ? quotes.high[i]   : quotes.close[i]),
+        low:    Math.round(quotes.low    && quotes.low[i]    ? quotes.low[i]    : quotes.close[i]),
         close:  Math.round(quotes.close[i]),
         volume: quotes.volume && quotes.volume[i] ? quotes.volume[i] : 0
       });
@@ -84,10 +93,10 @@ async function fetchCandles(ticker) {
     if (candles.length < 20) return null;
 
     return {
-      ticker:    ticker,
-      candles:   candles,
+      ticker,
+      candles,
       lastClose: candles[candles.length - 1].close,
-      lastVol:   candles[candles.length - 1].volume
+      prevClose: candles.length >= 2 ? candles[candles.length - 2].close : candles[candles.length - 1].close
     };
   } catch (e) {
     console.warn('[SCANNER] fetchCandles gagal:', e.message);
@@ -105,72 +114,95 @@ function scanOneTicker(ticker, candleData) {
   const volumeData = analyzeVolume(candles);
   const structure  = analyzeStructure(candles, indicators, volumeData);
   const scoring    = computeScore(indicators, volumeData, structure, { current: candleData.lastClose });
-
-  // Gunakan quickScan dari lib/scanner.js — tidak duplikasi logika sinyal
   const { signals } = quickScan(ticker, candles, indicators, volumeData, structure, scoring);
 
   if (!signals.length) return null;
 
-  // Change pct
-  let changePct = 0;
-  if (candles.length >= 2) {
-    const prev = candles[candles.length - 2].close;
-    changePct = prev ? parseFloat(((candleData.lastClose - prev) / prev * 100).toFixed(2)) : 0;
-  }
+  const prev      = candleData.prevClose || candleData.lastClose;
+  const changePct = prev ? parseFloat(((candleData.lastClose - prev) / prev * 100).toFixed(2)) : 0;
 
   return {
-    ticker:         ticker,
-    name:           metadata ? metadata.name : ticker,
-    sector:         metadata ? metadata.sector : 'Unknown',
+    ticker,
+    name:           metadata ? metadata.name   : ticker,
+    sector:         metadata ? metadata.sector  : 'Unknown',
+    board:          metadata ? metadata.board   : 'Unknown',
     lastClose:      candleData.lastClose,
-    changePct:      changePct,
+    changePct,
     isUp:           changePct >= 0,
-    score:          scoring ? scoring.final : 5,
+    score:          scoring ? scoring.final          : 5,
     recommendation: scoring ? scoring.recommendation : 'TAHAN',
-    confidence:     scoring ? scoring.confidence : 'Low',
+    confidence:     scoring ? scoring.confidence     : 'Low',
     rsi:            indicators.rsi,
-    signals:        signals,
+    signals,
     topSignal:      signals[0]
   };
 }
 
-// FIX 3: Fetch SEMUA saham paralel, bukan per batch berurutan
-// Jauh lebih cepat — semua request jalan serentak, dibatasi deadline Vercel
+// ── Filter backend — pindah dari client ke server ─────────────────
+function applyFilter(results, filter) {
+  if (!filter || filter === 'all') return results;
+
+  switch (filter) {
+    case 'bullish':
+      return results.filter(r => r.score >= 6 || r.recommendation === 'BELI' || r.recommendation === 'AKUMULASI');
+
+    case 'naik':
+      return results
+        .filter(r => r.isUp && r.changePct > 0)
+        .sort((a, b) => b.changePct - a.changePct);
+
+    case 'ready_pump': {
+      return results.filter(r => {
+        const hasBull  = r.signals.some(s => s.direction === 'long' && (s.strength === 'high' || s.strength === 'medium'));
+        const rsiOk    = r.rsi == null || (r.rsi < 45 && r.rsi > 10);
+        const notDeath = !r.signals.some(s => s.type === 'death_cross');
+        return hasBull && rsiOk && r.score >= 6 && notDeath;
+      }).sort((a, b) => b.score - a.score);
+    }
+
+    default:
+      // Filter berdasarkan signal type (breakout, volume_spike, oversold, dll)
+      return results.filter(r => r.signals.some(s => s.type === filter));
+  }
+}
+
 async function runScan(filter) {
   const startTime = Date.now();
-  const universe  = SCAN_UNIVERSE;
 
-  // Fetch semua sekaligus (paralel penuh)
+  // Universe: semua Utama + batch rotasi Pengembangan
+  const universe = UTAMA_UNIVERSE.concat(getPengembanganBatch());
+  console.log('[SCANNER] Universe:', universe.length, '(Utama=' + UTAMA_UNIVERSE.length + ' + Pengembangan batch=' + PENGEMBANGAN_BATCH_SIZE + ')');
+
+  // Fetch semua paralel
   const fetchedAll = await Promise.all(universe.map(fetchCandles));
+  console.log('[SCANNER] Fetch selesai dalam', Date.now() - startTime, 'ms');
 
-  const results = [];
+  const raw = [];
   for (let i = 0; i < universe.length; i++) {
-    // Berhenti proses jika sudah mendekati deadline Vercel
     if (Date.now() - startTime > VERCEL_DEADLINE) {
-      console.warn('[SCANNER] Mendekati deadline, berhenti di indeks ' + i);
+      console.warn('[SCANNER] Mendekati deadline, berhenti di indeks', i);
       break;
     }
-
     if (!fetchedAll[i]) continue;
     const result = scanOneTicker(universe[i], fetchedAll[i]);
-    if (!result) continue;
-
-    if (filter && filter !== 'all') {
-      const match = result.signals.some(function(s) { return s.type === filter; });
-      if (!match) continue;
-    }
-
-    results.push(result);
+    if (result) raw.push(result);
   }
 
-  results.sort(function(a, b) { return b.score - a.score; });
+  // Sort by score sebelum filter agar urutan konsisten
+  raw.sort((a, b) => b.score - a.score);
+
+  const results = applyFilter(raw, filter);
 
   return {
-    results:   results,
-    total:     results.length,
-    universe:  universe.length,
-    filter:    filter || 'all',
-    scannedAt: new Date().toISOString()
+    results,
+    total:        results.length,
+    totalRaw:     raw.length,
+    universe:     universe.length,
+    utamaCount:   UTAMA_UNIVERSE.length,
+    pengembanganBatch: PENGEMBANGAN_BATCH_SIZE,
+    filter:       filter || 'all',
+    scannedAt:    new Date().toISOString(),
+    scanMs:       Date.now() - startTime
   };
 }
 
@@ -189,11 +221,11 @@ module.exports = async function handler(req, res) {
     return res.status(200).json(Object.assign({}, cached, { fromCache: true }));
   }
 
-  console.log('[SCANNER START]', filter);
+  console.log('[SCANNER START] filter=' + filter);
   try {
     const data = await runScan(filter);
     cacheSet(cacheKey, data, CACHE_TTL);
-    console.log('[SCANNER DONE]', data.total, 'results');
+    console.log('[SCANNER DONE]', data.total, 'results dari', data.universe, 'universe');
     return res.status(200).json(data);
   } catch (e) {
     console.error('[SCANNER ERROR]', e.message);
