@@ -12,7 +12,9 @@ const tests = [
   'tests/bandar.test.js',
   'tests/volume.test.js',
   'tests/structure.test.js',
-  'tests/context.test.js'
+  'tests/context.test.js',
+  'tests/analyze.integration.test.js',
+  'tests/scanner.integration.test.js'
 ];
 
 let totalPassed = 0, totalFailed = 0;
