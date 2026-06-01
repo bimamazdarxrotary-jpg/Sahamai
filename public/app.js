@@ -655,33 +655,18 @@ async function runScanner(){
   btn.disabled=true;icon.className='spin';icon.textContent='↻';
   res.innerHTML=`<div class="scanner-loading">
     <div style="font-size:13px;color:var(--text2);margin-bottom:6px;font-family:var(--mono)">Scanning pasar...</div>
-    <div style="font-size:11px;color:var(--text3);margin-bottom:1rem;font-family:var(--mono)">Menganalisis 150+ saham IHSG</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:1rem;font-family:var(--mono)">Menganalisis 400+ saham IHSG</div>
     <div class="progress-bar"><div class="progress-fill" id="scanProgress"></div></div>
   </div>`;
   const prog=document.getElementById('scanProgress');
   let pct=0;
   const progInterval=setInterval(()=>{pct=Math.min(pct+2,90);if(prog)prog.style.width=pct+'%';},300);
   try{
-    const apiFilter=['bullish','naik','ready_pump'].includes(currentScanFilter)?'all':currentScanFilter;
-    const response=await fetch('/api/scanner',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({filter:apiFilter})});
+    // Filter langsung dikirim ke backend — tidak ada duplikasi di client
+    const response=await fetch('/api/scanner',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({filter:currentScanFilter})});
     clearInterval(progInterval);if(prog)prog.style.width='100%';
     if(!response.ok){const err=await response.json().catch(()=>({}));throw new Error(err.error||'Scanner gagal');}
-    let data=await response.json();
-    if(currentScanFilter==='bullish'){
-      data={...data,results:data.results.filter(r=>r.score>=6||r.recommendation==='BELI'||r.recommendation==='AKUMULASI')};
-      data.total=data.results.length;
-    }else if(currentScanFilter==='naik'){
-      data={...data,results:data.results.filter(r=>r.isUp&&r.changePct>0).sort((a,b)=>b.changePct-a.changePct)};
-      data.total=data.results.length;
-    }else if(currentScanFilter==='ready_pump'){
-      data={...data,results:data.results.filter(r=>{
-        const hasBull=r.signals&&r.signals.some(s=>s.direction==='long'&&(s.strength==='high'||s.strength==='medium'));
-        const rsiOk=r.rsi==null||(r.rsi<45&&r.rsi>10);
-        const notDeath=!r.signals||!r.signals.some(s=>s.type==='death_cross');
-        return hasBull&&rsiOk&&r.score>=6&&notDeath;
-      }).sort((a,b)=>b.score-a.score)};
-      data.total=data.results.length;
-    }
+    const data=await response.json();
     renderScanResults(data,currentScanFilter);
     const lastRun=document.getElementById('scanLastRun');
     if(lastRun){const now=new Date();lastRun.textContent=(data.fromCache?'⚡ Cache — ':'')+data.total+' ditemukan · '+now.toLocaleTimeString('id-ID');}
@@ -695,9 +680,8 @@ async function runScanner(){
 function renderScanResults(data,filter){
   const el=document.getElementById('scannerResults');
   if(!data||!data.results){el.innerHTML='<div class="scanner-empty">Tidak ada hasil.</div>';return;}
-  let results=data.results;
-  if(filter==='bullish')results=results.filter(r=>r.score>=6);
-  if(filter==='naik')results=results.filter(r=>r.isUp);
+  // Backend sudah handle semua filter — tidak perlu filter ulang di client
+  const results=data.results;
   if(!results.length){el.innerHTML='<div class="scanner-empty">Tidak ada saham yang cocok.</div>';return;}
   const bullCount=results.filter(r=>r.score>=6).length;
   const bearCount=results.filter(r=>r.score<=4).length;
