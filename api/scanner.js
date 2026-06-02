@@ -128,16 +128,14 @@ function scanOneTicker(ticker, candleData) {
   const candles  = candleData.candles;
   const metadata = IDX_STOCKS[ticker] || null;
 
+  const prev      = candleData.prevClose || candleData.lastClose;
+  const changePct = prev ? parseFloat(((candleData.lastClose - prev) / prev * 100).toFixed(2)) : 0;
+
   const indicators = computeAll(candles);
   const volumeData = analyzeVolume(candles);
   const structure  = analyzeStructure(candles, indicators, volumeData);
   const scoring    = computeScore(indicators, volumeData, structure, { current: candleData.lastClose });
   const { signals } = quickScan(ticker, candles, indicators, volumeData, structure, scoring, changePct);
-
-  if (!signals.length) return null;
-
-  const prev      = candleData.prevClose || candleData.lastClose;
-  const changePct = prev ? parseFloat(((candleData.lastClose - prev) / prev * 100).toFixed(2)) : 0;
 
   return {
     ticker,
