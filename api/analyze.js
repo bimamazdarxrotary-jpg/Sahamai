@@ -255,7 +255,7 @@ module.exports = async function handler(req, res) {
 
   // ── 6. Market context ──────────────────────────────────────────
   const marketContext = !isIndex && candles.length >= 5
-    ? analyzeMarketContext(ticker, candles, indicators, volumeData, structure)
+    ? await analyzeMarketContext(ticker, candles, indicators, volumeData, structure)
     : null;
 
   // ── 7. Quick scan signals ──────────────────────────────────────
