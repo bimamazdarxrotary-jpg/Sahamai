@@ -138,10 +138,22 @@ async function fetchPriceData(ticker, isIndex) {
 
   if (!candles.length) return null;
 
-  const lastClose = meta.regularMarketPrice || candles[candles.length - 1].close;
-  let prevClose = meta.chartPreviousClose  || (candles[candles.length - 2] && candles[candles.length - 2].close) || lastClose;
-  let change    = lastClose - prevClose;
-  let changePct = prevClose ? parseFloat((change / prevClose * 100).toFixed(2)) : 0;
+  // Gunakan HANYA data candle untuk harga dan changePct
+  // meta.regularMarketPrice & chartPreviousClose dari Yahoo IDX tidak reliable
+  const lastClose  = candles[candles.length - 1].close;
+  let prevClose    = candles.length >= 2 ? candles[candles.length - 2].close : lastClose;
+  let change       = lastClose - prevClose;
+  let changePct    = prevClose ? parseFloat((change / prevClose * 100).toFixed(2)) : 0;
+
+  // Sanity check: changePct > 25% kemungkinan corporate action / stock split
+  if (Math.abs(changePct) > 25) {
+    const prev3 = candles.length >= 3 ? candles[candles.length - 3].close : lastClose;
+    prevClose = prev3;
+    change    = lastClose - prevClose;
+    changePct = prevClose ? parseFloat((change / prevClose * 100).toFixed(2)) : 0;
+    // Jika masih > 25%, kemungkinan corporate action — tampilkan 0
+    if (Math.abs(changePct) > 25) { change = 0; changePct = 0; }
+  }
 
   // Filter data Yahoo yang tidak wajar (corporate action, stock split, dll)
   // Kalau change > 25% dalam sehari, kemungkinan data salah — reset ke 0

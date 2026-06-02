@@ -92,22 +92,18 @@ async function fetchCandles(ticker) {
     }
     if (candles.length < 20) return null;
 
-    // Gunakan regularMarketPrice dari meta sebagai harga terakhir yang akurat
-    // (lebih fresh dari candle terakhir yang bisa saja data kemarin)
-    const lastClose = meta.regularMarketPrice
-      ? Math.round(meta.regularMarketPrice)
-      : candles[candles.length - 1].close;
+    // Gunakan HANYA data candle untuk harga dan changePct
+    // meta.regularMarketPrice & chartPreviousClose dari Yahoo IDX tidak reliable
+    // (bisa return harga pre-market atau penutupan sesi berbeda dari BEI resmi)
+    const lastClose = candles[candles.length - 1].close;
+    const prevClose = candles.length >= 2
+      ? candles[candles.length - 2].close
+      : lastClose;
 
-    // Gunakan chartPreviousClose dari meta sebagai harga penutupan sebelumnya
-    // (akurat untuk hitung changePct hari ini)
-    const prevClose = meta.chartPreviousClose
-      ? Math.round(meta.chartPreviousClose)
-      : (candles.length >= 2 ? candles[candles.length - 2].close : lastClose);
-
-    // Sanity check: jika changePct > 25% kemungkinan data error, fallback ke candle
+    // Sanity check: changePct > 25% kemungkinan corporate action / stock split
     const rawChangePct = prevClose ? ((lastClose - prevClose) / prevClose * 100) : 0;
     const finalPrevClose = Math.abs(rawChangePct) > 25
-      ? (candles.length >= 2 ? candles[candles.length - 2].close : lastClose)
+      ? (candles.length >= 3 ? candles[candles.length - 3].close : lastClose)
       : prevClose;
 
     return {
