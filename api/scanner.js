@@ -132,7 +132,7 @@ function scanOneTicker(ticker, candleData) {
   const volumeData = analyzeVolume(candles);
   const structure  = analyzeStructure(candles, indicators, volumeData);
   const scoring    = computeScore(indicators, volumeData, structure, { current: candleData.lastClose });
-  const { signals } = quickScan(ticker, candles, indicators, volumeData, structure, scoring);
+  const { signals } = quickScan(ticker, candles, indicators, volumeData, structure, scoring, changePct);
 
   if (!signals.length) return null;
 
@@ -208,6 +208,39 @@ async function runScan(filter) {
 
   // Sort by score sebelum filter agar urutan konsisten
   raw.sort((a, b) => b.score - a.score);
+
+  // ── Agregat return per sektor dari hasil scan ─────────────────
+  // Simpan ke cache agar lib/context.js bisa pakai data peer nyata
+  try {
+    const sectorMap = {};
+    for (const r of raw) {
+      if (!r.sector || r.sector === 'Unknown') continue;
+      if (!sectorMap[r.sector]) sectorMap[r.sector] = [];
+      sectorMap[r.sector].push(r.changePct);
+    }
+    const sectorStats = {};
+    for (const [sector, returns] of Object.entries(sectorMap)) {
+      if (returns.length < 2) continue;
+      const sorted = [...returns].sort((a, b) => a - b);
+      const mid    = Math.floor(sorted.length / 2);
+      const median = sorted.length % 2 !== 0
+        ? sorted[mid]
+        : (sorted[mid - 1] + sorted[mid]) / 2;
+      const avg = returns.reduce((a, b) => a + b, 0) / returns.length;
+      sectorStats[sector] = {
+        median:    parseFloat(median.toFixed(2)),
+        avg:       parseFloat(avg.toFixed(2)),
+        count:     returns.length,
+        updatedAt: new Date().toISOString()
+      };
+    }
+    if (Object.keys(sectorStats).length > 0) {
+      cacheSet('sector:returns', sectorStats, 30 * 60 * 1000); // TTL 30 menit
+      console.log('[SCANNER] Sector returns cached:', Object.keys(sectorStats).length, 'sektor');
+    }
+  } catch (e) {
+    console.warn('[SCANNER] Gagal cache sector returns:', e.message);
+  }
 
   const results = applyFilter(raw, filter);
 
