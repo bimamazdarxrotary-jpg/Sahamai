@@ -614,6 +614,45 @@ function renderWatchlist(){
   items.innerHTML=list.map(t=>`<div class="wl-item" onclick="quickAnalyze('${t}')"><span class="wl-ticker">${t}</span><span class="wl-remove" onclick="event.stopPropagation();removeFromWatchlist('${t}')" title="Hapus">×</span></div>`).join('');
 }
 document.addEventListener('DOMContentLoaded',renderWatchlist);
+document.addEventListener('DOMContentLoaded',renderPopularChips);
+
+// ── POPULAR CHIPS — top saham dari hasil scanner terakhir ─────────
+// Prioritas: scanner result cache (localStorage) → fallback default
+const POPULAR_FALLBACK=['BBCA','TLKM','GOTO','ASII','BMRI','BREN','AMMN','IHSG'];
+const POPULAR_STORAGE_KEY='sahamai_popular_tickers';
+const POPULAR_MAX=8;
+
+function savePopularFromScan(results){
+  if(!results||!results.length)return;
+  try{
+    // Ambil top POPULAR_MAX saham by score, selalu sertakan IHSG
+    const top=results
+      .filter(r=>r.ticker&&r.ticker!=='IHSG')
+      .slice(0,POPULAR_MAX-1)
+      .map(r=>r.ticker);
+    const tickers=[...top,'IHSG'].slice(0,POPULAR_MAX);
+    localStorage.setItem(POPULAR_STORAGE_KEY,JSON.stringify({tickers,savedAt:Date.now()}));
+    renderPopularChips(); // re-render setelah scan selesai
+  }catch(e){}
+}
+
+async function renderPopularChips(){
+  const container=document.getElementById('popularChips');
+  if(!container)return;
+  let tickers=POPULAR_FALLBACK;
+  try{
+    const raw=localStorage.getItem(POPULAR_STORAGE_KEY);
+    if(raw){
+      const data=JSON.parse(raw);
+      // Pakai cache scanner jika tidak lebih dari 24 jam
+      const age=Date.now()-(data.savedAt||0);
+      if(data.tickers&&data.tickers.length&&age<24*60*60*1000){
+        tickers=data.tickers;
+      }
+    }
+  }catch(e){}
+  container.innerHTML=tickers.map(t=>`<span class="chip" onclick="quickAnalyze('${t}')">${t}</span>`).join('');
+}
 
 // ── SCANNER ────────────────────────────────────────────────────────
 function toggleScanner(){
@@ -667,6 +706,7 @@ async function runScanner(){
     clearInterval(progInterval);if(prog)prog.style.width='100%';
     if(!response.ok){const err=await response.json().catch(()=>({}));throw new Error(err.error||'Scanner gagal');}
     const data=await response.json();
+    savePopularFromScan(data.results); // update chip populer dari hasil scan
     renderScanResults(data,currentScanFilter);
     const lastRun=document.getElementById('scanLastRun');
     if(lastRun){const now=new Date();lastRun.textContent=(data.fromCache?'⚡ Cache — ':'')+data.total+' ditemukan · '+now.toLocaleTimeString('id-ID');}
