@@ -266,40 +266,49 @@ module.exports = async function handler(req, res) {
   log.info('analyze', '[SCORE]', ticker + ': ' + scoring.final + '/10 ->', scoring.recommendation);
 
   // ── 6. Market context ──────────────────────────────────────────
-  const marketContext = !isIndex && candles.length >= 5
-    ? await analyzeMarketContext(ticker, candles, indicators, volumeData, structure)
-    : null;
-
   // ── 7. Quick scan signals ──────────────────────────────────────
+  // ── 8. Bandar analysis ─────────────────────────────────────────
+  const marketContextPromise = (!isIndex && candles.length >= 5)
+    ? analyzeMarketContext(ticker, candles, indicators, volumeData, structure)
+    : Promise.resolve(null);
+
   const scanSignals = !isIndex && candles.length >= 20
     ? quickScan(ticker, candles, indicators, volumeData, structure, scoring)
     : null;
 
-  // ── 8. Bandar analysis ─────────────────────────────────────────
   const bandarData = !isIndex && candles.length >= 20
     ? analyzeBandar(candles, indicators, volumeData, priceData, metadata)
     : null;
   if (bandarData) log.info('analyze', '[BANDAR]', ticker, 'score=' + bandarData.bandarScore, bandarData.smartMoney && bandarData.smartMoney.label);
 
-  // ── 9. Fetch berita terkini ────────────────────────────────────
-  let newsData = null;
-  try {
-    newsData = await fetchAllNews(ticker, metadata, isIndex);
-    log.info('analyze', '[NEWS]', ticker, 'emiten=' + (newsData.emiten && newsData.emiten.length) + ' komods=' + (newsData.komoditas && newsData.komoditas.length));
-  } catch (e) {
+  // ── 9 & 10. News + AI + Market context — PARALEL ──────────────
+  // Jalankan semua sekaligus untuk hemat 2-3 detik latency
+  const priceContext = buildPriceContext(priceData);
+
+  const newsPromise = fetchAllNews(ticker, metadata, isIndex).catch(e => {
     log.warn('analyze', '[NEWS ERROR]', e.message);
-    // Tidak fatal — lanjut tanpa berita
+    return null;
+  });
+
+  const aiPromise = callAI({
+    ticker, metadata, isIndex, priceData, priceContext,
+    indicators, volumeData, structure, scoring, bandarData,
+    newsData: null // news belum ada, AI pakai data teknikal
+  });
+
+  const [marketContext, newsData, rawAI] = await Promise.all([
+    marketContextPromise,
+    newsPromise,
+    aiPromise
+  ]);
+
+  if (newsData) {
+    log.info('analyze', '[NEWS]', ticker, 'emiten=' + (newsData.emiten && newsData.emiten.length) + ' komods=' + (newsData.komoditas && newsData.komoditas.length));
   }
 
-  // ── 10. AI ────────────────────────────────────────────────────
-  const priceContext = buildPriceContext(priceData);
+  // ── Proses hasil AI ───────────────────────────────────────────
   let parsed;
   try {
-    const rawAI = await callAI({
-      ticker, metadata, isIndex, priceData, priceContext,
-      indicators, volumeData, structure, scoring, bandarData,
-      newsData
-    });
     const aiValidation = validateAIOutput(rawAI);
     if (!aiValidation.valid) {
       log.error('analyze', '[AI PARSE]', ticker + ':', aiValidation.error);
