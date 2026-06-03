@@ -694,30 +694,81 @@ async function runScanner(){
   btn.disabled=true;icon.className='spin';icon.textContent='↻';
   res.innerHTML=`<div class="scanner-loading">
     <div style="font-size:13px;color:var(--text2);margin-bottom:6px;font-family:var(--mono)">Scanning pasar...</div>
-    <div style="font-size:11px;color:var(--text3);margin-bottom:1rem;font-family:var(--mono)">Menganalisis 400+ saham IHSG</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:1rem;font-family:var(--mono)" id="scanProgressLabel">Menganalisis 400+ saham IHSG</div>
     <div class="progress-bar"><div class="progress-fill" id="scanProgress"></div></div>
   </div>`;
+
+  // Cek cache dulu via POST biasa
+  try {
+    const cacheCheck = await fetch('/api/scanner', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({filter: currentScanFilter})
+    });
+    if (cacheCheck.ok) {
+      const data = await cacheCheck.json();
+      if (data.fromCache) {
+        savePopularFromScan(data.results);
+        renderScanResults(data, currentScanFilter);
+        const lastRun = document.getElementById('scanLastRun');
+        if (lastRun) lastRun.textContent = '⚡ Cache — ' + data.total + ' ditemukan · ' + new Date().toLocaleTimeString('id-ID');
+        btn.disabled=false;icon.className='';icon.textContent='⚡';
+        return;
+      }
+    }
+  } catch(e) {}
+
+  // Tidak ada cache — pakai SSE untuk progressive loading
   const prog=document.getElementById('scanProgress');
-  let pct=0;
-  const progInterval=setInterval(()=>{pct=Math.min(pct+2,90);if(prog)prog.style.width=pct+'%';},300);
-  try{
-    // Filter langsung dikirim ke backend — tidak ada duplikasi di client
-    const response=await fetch('/api/scanner',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({filter:currentScanFilter})});
-    clearInterval(progInterval);if(prog)prog.style.width='100%';
-    if(!response.ok){const err=await response.json().catch(()=>({}));throw new Error(err.error||'Scanner gagal');}
-    const data=await response.json();
-    savePopularFromScan(data.results); // update chip populer dari hasil scan
-    renderScanResults(data,currentScanFilter);
-    const lastRun=document.getElementById('scanLastRun');
-    if(lastRun){const now=new Date();lastRun.textContent=(data.fromCache?'⚡ Cache — ':'')+data.total+' ditemukan · '+now.toLocaleTimeString('id-ID');}
-  }catch(e){
-    clearInterval(progInterval);
-    res.innerHTML=`<div class="scanner-empty">❌ ${esc(e.message)}<br><span style="font-size:11px;margin-top:8px;display:block">Coba lagi beberapa saat.</span></div>`;
-    showToast(e.message,'error');
-  }finally{btn.disabled=false;icon.className='';icon.textContent='⚡';}
+  const progLabel=document.getElementById('scanProgressLabel');
+  let finalData=null;
+
+  try {
+    const evtSource = new EventSource('/api/scanner?filter=' + encodeURIComponent(currentScanFilter) + '&stream=true');
+
+    evtSource.onmessage = function(e) {
+      try {
+        const data = JSON.parse(e.data);
+        if (data.type === 'partial') {
+          // Tampilkan hasil partial segera
+          if(prog) prog.style.width = (data.progress || 30) + '%';
+          if(progLabel) progLabel.textContent = data.total + ' setup ditemukan, lanjut scan...';
+          if (data.results && data.results.length > 0) {
+            renderScanResults({results: data.results, total: data.total, filter: currentScanFilter}, currentScanFilter, true);
+          }
+        } else if (data.type === 'complete') {
+          finalData = data;
+          evtSource.close();
+          if(prog) prog.style.width = '100%';
+          savePopularFromScan(data.results);
+          renderScanResults(data, currentScanFilter);
+          const lastRun = document.getElementById('scanLastRun');
+          if (lastRun) lastRun.textContent = data.total + ' ditemukan · ' + new Date().toLocaleTimeString('id-ID');
+          btn.disabled=false;icon.className='';icon.textContent='⚡';
+        } else if (data.type === 'error') {
+          evtSource.close();
+          res.innerHTML = `<div class="scanner-empty">❌ ${esc(data.error)}</div>`;
+          showToast(data.error, 'error');
+          btn.disabled=false;icon.className='';icon.textContent='⚡';
+        }
+      } catch(err) {}
+    };
+
+    evtSource.onerror = function() {
+      evtSource.close();
+      if (!finalData) {
+        res.innerHTML = '<div class="scanner-empty">❌ Koneksi terputus. Coba lagi.</div>';
+        btn.disabled=false;icon.className='';icon.textContent='⚡';
+      }
+    };
+  } catch(e) {
+    res.innerHTML = `<div class="scanner-empty">❌ ${esc(e.message)}</div>`;
+    showToast(e.message, 'error');
+    btn.disabled=false;icon.className='';icon.textContent='⚡';
+  }
 }
 
-function renderScanResults(data,filter){
+function renderScanResults(data,filter,isPartial){
   const el=document.getElementById('scannerResults');
   if(!data||!data.results){el.innerHTML='<div class="scanner-empty">Tidak ada hasil.</div>';return;}
   // Backend sudah handle semua filter — tidak perlu filter ulang di client
