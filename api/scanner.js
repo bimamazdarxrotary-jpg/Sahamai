@@ -3,14 +3,14 @@
 // Scan saham IHSG untuk setup: breakout, volume spike, dll
 // ══════════════════════════════════════════════════════════════════
 
-const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
-
 const { computeAll }       = require('../lib/indicators');
 const { analyzeVolume }    = require('../lib/volume');
 const { analyzeStructure } = require('../lib/structure');
 const { computeScore }     = require('../lib/scoring');
 const { quickScan }        = require('../lib/scanner');
 const { cacheGet, cacheSet } = require('../lib/cache');
+const { fetchPriceDataWithFallback } = require('../lib/datasource');
+const { applyCompression } = require('../lib/compress');
 const IDX_STOCKS           = require('../data/idx-stocks.json');
 
 // ── Bangun universe dari idx-stocks.json ──────────────────────────
@@ -48,75 +48,26 @@ const FETCH_TIMEOUT   = 4000;            // 4 detik per saham (lebih ketat)
 const VERCEL_DEADLINE = 24000;           // 24 detik — batas aman dari maxDuration 30s
 
 // ── Fetch dengan timeout ──────────────────────────────────────────
-function fetchWithTimeout(url, options, timeoutMs) {
-  return new Promise(function(resolve) {
-    const timer = setTimeout(function() { resolve(null); }, timeoutMs);
-    fetch(url, options).then(function(res) {
-      clearTimeout(timer);
-      resolve(res);
-    }).catch(function(e) {
-      clearTimeout(timer);
-      console.warn('[SCANNER] Fetch error:', e && e.message);
-      resolve(null);
-    });
-  });
-}
-
+// fetchCandles: wrapper tipis pakai datasource.js (Yahoo → Stooq fallback)
 async function fetchCandles(ticker) {
-  const url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + ticker + '.JK?interval=1d&range=3mo';
   try {
-    const res = await fetchWithTimeout(url, {
-      headers: { 'User-Agent': USER_AGENT, 'Accept': 'application/json' }
-    }, FETCH_TIMEOUT);
-
-    if (!res || !res.ok) return null;
-
-    const json       = await res.json();
-    const result     = json && json.chart && json.chart.result && json.chart.result[0];
-    const meta       = result && result.meta;
-    const quotes     = result && result.indicators && result.indicators.quote && result.indicators.quote[0];
-    const timestamps = result && result.timestamp;
-    if (!meta || !quotes || !timestamps) return null;
-
-    const candles = [];
-    for (let i = 0; i < timestamps.length; i++) {
-      if (!quotes.close[i]) continue;
-      candles.push({
-        date:   new Date(timestamps[i] * 1000).toISOString().split('T')[0],
-        open:   Math.round(quotes.open   && quotes.open[i]   ? quotes.open[i]   : quotes.close[i]),
-        high:   Math.round(quotes.high   && quotes.high[i]   ? quotes.high[i]   : quotes.close[i]),
-        low:    Math.round(quotes.low    && quotes.low[i]    ? quotes.low[i]    : quotes.close[i]),
-        close:  Math.round(quotes.close[i]),
-        volume: quotes.volume && quotes.volume[i] ? quotes.volume[i] : 0
-      });
+    const data = await fetchPriceDataWithFallback(ticker, false);
+    if (!data || !data.candles || data.candles.length < 20) return null;
+    if (data.source && data.source !== 'yahoo') {
+      console.log('[SCANNER FALLBACK]', ticker, '->', data.source);
     }
-    if (candles.length < 20) return null;
-
-    // Gunakan HANYA data candle untuk harga dan changePct
-    // meta.regularMarketPrice & chartPreviousClose dari Yahoo IDX tidak reliable
-    // (bisa return harga pre-market atau penutupan sesi berbeda dari BEI resmi)
-    const lastClose = candles[candles.length - 1].close;
-    const prevClose = candles.length >= 2
-      ? candles[candles.length - 2].close
-      : lastClose;
-
-    // Sanity check: changePct > 25% kemungkinan corporate action / stock split
-    const rawChangePct = prevClose ? ((lastClose - prevClose) / prevClose * 100) : 0;
-    const finalPrevClose = Math.abs(rawChangePct) > 25
-      ? (candles.length >= 3 ? candles[candles.length - 3].close : lastClose)
-      : prevClose;
-
     return {
       ticker,
-      candles,
-      lastClose,
-      prevClose: finalPrevClose
+      candles:   data.candles,
+      lastClose: data.current,
+      prevClose: data.prevClose
     };
   } catch (e) {
-    console.warn('[SCANNER] fetchCandles gagal:', e.message);
+    console.warn('[SCANNER] fetchCandles gagal:', ticker, e.message);
     return null;
   }
 }
+
 
 function scanOneTicker(ticker, candleData) {
   if (!candleData || !candleData.candles || candleData.candles.length < 20) return null;
@@ -178,26 +129,45 @@ function applyFilter(results, filter) {
   }
 }
 
-async function runScan(filter) {
+async function runScan(filter, res) {
   const startTime = Date.now();
+  const isStreaming = res && res.write && typeof res.write === 'function';
 
   // Universe: semua Utama + batch rotasi Pengembangan
   const universe = UTAMA_UNIVERSE.concat(getPengembanganBatch());
   console.log('[SCANNER] Universe:', universe.length, '(Utama=' + UTAMA_UNIVERSE.length + ' + Pengembangan batch=' + PENGEMBANGAN_BATCH_SIZE + ')');
 
-  // Fetch semua paralel
-  const fetchedAll = await Promise.all(universe.map(fetchCandles));
-  console.log('[SCANNER] Fetch selesai dalam', Date.now() - startTime, 'ms');
-
+  // Fetch dalam batch 60 paralel agar progressive
+  const BATCH_SIZE = 60;
   const raw = [];
-  for (let i = 0; i < universe.length; i++) {
+
+  for (let batchStart = 0; batchStart < universe.length; batchStart += BATCH_SIZE) {
     if (Date.now() - startTime > VERCEL_DEADLINE) {
-      console.warn('[SCANNER] Mendekati deadline, berhenti di indeks', i);
+      console.warn('[SCANNER] Mendekati deadline, berhenti di batch', batchStart);
       break;
     }
-    if (!fetchedAll[i]) continue;
-    const result = scanOneTicker(universe[i], fetchedAll[i]);
-    if (result) raw.push(result);
+
+    const batch   = universe.slice(batchStart, batchStart + BATCH_SIZE);
+    const fetched = await Promise.all(batch.map(fetchCandles));
+
+    for (let i = 0; i < batch.length; i++) {
+      if (!fetched[i]) continue;
+      const result = scanOneTicker(batch[i], fetched[i]);
+      if (result) raw.push(result);
+    }
+
+    // Progressive: kirim partial hasil setelah batch pertama selesai
+    if (isStreaming && batchStart === 0 && raw.length > 0) {
+      const partial = applyFilter([...raw].sort((a, b) => b.score - a.score), filter);
+      try {
+        res.write('data: ' + JSON.stringify({
+          type:      'partial',
+          results:   partial.slice(0, 20),
+          total:     partial.length,
+          progress:  Math.round((batchStart + BATCH_SIZE) / universe.length * 100)
+        }) + '\n\n');
+      } catch (e) { /* client disconnected */ }
+    }
   }
 
   // Sort by score sebelum filter agar urutan konsisten
@@ -259,6 +229,11 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const filter   = (req.query && req.query.filter) || (req.body && req.body.filter) || 'all';
+  const isStream = req.query && req.query.stream === 'true';
+
+  // Terapkan gzip compression — skip untuk SSE (streaming)
+  if (!isStream) applyCompression(req, res);
+
   const cacheKey = 'scanner:' + filter;
   const cached   = cacheGet(cacheKey);
   if (cached) {
@@ -266,14 +241,31 @@ module.exports = async function handler(req, res) {
     return res.status(200).json(Object.assign({}, cached, { fromCache: true }));
   }
 
-  console.log('[SCANNER START] filter=' + filter);
+  console.log('[SCANNER START] filter=' + filter + ' stream=' + isStream);
   try {
-    const data = await runScan(filter);
-    cacheSet(cacheKey, data, CACHE_TTL);
-    console.log('[SCANNER DONE]', data.total, 'results dari', data.universe, 'universe');
-    return res.status(200).json(data);
+    if (isStream) {
+      // SSE mode — progressive loading
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      const data = await runScan(filter, res);
+      cacheSet(cacheKey, data, CACHE_TTL);
+      // Kirim hasil final
+      res.write('data: ' + JSON.stringify(Object.assign({}, data, { type: 'complete', fromCache: false })) + '\n\n');
+      res.end();
+    } else {
+      const data = await runScan(filter, null);
+      cacheSet(cacheKey, data, CACHE_TTL);
+      console.log('[SCANNER DONE]', data.total, 'results dari', data.universe, 'universe');
+      return res.status(200).json(data);
+    }
   } catch (e) {
     console.error('[SCANNER ERROR]', e.message);
-    return res.status(500).json({ error: 'Scanner gagal: ' + e.message });
+    if (isStream) {
+      res.write('data: ' + JSON.stringify({ type: 'error', error: e.message }) + '\n\n');
+      res.end();
+    } else {
+      return res.status(500).json({ error: 'Scanner gagal: ' + e.message });
+    }
   }
 };

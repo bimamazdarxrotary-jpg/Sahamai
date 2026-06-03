@@ -13,6 +13,8 @@ const { analyzeMarketContext }              = require('../lib/context');
 const { quickScan }                         = require('../lib/scanner');
 const { analyzeBandar }                     = require('../lib/bandar');
 const { fetchAllNews }                      = require('../lib/news');
+const { fetchPriceDataWithFallback }        = require('../lib/datasource');
+const { applyCompression }                  = require('../lib/compress');
 const log                                   = require('../lib/logger');
 
 // ── Rate Limiting ──────────────────────────────────────────────────
@@ -79,117 +81,18 @@ async function fetchPriceData(ticker, isIndex) {
   const cached   = cacheGet(cacheKey);
   if (cached) return cached;
 
-  const symbol = isIndex
-    ? (ticker === 'IHSG' ? '%5EJKSE' : '%5EJKLQ45')
-    : ticker + '.JK';
+  // fetchPriceDataWithFallback: Yahoo → Stooq (otomatis jika Yahoo gagal)
+  const data = await fetchPriceDataWithFallback(ticker, isIndex);
+  if (!data) return null;
 
-  const url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + symbol + '?interval=1d&range=6mo';
-
-  let res;
-  try {
-    res = await fetchWithRetry(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': 'application/json'
-      }
-    });
-  } catch (e) {
-    log.error('analyze', '[YAHOO FETCH ERROR]', e.message);
-    return null;
+  if (data.source && data.source !== 'yahoo') {
+    log.warn('analyze', '[DATASOURCE FALLBACK]', ticker + ' menggunakan ' + data.source);
   }
 
-  if (!res.ok) {
-    log.error('analyze', '[YAHOO ERROR]', res.status, ticker);
-    return null;
-  }
-
-  let json;
-  try { json = await res.json(); }
-  catch (e) { log.error('analyze', '[YAHOO JSON PARSE]', e.message); return null; }
-
-  const result     = json && json.chart && json.chart.result && json.chart.result[0];
-  const meta       = result && result.meta;
-  const quotes     = result && result.indicators && result.indicators.quote && result.indicators.quote[0];
-  const timestamps = result && result.timestamp;
-
-  if (!meta || !quotes || !timestamps) {
-    log.error('analyze', '[YAHOO NO DATA]', ticker);
-    return null;
-  }
-
-  const closes  = quotes.close;
-  const highs   = quotes.high;
-  const lows    = quotes.low;
-  const opens   = quotes.open;
-  const volumes = quotes.volume;
-
-  const candles = [];
-  for (let i = 0; i < timestamps.length; i++) {
-    if (closes[i] == null) continue;
-    candles.push({
-      date:   new Date(timestamps[i] * 1000).toISOString().split('T')[0],
-      open:   Math.round(opens && opens[i] ? opens[i] : closes[i]),
-      high:   Math.round(highs[i] || closes[i]),
-      low:    Math.round(lows[i]  || closes[i]),
-      close:  Math.round(closes[i]),
-      volume: volumes[i] || 0
-    });
-  }
-
-  if (!candles.length) return null;
-
-  // Gunakan HANYA data candle untuk harga dan changePct
-  // meta.regularMarketPrice & chartPreviousClose dari Yahoo IDX tidak reliable
-  const lastClose  = candles[candles.length - 1].close;
-  let prevClose    = candles.length >= 2 ? candles[candles.length - 2].close : lastClose;
-  let change       = lastClose - prevClose;
-  let changePct    = prevClose ? parseFloat((change / prevClose * 100).toFixed(2)) : 0;
-
-  // Sanity check: changePct > 25% kemungkinan corporate action / stock split
-  if (Math.abs(changePct) > 25) {
-    const prev3 = candles.length >= 3 ? candles[candles.length - 3].close : lastClose;
-    prevClose = prev3;
-    change    = lastClose - prevClose;
-    changePct = prevClose ? parseFloat((change / prevClose * 100).toFixed(2)) : 0;
-    // Jika masih > 25%, kemungkinan corporate action — tampilkan 0
-    if (Math.abs(changePct) > 25) { change = 0; changePct = 0; }
-  }
-
-  // Filter data Yahoo yang tidak wajar (corporate action, stock split, dll)
-  // Kalau change > 25% dalam sehari, kemungkinan data salah — reset ke 0
-  if (Math.abs(changePct) > 25) {
-    const prevFromCandles = candles.length >= 2 ? candles[candles.length - 2].close : lastClose;
-    const changePctFromCandles = prevFromCandles ? parseFloat(((lastClose - prevFromCandles) / prevFromCandles * 100).toFixed(2)) : 0;
-    // Pakai data candle kalau lebih masuk akal
-    if (Math.abs(changePctFromCandles) <= 25) {
-      prevClose = prevFromCandles;
-      change    = lastClose - prevClose;
-      changePct = changePctFromCandles;
-    } else {
-      // Keduanya tidak wajar — kemungkinan corporate action, tampilkan 0
-      change    = 0;
-      changePct = 0;
-    }
-  }
-
-  const priceData = {
-    current:   Math.round(lastClose),
-    prevClose: Math.round(prevClose),
-    change:    Math.round(change),
-    changePct: changePct,
-    isUp:      change >= 0,
-    high52w:   meta.fiftyTwoWeekHigh ? Math.round(meta.fiftyTwoWeekHigh) : null,
-    low52w:    meta.fiftyTwoWeekLow  ? Math.round(meta.fiftyTwoWeekLow)  : null,
-    volume:    meta.regularMarketVolume || candles[candles.length - 1].volume || null,
-    marketCap: meta.marketCap || null,
-    currency:  meta.currency  || 'IDR',
-    candles:   candles,
-    history:   candles.slice(-60)
-  };
-
-  cacheSet(cacheKey, priceData, TTL.price);
-  return priceData;
+  cacheSet(cacheKey, data, TTL.price);
+  return data;
 }
+
 
 // ── Build price context ─────────────────────────────────────────────
 function buildPriceContext(priceData) {
@@ -225,6 +128,8 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
+
+  applyCompression(req, res);
   if (req.method !== 'POST')    return res.status(405).json({ error: 'Method not allowed' });
 
   const ip = ((req.headers['x-forwarded-for'] || '').split(',')[0] || 'unknown');
