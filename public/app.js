@@ -12,6 +12,8 @@ async function analyzeStock(){
   const input=document.getElementById('stockInput');
   const ticker=input.value.trim().toUpperCase();
   if(!ticker){showToast('Masukkan kode saham','error');return;}
+  // BUG FIX 1: validasi karakter kode saham — hanya huruf, maks 10
+  if(!/^[A-Z0-9]{1,10}$/.test(ticker)){showToast('Kode saham tidak valid','error');return;}
   const btn=document.getElementById('analyzeBtn'),icon=document.getElementById('btnIcon');
   btn.disabled=true;icon.className='spin';icon.textContent='↻';
   document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('active',c.textContent===ticker));
@@ -19,13 +21,17 @@ async function analyzeStock(){
   section.style.display='block';
   section.scrollIntoView({behavior:'smooth',block:'start'});
   content.innerHTML=buildSkeleton();
-  if(tvChart){tvChart.remove();tvChart=null;tvSeries=null;tvVolSeries=null;}
+  // BUG FIX 2: destroy semua chart (bukan hanya tvChart) sebelum analisis baru
+  destroyAllCharts();
   try{
     const res=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ticker})});
     const d=await res.json();
     if(!res.ok)throw new Error(d.error||`HTTP ${res.status}`);
     content.innerHTML=buildResult(ticker,d);
-    if(d.priceData?.candles?.length){currentCandles=d.priceData.candles;initTVChart(currentCandles,currentChartType);}
+    if(d.priceData&&d.priceData.candles&&d.priceData.candles.length){
+      currentCandles=d.priceData.candles;
+      initTVChart(currentCandles,currentChartType);
+    }
     showToast(`${d.fromCache?'⚡ Cache':'✓ Selesai'} — ${d.latencyMs||0}ms`,'ok');
   }catch(err){
     content.innerHTML=`<div style="text-align:center;padding:4rem 1rem"><div style="font-size:3rem;margin-bottom:1rem">⚠️</div><p style="font-size:1rem;color:var(--red);margin-bottom:8px;font-family:var(--mono);font-weight:700">Gagal menganalisis</p><p style="font-size:12px;color:var(--text3)">${esc(String(err.message))}</p></div>`;
@@ -34,6 +40,14 @@ async function analyzeStock(){
   btn.disabled=false;icon.className='';icon.textContent='✦';
 }
 function quickAnalyze(code){document.getElementById('stockInput').value=code;analyzeStock();}
+
+// BUG FIX 2: fungsi terpusat untuk destroy semua chart instance
+function destroyAllCharts(){
+  if(tvChart){try{tvChart.remove();}catch(e){}tvChart=null;tvSeries=null;tvVolSeries=null;}
+  if(rsiChart){try{rsiChart.remove();}catch(e){}rsiChart=null;rsiSeries=null;}
+  if(macdChart){try{macdChart.remove();}catch(e){}macdChart=null;macdHistSeries=null;macdLineSeries=null;macdSignalSeries=null;}
+  chartSeriesMap={};
+}
 
 // ── CHART CALC ─────────────────────────────────────────────────────
 function calcEMA(data,period){
@@ -52,7 +66,8 @@ function calcSMA(data,period){
     result.push({time:data[i].date,value:Math.round(avg)});
   }return result;
 }
-function calcBB(data,period=20,mult=2){
+function calcBB(data,period,mult){
+  period=period||20;mult=mult||2;
   const upper=[],middle=[],lower=[];
   for(let i=period-1;i<data.length;i++){
     const slice=data.slice(i-period+1,i+1);
@@ -63,7 +78,8 @@ function calcBB(data,period=20,mult=2){
     lower.push({time:data[i].date,value:Math.round(avg-mult*std)});
   }return{upper,middle,lower};
 }
-function calcRSI(data,period=14){
+function calcRSI(data,period){
+  period=period||14;
   const result=[];const closes=data.map(c=>c.close);
   if(closes.length<period+1)return result;
   const changes=closes.slice(1).map((v,i)=>v-closes[i]);
@@ -76,7 +92,8 @@ function calcRSI(data,period=14){
     result.push({time:data[i].date,value:Math.round(100-100/(1+rs))});
   }return result;
 }
-function calcMACD(data,fast=12,slow=26,signal=9){
+function calcMACD(data,fast,slow,signal){
+  fast=fast||12;slow=slow||26;signal=signal||9;
   const kf=2/(fast+1),ks=2/(slow+1),kg=2/(signal+1);
   const closes=data.map(c=>c.close);
   if(closes.length<slow+signal)return{macd:[],signal:[],hist:[]};
@@ -104,8 +121,15 @@ function toggleIndicator(ind){
   activeIndicators[ind]=!activeIndicators[ind];
   const btn=document.getElementById('tog-'+ind);
   if(btn)btn.className='ind-toggle '+(activeIndicators[ind]?'on-':'off-')+ind;
-  if(ind==='rsi'){const p=document.getElementById('panel-rsi');if(p)p.classList.toggle('visible',activeIndicators.rsi);}
-  if(ind==='macd'){const p=document.getElementById('panel-macd');if(p)p.classList.toggle('visible',activeIndicators.macd);}
+  // BUG FIX 3: destroy sub-chart yang relevan sebelum re-init agar tidak double-mount
+  if(ind==='rsi'){
+    if(rsiChart){try{rsiChart.remove();}catch(e){}rsiChart=null;rsiSeries=null;}
+    const p=document.getElementById('panel-rsi');if(p)p.classList.toggle('visible',activeIndicators.rsi);
+  }
+  if(ind==='macd'){
+    if(macdChart){try{macdChart.remove();}catch(e){}macdChart=null;macdHistSeries=null;macdLineSeries=null;macdSignalSeries=null;}
+    const p=document.getElementById('panel-macd');if(p)p.classList.toggle('visible',activeIndicators.macd);
+  }
   if(currentCandles.length)initTVChart(currentCandles,currentChartType);
 }
 
@@ -113,10 +137,8 @@ function initTVChart(allCandles,type){
   type=type||'candle';
   const container=document.getElementById('tvChart');
   if(!container||!allCandles||!allCandles.length)return;
-  if(tvChart){tvChart.remove();tvChart=null;}
-  if(rsiChart){rsiChart.remove();rsiChart=null;}
-  if(macdChart){macdChart.remove();macdChart=null;}
-  chartSeriesMap={};
+  // Destroy semua chart dulu
+  destroyAllCharts();
   const data=filterByRange(allCandles,currentRange);
   if(!data.length)return;
   const isUp=data[data.length-1].close>=data[0].close;
@@ -131,7 +153,8 @@ function initTVChart(allCandles,type){
   });
   if(type==='candle'){
     tvSeries=tvChart.addCandlestickSeries({upColor:'#00d68f',downColor:'#f04f5e',borderUpColor:'#00d68f',borderDownColor:'#f04f5e',wickUpColor:'#00d68f',wickDownColor:'#f04f5e'});
-    tvSeries.setData(data.map(c=>({time:c.date,open:c.open||c.close,high:c.high,low:c.low,close:c.close})));
+    // BUG FIX 4: open fallback ke close jika null/undefined, bukan hanya falsy (menghindari open=0 edge case)
+    tvSeries.setData(data.map(c=>({time:c.date,open:c.open!=null?c.open:c.close,high:c.high,low:c.low,close:c.close})));
   }else{
     tvSeries=tvChart.addAreaSeries({lineColor:isUp?'#00d68f':'#f04f5e',topColor:isUp?'rgba(0,214,143,0.2)':'rgba(240,79,94,0.15)',bottomColor:'rgba(0,0,0,0)',lineWidth:2});
     tvSeries.setData(data.map(c=>({time:c.date,value:c.close})));
@@ -147,8 +170,9 @@ function initTVChart(allCandles,type){
     bU.setData(bb.upper);bM.setData(bb.middle);bL.setData(bb.lower);chartSeriesMap.bb=[bU,bM,bL];
   }
   tvVolSeries=tvChart.addHistogramSeries({color:'rgba(255,255,255,0.06)',priceFormat:{type:'volume'},priceScaleId:'',scaleMargins:{top:0.75,bottom:0}});
-  tvVolSeries.setData(data.map(c=>({time:c.date,value:c.volume||0,color:c.close>=(c.open||c.close)?'rgba(0,214,143,0.2)':'rgba(240,79,94,0.18)'})));
+  tvVolSeries.setData(data.map(c=>({time:c.date,value:c.volume||0,color:c.close>=(c.open!=null?c.open:c.close)?'rgba(0,214,143,0.2)':'rgba(240,79,94,0.18)'})));
   tvChart.timeScale().fitContent();
+  // RSI sub-chart
   if(activeIndicators.rsi){
     const rc=document.getElementById('rsiChart');
     if(rc&&data.length>=15){
@@ -160,9 +184,10 @@ function initTVChart(allCandles,type){
       const times=data.map(c=>c.date);
       ob.setData(times.map(t=>({time:t,value:70})));os.setData(times.map(t=>({time:t,value:30})));
       rsiChart.timeScale().fitContent();
-      new ResizeObserver(()=>{if(rsiChart&&rc)rsiChart.applyOptions({width:rc.clientWidth});}).observe(rc);
+      new ResizeObserver(function(){if(rsiChart&&rc)rsiChart.applyOptions({width:rc.clientWidth});}).observe(rc);
     }
   }
+  // MACD sub-chart
   if(activeIndicators.macd){
     const mc=document.getElementById('macdChart');
     if(mc&&data.length>=35){
@@ -175,10 +200,10 @@ function initTVChart(allCandles,type){
       if(md.macd.length)macdLineSeries.setData(md.macd);
       if(md.signal.length)macdSignalSeries.setData(md.signal);
       macdChart.timeScale().fitContent();
-      new ResizeObserver(()=>{if(macdChart&&mc)macdChart.applyOptions({width:mc.clientWidth});}).observe(mc);
+      new ResizeObserver(function(){if(macdChart&&mc)macdChart.applyOptions({width:mc.clientWidth});}).observe(mc);
     }
   }
-  new ResizeObserver(()=>{if(tvChart&&container)tvChart.applyOptions({width:container.clientWidth});}).observe(container);
+  new ResizeObserver(function(){if(tvChart&&container)tvChart.applyOptions({width:container.clientWidth});}).observe(container);
 }
 
 function filterByRange(candles,range){
@@ -191,32 +216,41 @@ function filterByRange(candles,range){
 function setRange(range,el){
   document.querySelectorAll('.chart-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');currentRange=range;
-  if(tvChart){tvChart.remove();tvChart=null;}
+  // BUG FIX 5: tidak destroy dulu via destroyAllCharts karena itu akan hapus RSI/MACD state juga
+  // Cukup remove tvChart lalu re-init
+  if(tvChart){try{tvChart.remove();}catch(e){}tvChart=null;tvSeries=null;tvVolSeries=null;}
   initTVChart(currentCandles,currentChartType);
 }
 function setChartType(type,el){
   document.querySelectorAll('.chart-type-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');currentChartType=type;
-  if(tvChart){tvChart.remove();tvChart=null;}
+  if(tvChart){try{tvChart.remove();}catch(e){}tvChart=null;tvSeries=null;tvVolSeries=null;}
   initTVChart(currentCandles,type);
 }
 
 // ── HELPERS ────────────────────────────────────────────────────────
-function showToast(msg,type=''){
+function showToast(msg,type){
+  type=type||'';
   document.querySelectorAll('.toast').forEach(t=>t.remove());
   const t=document.createElement('div');
   t.className='toast '+(type||'');t.textContent=msg;
-  document.body.appendChild(t);setTimeout(()=>t.remove(),3500);
+  document.body.appendChild(t);setTimeout(function(){t.remove();},3500);
 }
-function safe(v,fb='—'){return v!=null&&v!==''?v:fb;}
+function safe(v,fb){fb=fb===undefined?'—':fb;return v!=null&&v!==''?v:fb;}
 function esc(v){return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function safeArr(a){return Array.isArray(a)?a:[];}
-function fmtPrice(v){if(!v&&v!==0)return'—';return'Rp '+Number(v).toLocaleString('id-ID');}
+function fmtPrice(v){if(v==null||v==='')return'—';return'Rp '+Number(v).toLocaleString('id-ID');}
 function fmtVol(v){if(!v)return'—';if(v>=1e9)return(v/1e9).toFixed(2)+'B';if(v>=1e6)return(v/1e6).toFixed(1)+'Jt';if(v>=1e3)return(v/1e3).toFixed(0)+'K';return v.toLocaleString('id-ID');}
 function getBadgeClass(s){const u=(s||'').toUpperCase();if(u==='BELI'||u==='BULLISH'||u==='AKUMULASI')return'sent-beli';if(u==='JUAL'||u==='BEARISH'||u==='KURANGI')return'sent-jual';return'sent-tahan';}
 function getScoreColor(n){n=parseFloat(n)||0;if(n>=7)return'#00d68f';if(n>=5)return'#f0b429';return'#f04f5e';}
 function getScoreGrad(n){if(n>=7)return'linear-gradient(90deg,#00b377,#00d68f)';if(n>=5)return'linear-gradient(90deg,#d97706,#f0b429)';return'linear-gradient(90deg,#c0392b,#f04f5e)';}
-function extractNum(str){if(typeof str==='number')return str;const m=String(str||'').match(/\d+(\.\d+)?/);return m?parseFloat(m[0]):0;}
+// BUG FIX 6: extractNum — lebih robust, handle string Rp, koma, titik ribuan
+function extractNum(str){
+  if(typeof str==='number')return str;
+  const clean=String(str||'').replace(/Rp\.?\s*/gi,'').replace(/\./g,'').replace(/,/g,'.');
+  const m=clean.match(/-?\d+(\.\d+)?/);
+  return m?parseFloat(m[0]):0;
+}
 
 // ── BUILD RESULT ───────────────────────────────────────────────────
 function buildResult(ticker,d){
@@ -228,17 +262,29 @@ function buildResult(ticker,d){
   const isIndex=['IHSG','LQ45'].includes(ticker);
   const sentiment=safe(d.sentiment,'TAHAN');
   const today=new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
-  const finalScore=sc.final??extractNum(d.scoreTeknikal)??5;
+  // BUG FIX 7: gunakan sc.final langsung, extractNum hanya fallback, jangan double-parse
+  const finalScore=sc.final!=null?parseFloat(sc.final):(extractNum(d.scoreTeknikal)||5);
   const smfData=vol.smartMoneyFlow||{};
   const smfRatio=smfData.ratio||50;
   const smfBull=smfData.bias==='strong_buying'||smfData.bias==='mild_buying';
   const obvTrend=vol.obv?vol.obv.trend:'unknown';
 
-  // ── SIGNAL STRIP
-  const signalsHtml=d.scanSignals&&d.scanSignals.length
-    ?`<div class="signals">${d.scanSignals.map(s=>{const icons={breakout:'🚀',volume_spike:'📊',oversold:'🔻',golden_cross:'✨',accumulation:'📦',macd_cross:'⚡',ready_pump:'🎯',death_cross:'💀',divergence:'🔁',mfi_oversold:'💧',candlestick:'🕯️',fib_level:'📐'};return`<span class="sig ${s.strength||'medium'}">${icons[s.type]||'🔔'} ${esc(s.label)}</span>`;}).join('')}</div>`:'';
+  // BUG FIX 8: tampilkan crash warning banner jika ada
+  const crashBanner=d.crashWarning
+    ?`<div style="background:rgba(240,79,94,0.1);border:1px solid rgba(240,79,94,0.3);border-radius:10px;padding:.85rem;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start">
+        <span style="font-size:1.3rem;flex-shrink:0">⚠️</span>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--red);font-family:var(--mono);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">MARKET CRASH ALERT</div>
+          <div style="font-size:11px;color:rgba(240,79,94,0.85);line-height:1.7">${esc(d.crashWarning)}</div>
+        </div>
+      </div>`:'' ;
 
-  // ── TICKER HERO (Stocks.ly style)
+  // ── SIGNAL STRIP
+  const signalIcons={breakout:'🚀',volume_spike:'📊',oversold:'🔻',golden_cross:'✨',accumulation:'📦',macd_cross:'⚡',ready_pump:'🎯',death_cross:'💀',divergence:'🔁',mfi_oversold:'💧',candlestick:'🕯️',fib_level:'📐',squeeze:'🔲',market_crash:'⚠️'};
+  const signalsHtml=d.scanSignals&&d.scanSignals.length
+    ?`<div class="signals">${d.scanSignals.map(function(s){return`<span class="sig ${s.strength||'medium'}">${signalIcons[s.type]||'🔔'} ${esc(s.label)}</span>`;}).join('')}</div>`:'' ;
+
+  // ── TICKER HERO
   const tickerHero=`
   <div class="ticker-hero">
     <div class="th-top">
@@ -277,16 +323,16 @@ function buildResult(ticker,d){
     </div>
   </div>`;
 
-  // ── 4-PANEL GRID (Stocks.ly)
+  // ── 4-PANEL GRID
   const p1=`
   <div class="panel p-green">
     <div class="p-label green">📊 Ringkasan Scoring</div>
     <div class="p-num green">${finalScore}<span style="font-size:.9rem;color:var(--text3)">/10</span></div>
     <div class="p-sub">${esc(sc.recommendation||'TAHAN')} · ${esc(sc.riskReward||'Moderate')}</div>
     ${sc.breakdown?`<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:.5rem">
-      <span class="pill pill-${sc.breakdown.trend?.score>=6?'g':'r'}">T:${sc.breakdown.trend?.score||'—'}</span>
-      <span class="pill pill-${sc.breakdown.volume?.score>=6?'g':'r'}">V:${sc.breakdown.volume?.score||'—'}</span>
-      <span class="pill pill-${sc.breakdown.momentum?.score>=6?'g':'r'}">M:${sc.breakdown.momentum?.score||'—'}</span>
+      <span class="pill pill-${sc.breakdown.trend&&sc.breakdown.trend.score>=6?'g':'r'}">T:${sc.breakdown.trend&&sc.breakdown.trend.score||'—'}</span>
+      <span class="pill pill-${sc.breakdown.volume&&sc.breakdown.volume.score>=6?'g':'r'}">V:${sc.breakdown.volume&&sc.breakdown.volume.score||'—'}</span>
+      <span class="pill pill-${sc.breakdown.momentum&&sc.breakdown.momentum.score>=6?'g':'r'}">M:${sc.breakdown.momentum&&sc.breakdown.momentum.score||'—'}</span>
     </div>`:''}
   </div>`;
 
@@ -313,15 +359,17 @@ function buildResult(ticker,d){
     </div>
   </div>`;
 
+  // BUG FIX 9: optional chaining diganti dengan null-safe access agar tidak error di browser lama
+  const rsi=ind.rsi;
   const ma20ok=ind.ma&&pd.current&&ind.ma.ma20&&pd.current>ind.ma.ma20;
   const ma50ok=ind.ma&&pd.current&&ind.ma.ma50&&pd.current>ind.ma.ma50;
   const macdOk=ind.macd&&ind.macd.trend==='bullish';
-  const atrPct=ind.atr?.atrPct||0;
+  const atrPct=(ind.atr&&ind.atr.atrPct)||0;
   const p3=`
   <div class="panel p-dark">
     <div class="p-label muted">⚡ Kondisi Harga</div>
     <div style="display:flex;align-items:baseline;gap:6px;margin:.3rem 0">
-      <span style="font-family:var(--mono);font-size:1.6rem;font-weight:800;color:${ind.rsi<30?'var(--green)':ind.rsi>70?'var(--red)':'var(--text)'}">${ind.rsi??'—'}</span>
+      <span style="font-family:var(--mono);font-size:1.6rem;font-weight:800;color:${rsi<30?'var(--green)':rsi>70?'var(--red)':'var(--text)'}">${rsi!=null?rsi:'—'}</span>
       <span style="font-size:9px;color:var(--text3);font-family:var(--mono)">RSI</span>
     </div>
     <div class="cond-chips">
@@ -348,7 +396,7 @@ function buildResult(ticker,d){
     ?`<div class="grid-2">${p1}${p2}</div><div class="grid-2">${p3}${p4}</div>`
     :`<div class="grid-2">${p1}${p2}</div>`;
 
-  // ── RISK MANAGEMENT (Stocks.ly)
+  // ── RISK MANAGEMENT
   const riskCard=!isIndex&&(d.targetHarga||d.stopLoss)?`
   <div class="risk-card">
     <div class="risk-header">
@@ -373,7 +421,7 @@ function buildResult(ticker,d){
       </div>
     </div>
     ${d.rekomendasi?`<div class="risk-note-bar">${esc(d.rekomendasi)}</div>`:''}
-  </div>`:'';
+  </div>`:'' ;
 
   // ── CHART
   const chartCard=pd.current?`
@@ -404,101 +452,101 @@ function buildResult(ticker,d){
     </div>
     <div class="subpanel" id="panel-rsi"><div class="subpanel-lbl">RSI(14)</div><div id="rsiChart"></div></div>
     <div class="subpanel" id="panel-macd"><div class="subpanel-lbl">MACD(12,26,9)</div><div id="macdChart"></div></div>
-  </div>`:'';
+  </div>`:'' ;
 
   // ── STAT ROW
   const statRow=pd.current?`
   <div class="grid-4">
     <div class="stat"><div class="stat-l">52W HIGH</div><div class="stat-v g">${fmtPrice(pd.high52w)}</div></div>
     <div class="stat"><div class="stat-l">52W LOW</div><div class="stat-v">${fmtPrice(pd.low52w)}</div></div>
-    <div class="stat"><div class="stat-l">RSI(14)</div><div class="stat-v ${ind.rsi<30?'g':ind.rsi>70?'r':'gold'}">${ind.rsi??'—'}</div></div>
+    <div class="stat"><div class="stat-l">RSI(14)</div><div class="stat-v ${rsi<30?'g':rsi>70?'r':'gold'}">${rsi!=null?rsi:'—'}</div></div>
     <div class="stat"><div class="stat-l">VOLUME</div><div class="stat-v">${fmtVol(pd.volume)}</div></div>
-  </div>`:'';
+  </div>`:'' ;
 
   // ── WHY NOW
   const whyNow=d.whyNow?`
   <div class="why-card">
     <div class="why-lbl">⚡ WHY NOW</div>
     <div class="why-text">${esc(d.whyNow)}</div>
-  </div>`:'';
+  </div>`:'' ;
 
   // ── SCORE BREAKDOWN
   const scorePanel=sc.breakdown?`
   <div class="card">
     <div class="clbl">Scoring Deterministik</div>
     <div class="breakdown-grid">
-      ${['trend','volume','momentum','risk','setup'].map(k=>{
+      ${['trend','volume','momentum','risk','setup'].map(function(k){
         const item=sc.breakdown[k];if(!item)return'';
         const isRisk=k==='risk',ds=isRisk?10-item.score:item.score;
         const labels={trend:'TREN',volume:'VOLUME',momentum:'MOMENTUM',risk:'SAFETY',setup:'SETUP'};
-        return`<div class="bk-item"><div class="bk-lbl">${labels[k]}</div><div class="bk-num" style="color:${getScoreColor(ds)}">${ds}</div><div class="bk-bar"><div class="bk-fill" style="width:${ds*10}%;background:${getScoreGrad(ds)}"></div></div><div class="bk-reasons">${(item.reasons||[]).slice(0,2).map(r=>'• '+esc(r)).join('<br>')}</div></div>`;
+        return`<div class="bk-item"><div class="bk-lbl">${labels[k]}</div><div class="bk-num" style="color:${getScoreColor(ds)}">${ds}</div><div class="bk-bar"><div class="bk-fill" style="width:${ds*10}%;background:${getScoreGrad(ds)}"></div></div><div class="bk-reasons">${safeArr(item.reasons).slice(0,2).map(function(r){return'• '+esc(r);}).join('<br>')}</div></div>`;
       }).join('')}
     </div>
-  </div>`:'';
+  </div>`:'' ;
 
   // ── INTEL
   const intelGrid=ind.bb||ind.macd||ind.stoch||ind.atr?`
   <div class="grid-2">
     ${ind.bb?`<div class="intel"><div class="intel-l">BOLLINGER BANDS</div><div class="intel-v" style="color:${ind.bb.position==='overbought_zone'?'var(--red)':ind.bb.position==='oversold_zone'?'var(--green)':'var(--text)'}">${(ind.bb.position||'').replace(/_/g,' ')}</div><div class="intel-s">BW: ${ind.bb.bandwidth}% · U: ${fmtPrice(ind.bb.upper)} / L: ${fmtPrice(ind.bb.lower)}</div></div>`:''}
-    ${ind.macd?`<div class="intel"><div class="intel-l">MACD</div><span class="pill pill-${ind.macd.trend==='bullish'?'g':'r'}">${(ind.macd.trend||'').toUpperCase()}</span>${ind.macd.crossover?`<span class="pill pill-gold" style="margin-left:3px">${ind.macd.crossover.replace(/_/g,' ').toUpperCase()}</span>`:''}<div class="intel-s" style="margin-top:4px">Hist: ${ind.macd.histogram??'—'}</div></div>`:''}
+    ${ind.macd?`<div class="intel"><div class="intel-l">MACD</div><span class="pill pill-${ind.macd.trend==='bullish'?'g':'r'}">${(ind.macd.trend||'').toUpperCase()}</span>${ind.macd.crossover?`<span class="pill pill-gold" style="margin-left:3px">${ind.macd.crossover.replace(/_/g,' ').toUpperCase()}</span>`:''}<div class="intel-s" style="margin-top:4px">Hist: ${ind.macd.histogram!=null?ind.macd.histogram:'—'}</div></div>`:''}
     ${ind.stoch?`<div class="intel"><div class="intel-l">STOCHASTIC</div><span class="pill pill-${ind.stoch.signal==='oversold'?'g':ind.stoch.signal==='overbought'?'r':'gold'}">${(ind.stoch.signal||'').toUpperCase()}</span><div class="intel-s" style="margin-top:4px">K: ${ind.stoch.k} · D: ${ind.stoch.d}</div></div>`:''}
     ${ind.atr?`<div class="intel"><div class="intel-l">VOLATILITAS ATR</div><div class="intel-v">${fmtPrice(ind.atr.atr)}</div><div class="intel-s">${ind.atr.atrPct}% — ${ind.atr.atrPct>4?'⚠️ Sangat Volatil':ind.atr.atrPct>2?'Volatil':'Stabil'}</div></div>`:''}
-  </div>`:'';
+  </div>`:'' ;
 
   // ── S&R
-  const srCard=ind.levels&&(ind.levels.support?.length||ind.levels.resistance?.length)?`
+  const srCard=ind.levels&&(safeArr(ind.levels.support).length||safeArr(ind.levels.resistance).length)?`
   <div class="grid-2">
-    <div class="card" style="margin-bottom:0"><div class="clbl">Support</div>${(ind.levels.support||[]).map(l=>`<div style="font-family:var(--mono);font-size:.88rem;font-weight:700;color:var(--green);margin-top:5px">${fmtPrice(l)}</div>`).join('')||'<span style="color:var(--text3);font-size:11px">—</span>'}</div>
-    <div class="card" style="margin-bottom:0"><div class="clbl red">Resistance</div>${(ind.levels.resistance||[]).map(l=>`<div style="font-family:var(--mono);font-size:.88rem;font-weight:700;color:var(--red);margin-top:5px">${fmtPrice(l)}</div>`).join('')||'<span style="color:var(--text3);font-size:11px">—</span>'}</div>
-  </div>`:'';
+    <div class="card" style="margin-bottom:0"><div class="clbl">Support</div>${safeArr(ind.levels.support).map(function(l){return`<div style="font-family:var(--mono);font-size:.88rem;font-weight:700;color:var(--green);margin-top:5px">${fmtPrice(l)}</div>`;}).join('')||'<span style="color:var(--text3);font-size:11px">—</span>'}</div>
+    <div class="card" style="margin-bottom:0"><div class="clbl red">Resistance</div>${safeArr(ind.levels.resistance).map(function(l){return`<div style="font-family:var(--mono);font-size:.88rem;font-weight:700;color:var(--red);margin-top:5px">${fmtPrice(l)}</div>`;}).join('')||'<span style="color:var(--text3);font-size:11px">—</span>'}</div>
+  </div>`:'' ;
 
   // ── SETUPS
   const setupsSection=safeArr(str.setups).length?`
   <div class="card">
     <div class="clbl">Setup Terdeteksi</div>
-    ${safeArr(str.setups).map(s=>`
+    ${safeArr(str.setups).map(function(s){return`
     <div class="setup ${s.confidence}">
-      <div class="setup-type" style="color:${s.direction==='long'?'var(--green)':s.direction==='short'?'var(--red)':'var(--text2)'}">${esc(s.type?.replace(/_/g,' '))} · ${esc(s.direction)} · ${esc(s.confidence)}</div>
+      <div class="setup-type" style="color:${s.direction==='long'?'var(--green)':s.direction==='short'?'var(--red)':'var(--text2)'}">${esc((s.type||'').replace(/_/g,' '))} · ${esc(s.direction)} · ${esc(s.confidence)}</div>
       <div class="setup-reason">${esc(s.reason)}</div>
-    </div>`).join('')}
-  </div>`:'';
+    </div>`;}).join('')}
+  </div>`:'' ;
 
   // ── SMART MONEY CARD
   const smCard=(d.bandarSmartMoney||d.smartMoneySignal)&&(d.bandarSmartMoney||d.smartMoneySignal)!=='Tidak terdeteksi.'
-    ?`<div class="sm-card"><div class="sm-lbl">🧠 Smart Money & Bandar</div><div class="sm-text">${esc(d.bandarSmartMoney||d.smartMoneySignal)}</div></div>`:'';
+    ?`<div class="sm-card"><div class="sm-lbl">🧠 Smart Money & Bandar</div><div class="sm-text">${esc(d.bandarSmartMoney||d.smartMoneySignal)}</div></div>`:'' ;
 
   // ── MAIN AI CARD
   const mainCard=`
   <div class="card">
     <div class="clbl">Analisis AI</div>
-    <div style="font-size:.875rem;color:var(--text2);line-height:1.9;margin-bottom:1rem">${esc(d.summary)}</div>
+    <div style="font-size:.875rem;color:var(--text2);line-height:1.9;margin-bottom:1rem">${esc(d.summary||'—')}</div>
   </div>`;
 
   // ── BULL/BEAR
   const thesis=safeArr(d.bullThesis).length||safeArr(d.bearThesis).length?`
   <div class="grid-2">
-    <div class="card" style="margin-bottom:0"><div class="clbl">🐂 Bull Thesis</div><div class="tags">${safeArr(d.bullThesis).map(t=>`<span class="tag g">${esc(t)}</span>`).join('')}</div></div>
-    <div class="card" style="margin-bottom:0"><div class="clbl red">🐻 Bear Thesis</div><div class="tags">${safeArr(d.bearThesis).map(t=>`<span class="tag r">${esc(t)}</span>`).join('')}</div></div>
-  </div>`:'';
+    <div class="card" style="margin-bottom:0"><div class="clbl">🐂 Bull Thesis</div><div class="tags">${safeArr(d.bullThesis).map(function(t){return`<span class="tag g">${esc(t)}</span>`;}).join('')}</div></div>
+    <div class="card" style="margin-bottom:0"><div class="clbl red">🐻 Bear Thesis</div><div class="tags">${safeArr(d.bearThesis).map(function(t){return`<span class="tag r">${esc(t)}</span>`;}).join('')}</div></div>
+  </div>`:'' ;
 
   // ── ANALYSIS
   const analysisCards=!isIndex?`
   <div class="grid-2">
-    <div class="card" style="margin-bottom:0"><div class="clbl blue">📈 Teknikal</div><div style="font-size:.86rem;color:var(--text2);line-height:1.8;margin-top:.6rem">${esc(d.analisisTeknikal)}</div></div>
-    <div class="card" style="margin-bottom:0"><div class="clbl gold">📊 Fundamental</div><div style="font-size:.86rem;color:var(--text2);line-height:1.8;margin-top:.6rem">${esc(d.analisisFundamental)}</div></div>
+    <div class="card" style="margin-bottom:0"><div class="clbl blue">📈 Teknikal</div><div style="font-size:.86rem;color:var(--text2);line-height:1.8;margin-top:.6rem">${esc(d.analisisTeknikal||'—')}</div></div>
+    <div class="card" style="margin-bottom:0"><div class="clbl gold">📊 Fundamental</div><div style="font-size:.86rem;color:var(--text2);line-height:1.8;margin-top:.6rem">${esc(d.analisisFundamental||'—')}</div></div>
   </div>`:`
   <div class="grid-2">
-    <div class="card" style="margin-bottom:0"><div class="clbl">💪 Sektor Kuat</div><div class="tags">${safeArr(d.sektorKuat).map(s=>`<span class="tag g">${esc(s)}</span>`).join('')}</div></div>
-    <div class="card" style="margin-bottom:0"><div class="clbl red">📉 Sektor Lemah</div><div class="tags">${safeArr(d.sektorLemah).map(s=>`<span class="tag r">${esc(s)}</span>`).join('')}</div></div>
+    <div class="card" style="margin-bottom:0"><div class="clbl">💪 Sektor Kuat</div><div class="tags">${safeArr(d.sektorKuat).map(function(s){return`<span class="tag g">${esc(s)}</span>`;}).join('')}</div></div>
+    <div class="card" style="margin-bottom:0"><div class="clbl red">📉 Sektor Lemah</div><div class="tags">${safeArr(d.sektorLemah).map(function(s){return`<span class="tag r">${esc(s)}</span>`;}).join('')}</div></div>
   </div>`;
 
   // ── KRK
   const krkSection=`
   <div class="grid-2">
-    <div class="card" style="margin-bottom:0"><div class="clbl">✅ Keunggulan</div><div class="tags">${safeArr(d.keunggulan).map(k=>`<span class="tag g">${esc(k)}</span>`).join('')}</div></div>
-    <div class="card" style="margin-bottom:0"><div class="clbl red">⚠️ Risiko</div><div class="tags">${safeArr(d.risiko).map(r=>`<span class="tag r">${esc(r)}</span>`).join('')}</div></div>
+    <div class="card" style="margin-bottom:0"><div class="clbl">✅ Keunggulan</div><div class="tags">${safeArr(d.keunggulan).map(function(k){return`<span class="tag g">${esc(k)}</span>`;}).join('')}</div></div>
+    <div class="card" style="margin-bottom:0"><div class="clbl red">⚠️ Risiko</div><div class="tags">${safeArr(d.risiko).map(function(r){return`<span class="tag r">${esc(r)}</span>`;}).join('')}</div></div>
   </div>
-  <div class="card"><div class="clbl gold">🚀 Katalis</div><div class="tags">${safeArr(d.katalis).map((k,i)=>{const neg=/risiko|waspada|ancaman|negatif|turun|melemah|tekanan/i.test(k);return`<span class="tag ${neg?'r':i===0?'g':''}">${esc(k)}</span>`;}).join('')}</div></div>`;
+  <div class="card"><div class="clbl gold">🚀 Katalis</div><div class="tags">${safeArr(d.katalis).map(function(k,i){const neg=/risiko|waspada|ancaman|negatif|turun|melemah|tekanan/i.test(k);return`<span class="tag ${neg?'r':i===0?'g':''}">${esc(k)}</span>`;}).join('')}</div></div>`;
 
   // ── METRICS
   const metricsRow=`
@@ -511,27 +559,28 @@ function buildResult(ticker,d){
 
   // ── PRO INDICATORS
   const proInds=[];
-  if(ind.divergence?.detected)proInds.push(`<span class="pill pill-${ind.divergence.bias==='bullish'?'g':'r'}">${ind.divergence.bias==='bullish'?'Bullish':'Bearish'} Divergence</span>`);
-  if(ind.candlestick?.topPattern)proInds.push(`<span class="pill pill-gold">${esc(ind.candlestick.topPattern.name)}</span>`);
-  if(ind.fibonacci?.atKeyLevel)proInds.push(`<span class="pill pill-b">Fib Level Kunci</span>`);
-  if(ind.relStrength?.trend==='outperform')proInds.push(`<span class="pill pill-g">RS Outperform ${ind.relStrength.rsScore}</span>`);
+  if(ind.divergence&&ind.divergence.detected)proInds.push(`<span class="pill pill-${ind.divergence.bias==='bullish'?'g':'r'}">${ind.divergence.bias==='bullish'?'Bullish':'Bearish'} Divergence</span>`);
+  if(ind.candlestick&&ind.candlestick.topPattern)proInds.push(`<span class="pill pill-gold">${esc(ind.candlestick.topPattern.name)}</span>`);
+  if(ind.fibonacci&&ind.fibonacci.atKeyLevel)proInds.push(`<span class="pill pill-b">Fib Level Kunci</span>`);
+  if(ind.relStrength&&ind.relStrength.trend==='outperform')proInds.push(`<span class="pill pill-g">RS Outperform ${ind.relStrength.rsScore}</span>`);
   const proSection=proInds.length?`
   <div class="card">
     <div class="clbl">🔬 Indikator Pro</div>
     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:.6rem">${proInds.join('')}</div>
     ${ind.fibonacci?`<div style="font-size:10px;color:var(--text2);margin-top:.5rem;line-height:1.6">${esc(ind.fibonacci.narrative||'')}</div>`:''}
-  </div>`:'';
+  </div>`:'' ;
 
   // ── NEWS
+  // BUG FIX 10: news item yang tidak punya title di-skip, tidak render undefined
   const newsCard=d.newsData&&(safeArr(d.newsData.emiten).length||safeArr(d.newsData.makro).length)?`
   <div class="card">
     <div class="clbl">📰 Berita Terkini</div>
-    ${safeArr(d.newsData.emiten).slice(0,3).concat(safeArr(d.newsData.makro).slice(0,2)).map(n=>`
+    ${safeArr(d.newsData.emiten).slice(0,3).concat(safeArr(d.newsData.makro).slice(0,2)).filter(function(n){return n&&n.title;}).map(function(n){return`
     <div style="padding:7px 0;border-bottom:1px solid var(--bdr)">
       <div style="font-size:11px;color:var(--text);line-height:1.5;margin-bottom:2px">${esc(n.title)}</div>
-      <div style="font-size:9px;color:var(--text3);font-family:var(--mono)">${esc(n.date)} · ${esc(n.source||'MAKRO')}</div>
-    </div>`).join('')}
-  </div>`:'';
+      <div style="font-size:9px;color:var(--text3);font-family:var(--mono)">${esc(n.date||'')} · ${esc(n.source||'MAKRO')}</div>
+    </div>`;}).join('')}
+  </div>`:'' ;
 
   // ── INFO
   const infoCard=`
@@ -548,11 +597,16 @@ function buildResult(ticker,d){
   </div>`;
 
   // ── KOMPETITIF & SEKTOR CTX
-  const kompCard=!isIndex&&d.posisiKompetitif?`<div class="card"><div class="clbl blue">🏆 Posisi Kompetitif</div><div style="font-size:.86rem;color:var(--text2);line-height:1.8;margin-top:.6rem">${esc(d.posisiKompetitif)}</div></div>`:'';
-  const sectorCtx=d.sektorContext&&!isIndex?`<div class="card"><div class="clbl blue">🔄 Konteks Sektor</div><div style="font-size:.86rem;color:var(--text2);line-height:1.8;margin-top:.6rem">${esc(d.sektorContext)}</div></div>`:'';
-  const rekSaham=isIndex&&safeArr(d.rekomendasiSaham).length?`<div class="card"><div class="clbl blue">⭐ Saham Pilihan</div><div class="tags">${safeArr(d.rekomendasiSaham).map(s=>`<span class="tag gold">${esc(s)}</span>`).join('')}</div></div>`:'';
+  const kompCard=!isIndex&&d.posisiKompetitif?`<div class="card"><div class="clbl blue">🏆 Posisi Kompetitif</div><div style="font-size:.86rem;color:var(--text2);line-height:1.8;margin-top:.6rem">${esc(d.posisiKompetitif)}</div></div>`:'' ;
+  const sectorCtx=d.sektorContext&&!isIndex?`<div class="card"><div class="clbl blue">🔄 Konteks Sektor</div><div style="font-size:.86rem;color:var(--text2);line-height:1.8;margin-top:.6rem">${esc(d.sektorContext)}</div></div>`:'' ;
+  const rekSaham=isIndex&&safeArr(d.rekomendasiSaham).length?`<div class="card"><div class="clbl blue">⭐ Saham Pilihan</div><div class="tags">${safeArr(d.rekomendasiSaham).map(function(s){return`<span class="tag gold">${esc(s)}</span>`;}).join('')}</div></div>`:'' ;
+
+  // BUG FIX 11: chart-tab active state reset ke 3B saat analisis baru
+  currentRange='3mo';
+  currentChartType='candle';
 
   return`
+    ${crashBanner}
     ${signalsHtml}
     ${tickerHero}
     ${panelGrid}
@@ -589,10 +643,10 @@ function buildSkeleton(){
     </div>
     <div class="score-bar-wrap"><div class="sk" style="height:12px;width:80px;margin-bottom:10px"></div><div class="sk" style="height:4px;width:100%;border-radius:4px;margin-bottom:8px"></div></div>
   </div>
-  <div class="grid-2">${[1,2].map(()=>`<div class="panel p-dark"><div class="sk" style="height:9px;width:70%;margin-bottom:12px"></div><div class="sk" style="height:2rem;width:60%;margin-bottom:8px"></div><div class="sk" style="height:10px;width:80%"></div></div>`).join('')}</div>
-  <div class="grid-2">${[1,2].map(()=>`<div class="panel p-dark"><div class="sk" style="height:9px;width:70%;margin-bottom:12px"></div><div class="sk" style="height:1.5rem;width:50%;margin-bottom:8px"></div><div class="sk" style="height:24px;width:90%"></div></div>`).join('')}</div>
+  <div class="grid-2">${[1,2].map(function(){return`<div class="panel p-dark"><div class="sk" style="height:9px;width:70%;margin-bottom:12px"></div><div class="sk" style="height:2rem;width:60%;margin-bottom:8px"></div><div class="sk" style="height:10px;width:80%"></div></div>`;}).join('')}</div>
+  <div class="grid-2">${[1,2].map(function(){return`<div class="panel p-dark"><div class="sk" style="height:9px;width:70%;margin-bottom:12px"></div><div class="sk" style="height:1.5rem;width:50%;margin-bottom:8px"></div><div class="sk" style="height:24px;width:90%"></div></div>`;}).join('')}</div>
   <div class="chart-card"><div class="sk" style="height:240px;border-radius:8px"></div></div>
-  <div class="card"><div class="sk" style="height:9px;width:120px;margin-bottom:12px"></div><div class="breakdown-grid">${[1,2,3,4,5].map(()=>`<div class="bk-item"><div class="sk" style="height:9px;width:60%;margin-bottom:7px"></div><div class="sk" style="height:1.2rem;width:40%;margin-bottom:6px"></div><div class="sk" style="height:2px;margin-bottom:6px"></div></div>`).join('')}</div></div>
+  <div class="card"><div class="sk" style="height:9px;width:120px;margin-bottom:12px"></div><div class="breakdown-grid">${[1,2,3,4,5].map(function(){return`<div class="bk-item"><div class="sk" style="height:9px;width:60%;margin-bottom:7px"></div><div class="sk" style="height:1.2rem;width:40%;margin-bottom:6px"></div><div class="sk" style="height:2px;margin-bottom:6px"></div></div>`;}).join('')}</div></div>
   `;
 }
 
@@ -604,20 +658,19 @@ function addToWatchlist(ticker){
   if(list.indexOf(ticker)===-1){list.push(ticker);saveWatchlist(list);renderWatchlist();showToast(ticker+' ditambahkan ke watchlist','ok');}
   else showToast(ticker+' sudah ada di watchlist','');
 }
-function removeFromWatchlist(ticker){saveWatchlist(getWatchlist().filter(t=>t!==ticker));renderWatchlist();}
+function removeFromWatchlist(ticker){saveWatchlist(getWatchlist().filter(function(t){return t!==ticker;}));renderWatchlist();}
 function renderWatchlist(){
   const list=getWatchlist();
   const bar=document.getElementById('watchlistBar'),items=document.getElementById('watchlistItems');
   if(!bar||!items)return;
   if(!list.length){bar.style.display='none';return;}
   bar.style.display='block';
-  items.innerHTML=list.map(t=>`<div class="wl-item" onclick="quickAnalyze('${t}')"><span class="wl-ticker">${t}</span><span class="wl-remove" onclick="event.stopPropagation();removeFromWatchlist('${t}')" title="Hapus">×</span></div>`).join('');
+  items.innerHTML=list.map(function(t){return`<div class="wl-item" onclick="quickAnalyze('${t}')"><span class="wl-ticker">${t}</span><span class="wl-remove" onclick="event.stopPropagation();removeFromWatchlist('${t}')" title="Hapus">×</span></div>`;}).join('');
 }
 document.addEventListener('DOMContentLoaded',renderWatchlist);
 document.addEventListener('DOMContentLoaded',renderPopularChips);
 
-// ── POPULAR CHIPS — top saham dari hasil scanner terakhir ─────────
-// Prioritas: scanner result cache (localStorage) → fallback default
+// ── POPULAR CHIPS ──────────────────────────────────────────────────
 const POPULAR_FALLBACK=['BBCA','TLKM','GOTO','ASII','BMRI','BREN','AMMN','IHSG'];
 const POPULAR_STORAGE_KEY='sahamai_popular_tickers';
 const POPULAR_MAX=8;
@@ -625,18 +678,14 @@ const POPULAR_MAX=8;
 function savePopularFromScan(results){
   if(!results||!results.length)return;
   try{
-    // Ambil top POPULAR_MAX saham by score, selalu sertakan IHSG
-    const top=results
-      .filter(r=>r.ticker&&r.ticker!=='IHSG')
-      .slice(0,POPULAR_MAX-1)
-      .map(r=>r.ticker);
-    const tickers=[...top,'IHSG'].slice(0,POPULAR_MAX);
-    localStorage.setItem(POPULAR_STORAGE_KEY,JSON.stringify({tickers,savedAt:Date.now()}));
-    renderPopularChips(); // re-render setelah scan selesai
+    const top=results.filter(function(r){return r.ticker&&r.ticker!=='IHSG';}).slice(0,POPULAR_MAX-1).map(function(r){return r.ticker;});
+    const tickers=top.concat(['IHSG']).slice(0,POPULAR_MAX);
+    localStorage.setItem(POPULAR_STORAGE_KEY,JSON.stringify({tickers:tickers,savedAt:Date.now()}));
+    renderPopularChips();
   }catch(e){}
 }
 
-async function renderPopularChips(){
+function renderPopularChips(){
   const container=document.getElementById('popularChips');
   if(!container)return;
   let tickers=POPULAR_FALLBACK;
@@ -644,14 +693,11 @@ async function renderPopularChips(){
     const raw=localStorage.getItem(POPULAR_STORAGE_KEY);
     if(raw){
       const data=JSON.parse(raw);
-      // Pakai cache scanner jika tidak lebih dari 24 jam
       const age=Date.now()-(data.savedAt||0);
-      if(data.tickers&&data.tickers.length&&age<24*60*60*1000){
-        tickers=data.tickers;
-      }
+      if(data.tickers&&data.tickers.length&&age<24*60*60*1000){tickers=data.tickers;}
     }
   }catch(e){}
-  container.innerHTML=tickers.map(t=>`<span class="chip" onclick="quickAnalyze('${t}')">${t}</span>`).join('');
+  container.innerHTML=tickers.map(function(t){return`<span class="chip" onclick="quickAnalyze('${t}')">${t}</span>`;}).join('');
 }
 
 // ── SCANNER ────────────────────────────────────────────────────────
@@ -684,7 +730,7 @@ function toggleScanner(){
 
 function setScanFilter(el,filter){
   currentScanFilter=filter;
-  document.querySelectorAll('.sf-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.sf-btn').forEach(function(b){b.classList.remove('active');});
   el.classList.add('active');
 }
 
@@ -698,72 +744,63 @@ async function runScanner(){
     <div class="progress-bar"><div class="progress-fill" id="scanProgress"></div></div>
   </div>`;
 
-  // Cek cache dulu via POST biasa
-  try {
-    const cacheCheck = await fetch('/api/scanner', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({filter: currentScanFilter})
-    });
-    if (cacheCheck.ok) {
-      const data = await cacheCheck.json();
-      if (data.fromCache) {
+  // Cek cache dulu
+  try{
+    const cacheCheck=await fetch('/api/scanner',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({filter:currentScanFilter})});
+    if(cacheCheck.ok){
+      const data=await cacheCheck.json();
+      if(data.fromCache){
         savePopularFromScan(data.results);
-        renderScanResults(data, currentScanFilter);
-        const lastRun = document.getElementById('scanLastRun');
-        if (lastRun) lastRun.textContent = '⚡ Cache — ' + data.total + ' ditemukan · ' + new Date().toLocaleTimeString('id-ID');
+        renderScanResults(data,currentScanFilter);
+        const lastRun=document.getElementById('scanLastRun');
+        if(lastRun)lastRun.textContent='⚡ Cache — '+data.total+' ditemukan · '+new Date().toLocaleTimeString('id-ID');
         btn.disabled=false;icon.className='';icon.textContent='⚡';
         return;
       }
     }
-  } catch(e) {}
+  }catch(e){}
 
-  // Tidak ada cache — pakai SSE untuk progressive loading
+  // Tidak ada cache — pakai SSE
   const prog=document.getElementById('scanProgress');
   const progLabel=document.getElementById('scanProgressLabel');
   let finalData=null;
 
-  try {
-    const evtSource = new EventSource('/api/scanner?filter=' + encodeURIComponent(currentScanFilter) + '&stream=true');
-
-    evtSource.onmessage = function(e) {
-      try {
-        const data = JSON.parse(e.data);
-        if (data.type === 'partial') {
-          // Tampilkan hasil partial segera
-          if(prog) prog.style.width = (data.progress || 30) + '%';
-          if(progLabel) progLabel.textContent = data.total + ' setup ditemukan, lanjut scan...';
-          if (data.results && data.results.length > 0) {
-            renderScanResults({results: data.results, total: data.total, filter: currentScanFilter}, currentScanFilter, true);
-          }
-        } else if (data.type === 'complete') {
-          finalData = data;
+  try{
+    const evtSource=new EventSource('/api/scanner?filter='+encodeURIComponent(currentScanFilter)+'&stream=true');
+    evtSource.onmessage=function(e){
+      try{
+        const data=JSON.parse(e.data);
+        if(data.type==='partial'){
+          if(prog)prog.style.width=(data.progress||30)+'%';
+          if(progLabel)progLabel.textContent=data.total+' setup ditemukan, lanjut scan...';
+          if(data.results&&data.results.length>0){renderScanResults({results:data.results,total:data.total,filter:currentScanFilter},currentScanFilter,true);}
+        }else if(data.type==='complete'){
+          finalData=data;
           evtSource.close();
-          if(prog) prog.style.width = '100%';
+          if(prog)prog.style.width='100%';
           savePopularFromScan(data.results);
-          renderScanResults(data, currentScanFilter);
-          const lastRun = document.getElementById('scanLastRun');
-          if (lastRun) lastRun.textContent = data.total + ' ditemukan · ' + new Date().toLocaleTimeString('id-ID');
+          renderScanResults(data,currentScanFilter);
+          const lastRun=document.getElementById('scanLastRun');
+          if(lastRun)lastRun.textContent=data.total+' ditemukan · '+new Date().toLocaleTimeString('id-ID');
           btn.disabled=false;icon.className='';icon.textContent='⚡';
-        } else if (data.type === 'error') {
+        }else if(data.type==='error'){
           evtSource.close();
-          res.innerHTML = `<div class="scanner-empty">❌ ${esc(data.error)}</div>`;
-          showToast(data.error, 'error');
+          res.innerHTML=`<div class="scanner-empty">❌ ${esc(data.error)}</div>`;
+          showToast(data.error,'error');
           btn.disabled=false;icon.className='';icon.textContent='⚡';
         }
-      } catch(err) {}
+      }catch(err){}
     };
-
-    evtSource.onerror = function() {
+    evtSource.onerror=function(){
       evtSource.close();
-      if (!finalData) {
-        res.innerHTML = '<div class="scanner-empty">❌ Koneksi terputus. Coba lagi.</div>';
+      if(!finalData){
+        res.innerHTML='<div class="scanner-empty">❌ Koneksi terputus. Coba lagi.</div>';
         btn.disabled=false;icon.className='';icon.textContent='⚡';
       }
     };
-  } catch(e) {
-    res.innerHTML = `<div class="scanner-empty">❌ ${esc(e.message)}</div>`;
-    showToast(e.message, 'error');
+  }catch(e){
+    res.innerHTML=`<div class="scanner-empty">❌ ${esc(e.message)}</div>`;
+    showToast(e.message,'error');
     btn.disabled=false;icon.className='';icon.textContent='⚡';
   }
 }
@@ -771,25 +808,26 @@ async function runScanner(){
 function renderScanResults(data,filter,isPartial){
   const el=document.getElementById('scannerResults');
   if(!data||!data.results){el.innerHTML='<div class="scanner-empty">Tidak ada hasil.</div>';return;}
-  // Backend sudah handle semua filter — tidak perlu filter ulang di client
   const results=data.results;
   if(!results.length){el.innerHTML='<div class="scanner-empty">Tidak ada saham yang cocok.</div>';return;}
-  const bullCount=results.filter(r=>r.score>=6).length;
-  const bearCount=results.filter(r=>r.score<=4).length;
+  const bullCount=results.filter(function(r){return r.score>=6;}).length;
+  const bearCount=results.filter(function(r){return r.score<=4;}).length;
   const stats=`<div class="scan-stats">
     <div class="scan-stat"><span class="scan-stat-num" style="color:var(--green)">${bullCount}</span><span class="scan-stat-lbl"> Bullish</span></div>
     <div class="scan-stat"><span class="scan-stat-num">${results.length}</span><span class="scan-stat-lbl"> Total</span></div>
     <div class="scan-stat"><span class="scan-stat-num" style="color:var(--red)">${bearCount}</span><span class="scan-stat-lbl"> Bearish</span></div>
   </div>`;
-  const rows=results.slice(0,50).map(r=>{
+  const rows=results.slice(0,50).map(function(r){
     const dir=r.score>=7?'bull':r.score<=3?'bear':'neutral';
     const scoreColor=getScoreColor(r.score);
-    const actionBadge=r.recommendation==='BELI'||r.recommendation==='AKUMULASI'
-      ?`<span class="pill pill-g">${r.recommendation}</span>`
-      :r.recommendation==='JUAL'||r.recommendation==='KURANGI'
-      ?`<span class="pill pill-r">${r.recommendation}</span>`
-      :`<span class="pill pill-gray">${r.recommendation||'TAHAN'}</span>`;
-    const sigs=(r.signals||[]).slice(0,2).map(s=>`<span class="sc-sig ${s.strength||'medium'}">${esc(s.label)}</span>`).join('');
+    const rek=r.recommendation||'TAHAN';
+    const actionBadge=rek==='BELI'||rek==='AKUMULASI'
+      ?`<span class="pill pill-g">${rek}</span>`
+      :rek==='JUAL'||rek==='KURANGI'
+      ?`<span class="pill pill-r">${rek}</span>`
+      :`<span class="pill pill-gray">${rek}</span>`;
+    const sigs=safeArr(r.signals).slice(0,2).map(function(s){return`<span class="sc-sig ${s.strength||'medium'}">${esc(s.label)}</span>`;}).join('');
+    const chgSign=r.isUp?'+':'';
     return`<div class="sc-row ${dir}" onclick="analyzeFromScanner('${esc(r.ticker)}')">
       <div class="sc-avatar">${r.ticker.slice(0,2)}</div>
       <div>
@@ -799,7 +837,7 @@ function renderScanResults(data,filter,isPartial){
       </div>
       <div class="sc-price-col">
         <div class="sc-price">${fmtPrice(r.lastClose)}</div>
-        <div class="sc-chg ${r.isUp?'up':'down'}">${r.isUp?'+':''}${r.changePct}%</div>
+        <div class="sc-chg ${r.isUp?'up':'down'}">${chgSign}${r.changePct}%</div>
         <div style="margin-top:3px">${actionBadge}</div>
       </div>
       <div class="sc-score-col">
@@ -810,7 +848,11 @@ function renderScanResults(data,filter,isPartial){
   }).join('');
   el.innerHTML=stats+'<div class="scan-list">'+rows+'</div>';
   const u=document.getElementById('scanUniverse');if(u)u.textContent=data.universe||'150+';
-  if(data.scannedAt){const t=new Date(data.scannedAt);const lr=document.getElementById('scanLastRun');if(lr)lr.textContent='Update: '+t.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})+(data.fromCache?' (cache)':'');}
+  if(data.scannedAt){
+    const t=new Date(data.scannedAt);
+    const lr=document.getElementById('scanLastRun');
+    if(lr)lr.textContent='Update: '+t.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})+(data.fromCache?' (cache)':'');
+  }
 }
 
 function analyzeFromScanner(ticker){
