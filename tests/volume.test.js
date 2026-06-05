@@ -143,17 +143,25 @@ test('Climax tidak terdeteksi pada data normal', () => {
 });
 
 test('Selling climax terdeteksi — volume 4x + candle merah', () => {
-  const closes = range(100, 122);
+  // Harga turun + volume ekstrim = selling climax
+  const closes = Array.from({length: 22}, function(_, i) { return 200 - i * 2; }); // turun
   const vols   = Array(22).fill(500000);
   vols[21] = 2200000; // 4x avg — volume ekstrim
-  const candles = closes.map((c, i) => ({
-    date: '2024-01-' + String(i+1).padStart(2,'0'),
-    open: c + 5, high: c + 10, low: c - 10, close: c - 3, // bearish candle
-    volume: vols[i]
-  }));
+  const candles = closes.map(function(c, i) {
+    return {
+      date:   '2024-01-' + String(i+1).padStart(2,'0'),
+      open:   c + 5,
+      high:   c + 10,
+      low:    c - 10,
+      close:  c - 3, // bearish candle
+      volume: vols[i]
+    };
+  });
   const result = analyzeVolume(candles);
   assert(result.climax !== null && result.climax.isClimax === true,
     'Volume 4x harus climax, ratio=' + (result.climax && result.climax.volRatio));
+  assert(result.climax.volRatio != null && result.climax.volRatio > 0,
+    'volRatio harus ada dan > 0, got=' + (result.climax && result.climax.volRatio));
 });
 
 test('Unusual activity terdeteksi pada spike 3x', () => {

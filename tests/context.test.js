@@ -11,10 +11,20 @@ const {
 } = require('../lib/context');
 
 let passed = 0, failed = 0;
+const _asyncTests = [];
 
 function test(name, fn) {
-  try { fn(); console.log('  ✅ ' + name); passed++; }
-  catch (e) { console.log('  ❌ ' + name + ' — ' + e.message); failed++; }
+  let result;
+  try { result = fn(); } catch (e) { console.log('  ❌ ' + name + ' — ' + e.message); failed++; return; }
+  if (result && typeof result.then === 'function') {
+    _asyncTests.push(
+      result
+        .then(function() { console.log('  ✅ ' + name); passed++; })
+        .catch(function(e) { console.log('  ❌ ' + name + ' — ' + e.message); failed++; })
+    );
+    return;
+  }
+  console.log('  ✅ ' + name); passed++;
 }
 
 function assert(condition, msg) {
@@ -52,30 +62,33 @@ test('Ticker kosong — return null', () => {
 console.log('\n📊 analyzeSectorStrength');
 // ══════════════════════════════════════════════════════════════════
 
-test('Data kurang — return unknown', () => {
-  const result = analyzeSectorStrength('Perbankan', makeCandles(2));
+// analyzeSectorStrength adalah async — mock fetch agar tidak hit network
+global.fetch = global.fetch || async function() { return { ok: false }; };
+
+test('Data kurang — return unknown', async () => {
+  const result = await analyzeSectorStrength('Perbankan', makeCandles(2));
   assert(result.strength === 'unknown');
 });
 
-test('Return field sektor, strength, return20d', () => {
-  const result = analyzeSectorStrength('Perbankan', makeCandles(25, 1));
+test('Return field sektor, strength, return20d', async () => {
+  const result = await analyzeSectorStrength('Perbankan', makeCandles(25, 1));
   assert('sektor' in result && 'strength' in result && 'return20d' in result);
 });
 
-test('Harga naik 15% — very_strong', () => {
-  const result = analyzeSectorStrength('Energi', makeCandles(25, 10)); // naik signifikan
+test('Harga naik 15% — very_strong', async () => {
+  const result = await analyzeSectorStrength('Energi', makeCandles(25, 10)); // naik signifikan
   assert(result.strength === 'very_strong' || result.strength === 'strong',
     'got ' + result.strength + ' return20d=' + result.return20d);
 });
 
-test('Harga turun — weak atau very_weak', () => {
-  const result = analyzeSectorStrength('Properti', makeCandles(25, -8)); // turun
+test('Harga turun — weak atau very_weak', async () => {
+  const result = await analyzeSectorStrength('Properti', makeCandles(25, -8)); // turun
   assert(['weak', 'very_weak', 'neutral_negative'].includes(result.strength),
     'got ' + result.strength);
 });
 
-test('Sektor null — return unknown', () => {
-  const result = analyzeSectorStrength(null, makeCandles(25));
+test('Sektor null — return unknown', async () => {
+  const result = await analyzeSectorStrength(null, makeCandles(25));
   assert(result.strength === 'unknown');
 });
 
@@ -157,8 +170,11 @@ test('riskSentiment null — tidak crash', () => {
 console.log('\n📊 analyzeMarketContext');
 // ══════════════════════════════════════════════════════════════════
 
-test('Return semua field utama', () => {
-  const result = analyzeMarketContext('BBCA', makeCandles(25), {}, {}, {});
+// analyzeMarketContext adalah async — mock fetch agar tidak hit network
+global.fetch = global.fetch || async function() { return { ok: false }; };
+
+test('Return semua field utama', async () => {
+  const result = await analyzeMarketContext('BBCA', makeCandles(25), {}, {}, {});
   assert('sektor' in result, 'harus ada sektor');
   assert('sectorStrength' in result, 'harus ada sectorStrength');
   assert('riskSentiment' in result, 'harus ada riskSentiment');
@@ -166,15 +182,15 @@ test('Return semua field utama', () => {
   assert('summary' in result, 'harus ada summary');
 });
 
-test('BBCA — sektor Perbankan terdeteksi', () => {
-  const result = analyzeMarketContext('BBCA', makeCandles(25), {}, {}, {});
+test('BBCA — sektor Keuangan terdeteksi', async () => {
+  const result = await analyzeMarketContext('BBCA', makeCandles(25), {}, {}, {});
   assert(result.sektor !== null && result.sektor.length > 0,
     'BBCA harus punya sektor, got: ' + result.sektor);
 });
 
-test('Ticker tidak dikenal — tidak crash', () => {
+test('Ticker tidak dikenal — tidak crash', async () => {
   let result;
-  try { result = analyzeMarketContext('XXXZZ', makeCandles(25), {}, {}, {}); }
+  try { result = await analyzeMarketContext('XXXZZ', makeCandles(25), {}, {}, {}); }
   catch (e) { throw new Error('Tidak boleh throw: ' + e.message); }
   assert(result !== null && 'summary' in result);
 });
@@ -213,5 +229,7 @@ test('Perindustrian + risk_on — isBeneficiary true', () => {
 });
 
 console.log('\n══════════════════════════════════');
-console.log(`Hasil: ${passed} passed, ${failed} failed`);
-if (failed > 0) process.exit(1);
+Promise.all(_asyncTests).then(function() {
+  console.log('Hasil: ' + passed + ' passed, ' + failed + ' failed');
+  if (failed > 0) process.exit(1);
+});
