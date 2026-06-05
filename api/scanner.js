@@ -82,7 +82,7 @@ function scanOneTicker(ticker, candleData) {
   const volumeData = analyzeVolume(candles);
   const structure  = analyzeStructure(candles, indicators, volumeData);
   const scoring    = computeScore(indicators, volumeData, structure, { current: candleData.lastClose });
-  const { signals } = quickScan(ticker, candles, indicators, volumeData, structure, scoring, changePct);
+  const { signals } = quickScan(ticker, candles, indicators, volumeData, structure, scoring, changePct, cacheGet);
 
   return {
     ticker,

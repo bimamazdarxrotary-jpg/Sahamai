@@ -17,6 +17,9 @@ const { fetchPriceDataWithFallback }        = require('../lib/datasource');
 const { applyCompression }                  = require('../lib/compress');
 const log                                   = require('../lib/logger');
 
+// ── IHSG crash threshold ──────────────────────────────────────────
+const CRASH_THRESHOLD = -8; // blokir sinyal bullish jika IHSG < -8%
+
 // ── Rate Limiting ──────────────────────────────────────────────────
 // Pakai lib/cache.js (TTL-based) agar tidak perlu setInterval
 // Vercel serverless: setiap cold start bersih — rate limit per-instance
@@ -166,6 +169,19 @@ module.exports = async function handler(req, res) {
   // ── 4. Market structure ────────────────────────────────────────
   const structure = candles.length >= 10 ? analyzeStructure(candles, indicators, volumeData) : null;
 
+  // ── Simpan IHSG changePct ke cache untuk crash detection ──────
+  if (isIndex && ticker === 'IHSG' && priceData && priceData.changePct != null) {
+    cacheSet('ihsg:changePct', priceData.changePct, 10 * 60 * 1000); // 10 menit
+    log.info('analyze', '[IHSG]', 'changePct=' + priceData.changePct + '% cached');
+  }
+
+  // ── Cek crash IHSG ─────────────────────────────────────────────
+  const ihsgChangePct = cacheGet('ihsg:changePct');
+  const isMarketCrash = typeof ihsgChangePct === 'number' && ihsgChangePct < CRASH_THRESHOLD;
+  if (isMarketCrash) {
+    log.warn('analyze', '[CRASH BLOCKER]', 'IHSG ' + ihsgChangePct + '% — sinyal bullish diblokir untuk ' + ticker);
+  }
+
   // ── 5. Scoring ─────────────────────────────────────────────────
   const scoring = computeScore(indicators, volumeData, structure, priceData);
   log.info('analyze', '[SCORE]', ticker + ': ' + scoring.final + '/10 ->', scoring.recommendation);
@@ -178,7 +194,7 @@ module.exports = async function handler(req, res) {
     : Promise.resolve(null);
 
   const scanSignals = !isIndex && candles.length >= 20
-    ? quickScan(ticker, candles, indicators, volumeData, structure, scoring)
+    ? quickScan(ticker, candles, indicators, volumeData, structure, scoring, priceData && priceData.changePct, cacheGet)
     : null;
 
   const bandarData = !isIndex && candles.length >= 20
@@ -199,6 +215,9 @@ module.exports = async function handler(req, res) {
     ticker, metadata, isIndex, priceData, priceContext,
     indicators, volumeData, structure, scoring, bandarData,
     newsData: null // news belum ada, AI pakai data teknikal
+  }).catch(function(e) {
+    log.warn('analyze', '[AI ERROR]', e.message);
+    return null;
   });
 
   const [marketContext, newsData, rawAI] = await Promise.all([
@@ -232,10 +251,26 @@ module.exports = async function handler(req, res) {
   // ── Override metadata IDX ──────────────────────────────────────
   if (metadata) {
     const name = metadata.name || '';
-    // Jangan tambah 'PT' jika nama sudah punya prefix (PT, Bank, Indeks, dll)
     const hasPrefix = /^(PT|Bank|Indeks|Index|BRI|BNI|BCA|BTN)\s/i.test(name);
     parsed.namaLengkap = hasPrefix ? name : 'PT ' + name;
     parsed.sektor      = metadata.sector + (metadata.subsector ? ' - ' + metadata.subsector : '');
+  }
+
+  // ── CRASH BLOCKER — override rekomendasi saat IHSG crash >8% ──
+  // Blokir sinyal bullish agar user tidak masuk posisi di kondisi panik
+  if (isMarketCrash && !isIndex) {
+    const bullishRek = ['BELI', 'AKUMULASI'];
+    if (bullishRek.includes((parsed.rekomendasi || '').toUpperCase()) ||
+        bullishRek.includes((parsed.sentiment   || '').toUpperCase())) {
+      parsed.rekomendasi   = 'TAHAN';
+      parsed.sentiment     = 'TAHAN';
+      parsed.crashOverride = true;
+      parsed.crashWarning  = 'IHSG turun ' + Math.abs(ihsgChangePct).toFixed(1) +
+        '% hari ini (crash >8%). Rekomendasi beli diblokir — prioritas capital preservation. ' +
+        'Tunggu IHSG stabil sebelum entry baru.';
+      log.warn('analyze', '[CRASH BLOCKER]', ticker,
+        'rekomendasi di-override ke TAHAN (IHSG ' + ihsgChangePct + '%)');
+    }
   }
 
   // ── Build response — include indikator baru di cache ───────────
@@ -294,7 +329,9 @@ module.exports = async function handler(req, res) {
       breakout:   structure.breakout,
       hhll:       structure.hhll
     } : null,
-    scoringData:   scoring,
+    scoringData:   isMarketCrash && !isIndex && parsed.crashOverride
+      ? Object.assign({}, scoring, { recommendation: 'TAHAN' })
+      : scoring,
     bandarData:    bandarData ? {
       bandarScore: bandarData.bandarScore,
       narrative:   bandarData.narrative,
@@ -314,7 +351,8 @@ module.exports = async function handler(req, res) {
     ticker:        ticker,
     generatedAt:   new Date().toISOString(),
     latencyMs:     Date.now() - startTime,
-    fromCache:     false
+    fromCache:     false,
+    marketCrash:   isMarketCrash ? { active: true, ihsgChangePct } : null
   });
 
   cacheSet(cacheKey, response, TTL.analysis);
