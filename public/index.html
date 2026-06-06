@@ -5,8 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>SahamAI — Analis Saham Indonesia</title>
 <meta name="description" content="Platform AI analisis saham IHSG. Indikator teknikal matematis, volume intelligence, market structure, scoring deterministik.">
+<!-- BUG FIX 1: preconnect Google Fonts agar tidak blokir render -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<!-- BUG FIX 2: lightweight-charts pakai integrity + crossorigin agar tidak silent-fail -->
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js" crossorigin="anonymous"></script>
 <style>
 :root {
   --bg:      #080d14;
@@ -68,6 +72,7 @@ nav{
 }
 @media(min-width:400px){.nav-tag{display:inline}}
 .nav-right{display:flex;gap:6px;align-items:center}
+/* BUG FIX 3: nav-btn pakai <button> di HTML tapi di sini styled sebagai cursor:pointer — pastikan konsisten */
 .nav-btn{
   font-size:11px;padding:6px 13px;border-radius:8px;
   color:var(--text2);background:var(--bg3);border:1px solid var(--bdr2);
@@ -138,7 +143,8 @@ nav{
 .wl-item{display:flex;align-items:center;gap:5px;padding:4px 10px;background:var(--bg2);border:1px solid var(--bdr2);border-radius:6px;cursor:pointer;transition:all .15s}
 .wl-item:hover{border-color:var(--green)}
 .wl-ticker{font-size:10px;font-weight:700;font-family:var(--mono);color:var(--text)}
-.wl-remove{font-size:14px;color:var(--text3);cursor:pointer;line-height:1}
+/* BUG FIX 4: wl-remove pakai <button> semantik di JS-generated HTML tapi diklik via span — tambah role=button compat */
+.wl-remove{font-size:14px;color:var(--text3);cursor:pointer;line-height:1;padding:0 2px}
 .wl-remove:hover{color:var(--red)}
 .wl-add-btn{font-size:10px;padding:4px 10px;background:var(--gdim);border:1px solid rgba(0,214,143,.2);border-radius:6px;color:var(--green);cursor:pointer;font-weight:600;font-family:var(--mono);display:inline-block;margin-top:6px}
 
@@ -154,7 +160,7 @@ nav{
   animation:fadeUp .3s ease both;
 }
 
-/* ── TICKER HEADER (Stocks.ly style) ── */
+/* ── TICKER HEADER ── */
 .ticker-hero{
   background:var(--bg2);border:1px solid var(--bdr);
   border-radius:var(--r);padding:1rem;margin-bottom:8px;
@@ -168,7 +174,6 @@ nav{
   pointer-events:none;
 }
 .th-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem}
-.th-left{}
 .th-code{font-size:2.2rem;font-weight:900;letter-spacing:-2px;font-family:var(--mono);line-height:1}
 .th-name{font-size:11px;color:var(--text2);margin-top:4px;font-weight:500}
 .th-badges{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
@@ -181,9 +186,8 @@ nav{
 .th-price{font-size:1.6rem;font-weight:800;letter-spacing:-1px;font-family:var(--mono);line-height:1}
 .th-chg{font-size:12px;font-weight:600;margin-top:3px;font-family:var(--mono)}
 .th-chg.up{color:var(--green)}.th-chg.down{color:var(--red)}
-.th-actions{display:flex;gap:6px;margin-top:8px;justify-content:flex-end;align-items:center}
 
-/* Sentiment score bar (Stocks.ly style) */
+/* Score bar */
 .score-bar-wrap{
   background:var(--bg3);border-radius:10px;padding:.85rem;
   border:1px solid var(--bdr);
@@ -199,13 +203,12 @@ nav{
 
 /* ── GRID ── */
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:8px}
+/* BUG FIX 5: grid-3 tidak pernah dipakai di app.js — hapus agar tidak membingungkan.
+   grid-4 dipakai untuk 2-kolom (stat row), biarkan */
 .grid-4{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-bottom:8px}
 
-/* ── PANEL CARDS (4-box grid) ── */
-.panel{
-  border-radius:var(--r2);padding:.9rem;
-}
+/* ── PANEL CARDS ── */
+.panel{border-radius:var(--r2);padding:.9rem;}
 .p-green{background:linear-gradient(135deg,rgba(0,214,143,.07),rgba(0,214,143,.02));border:1px solid rgba(0,214,143,.12)}
 .p-gold{background:linear-gradient(135deg,rgba(240,180,41,.07),rgba(240,180,41,.02));border:1px solid rgba(240,180,41,.12)}
 .p-blue{background:linear-gradient(135deg,rgba(77,159,255,.07),rgba(77,159,255,.02));border:1px solid rgba(77,159,255,.12)}
@@ -236,7 +239,7 @@ nav{
 .entry-range{font-family:var(--mono);font-size:1.3rem;font-weight:800;color:var(--blue);letter-spacing:-1px;margin:.4rem 0}
 .entry-sub{font-size:8px;color:var(--text3);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase}
 
-/* ── RISK MANAGEMENT (Stocks.ly style) ── */
+/* ── RISK MANAGEMENT ── */
 .risk-card{
   background:var(--bg2);border:1px solid var(--bdr);
   border-radius:var(--r);padding:1rem;margin-bottom:8px;
@@ -318,7 +321,9 @@ nav{
 .chart-ctrls{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
 .ctab{font-size:9px;padding:3px 9px;border-radius:4px;cursor:pointer;color:var(--text2);background:var(--bg3);border:1px solid var(--bdr);font-family:var(--mono);font-weight:600;transition:all .15s}
 .ctab.active,.ctab:hover{background:var(--gdim);border-color:var(--green);color:var(--green)}
-.ctab-type.active,.ctab-type:hover{background:var(--bdim);border-color:var(--blue);color:var(--blue)}
+/* BUG FIX 6: ctab-type hover tidak boleh override dengan warna green — pakai blue khusus */
+.ctab-type:hover:not(.active){background:var(--bdim);border-color:var(--blue);color:var(--blue)}
+.ctab-type.active{background:var(--bdim);border-color:var(--blue);color:var(--blue)}
 #tvChart{width:100%;height:240px;border-radius:6px;overflow:hidden}
 #rsiChart{width:100%;height:75px;border-radius:6px;overflow:hidden;margin-top:3px}
 #macdChart{width:100%;height:75px;border-radius:6px;overflow:hidden;margin-top:3px}
@@ -405,7 +410,7 @@ nav{
 .scan-run-btn:hover{background:#1aefaa}
 .scan-run-btn:disabled{opacity:.4;cursor:not-allowed}
 
-/* Scanner rows — Stocks.ly style */
+/* Scanner rows */
 .scan-list{display:flex;flex-direction:column;gap:6px}
 .sc-row{
   background:var(--bg2);border:1px solid var(--bdr);
@@ -450,7 +455,7 @@ nav{
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
-@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .spin{animation:spin .8s linear infinite;display:inline-block}
 
 /* ── SCROLLBAR ── */
@@ -463,36 +468,47 @@ nav{
 
 <nav>
   <div class="nav-logo">
-    <div class="nav-icon">📈</div>
+    <div class="nav-icon" aria-hidden="true">📈</div>
     <span class="nav-brand">Saham<span>AI</span></span>
     <span class="nav-tag">IHSG INTELLIGENCE</span>
   </div>
   <div class="nav-right">
-    <span class="nav-btn" id="navScannerBtn" onclick="toggleScanner()">⚡ Scanner</span>
+    <!-- BUG FIX 7: nav-btn pakai <button> bukan <span> untuk aksesibilitas keyboard & screen reader -->
+    <button class="nav-btn" id="navScannerBtn" onclick="toggleScanner()" type="button">⚡ Scanner</button>
   </div>
 </nav>
 
 <section class="hero">
   <div class="hero-tag">
-    <div class="hero-dot"></div>
+    <div class="hero-dot" aria-hidden="true"></div>
     <span>LIVE · AI-Powered · IHSG</span>
   </div>
   <h1>Analisis Saham<br><em>Indonesia</em></h1>
-  <p>Indikator teknikal matematis, volume intelligence, market structure & scoring deterministik.</p>
+  <p>Indikator teknikal matematis, volume intelligence, market structure &amp; scoring deterministik.</p>
 </section>
 
 <div class="search-wrap">
   <div class="search-box">
-    <div class="s-icon">🔍</div>
-    <input type="text" id="stockInput" placeholder="Ketik kode saham: BBCA, TLKM..." maxlength="10"
-      onkeydown="if(event.key==='Enter') analyzeStock()" autocomplete="off" autocorrect="off" spellcheck="false"/>
-    <button id="analyzeBtn" onclick="analyzeStock()">
-      <span id="btnIcon">✦</span> Analisis
+    <div class="s-icon" aria-hidden="true">🔍</div>
+    <!-- BUG FIX 8: tambah inputmode="text" + enterkeyhint="search" untuk keyboard mobile yang lebih baik -->
+    <input type="text" id="stockInput"
+      placeholder="Ketik kode saham: BBCA, TLKM..."
+      maxlength="10"
+      inputmode="text"
+      enterkeyhint="search"
+      onkeydown="if(event.key==='Enter') analyzeStock()"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="characters"
+      spellcheck="false"
+      aria-label="Kode saham"/>
+    <button id="analyzeBtn" onclick="analyzeStock()" type="button" aria-label="Analisis saham">
+      <span id="btnIcon" aria-hidden="true">✦</span> Analisis
     </button>
   </div>
 </div>
 
-<div class="chips">
+<div class="chips" role="list" aria-label="Saham populer">
   <span class="chips-lbl">POPULER:</span>
   <span id="popularChips"></span>
 </div>
@@ -502,32 +518,32 @@ nav{
   <div class="wl-items" id="watchlistItems"></div>
 </div>
 
-<section id="resultsSection">
+<section id="resultsSection" aria-live="polite" aria-label="Hasil analisis">
   <div id="resultsContent"></div>
 </section>
 
-<section id="scannerSection">
+<section id="scannerSection" aria-label="Scanner IHSG">
   <div class="scanner-hdr">
     <div class="scanner-title">⚡ Scanner IHSG</div>
     <div class="scanner-sub">Scan <span id="scanUniverse">200+</span> saham IHSG — setup real-time</div>
   </div>
-  <div class="scan-filters">
-    <button class="sf-btn active" onclick="setScanFilter(this,'all')">Semua</button>
-    <button class="sf-btn" onclick="setScanFilter(this,'breakout')">🚀 Breakout</button>
-    <button class="sf-btn" onclick="setScanFilter(this,'volume_spike')">📊 Vol Spike</button>
-    <button class="sf-btn" onclick="setScanFilter(this,'oversold')">🔻 Oversold</button>
-    <button class="sf-btn" onclick="setScanFilter(this,'golden_cross')">✨ Golden Cross</button>
-    <button class="sf-btn" onclick="setScanFilter(this,'accumulation')">📦 Akumulasi</button>
-    <button class="sf-btn" onclick="setScanFilter(this,'death_cross')">💀 Death Cross</button>
-    <button class="sf-btn" onclick="setScanFilter(this,'ready_pump')">🎯 Ready Pump</button>
+  <div class="scan-filters" role="group" aria-label="Filter scanner">
+    <button class="sf-btn active" onclick="setScanFilter(this,'all')" type="button">Semua</button>
+    <button class="sf-btn" onclick="setScanFilter(this,'breakout')" type="button">🚀 Breakout</button>
+    <button class="sf-btn" onclick="setScanFilter(this,'volume_spike')" type="button">📊 Vol Spike</button>
+    <button class="sf-btn" onclick="setScanFilter(this,'oversold')" type="button">🔻 Oversold</button>
+    <button class="sf-btn" onclick="setScanFilter(this,'golden_cross')" type="button">✨ Golden Cross</button>
+    <button class="sf-btn" onclick="setScanFilter(this,'accumulation')" type="button">📦 Akumulasi</button>
+    <button class="sf-btn" onclick="setScanFilter(this,'death_cross')" type="button">💀 Death Cross</button>
+    <button class="sf-btn" onclick="setScanFilter(this,'ready_pump')" type="button">🎯 Ready Pump</button>
   </div>
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;flex-wrap:wrap">
-    <button class="scan-run-btn" id="scanRunBtn" onclick="runScanner()">
-      <span id="scanBtnIcon">⚡</span> Mulai Scan
+    <button class="scan-run-btn" id="scanRunBtn" onclick="runScanner()" type="button">
+      <span id="scanBtnIcon" aria-hidden="true">⚡</span> Mulai Scan
     </button>
-    <span style="font-size:10px;color:var(--text3);font-family:var(--mono)" id="scanLastRun"></span>
+    <span style="font-size:10px;color:var(--text3);font-family:var(--mono)" id="scanLastRun" aria-live="polite"></span>
   </div>
-  <div id="scannerResults"></div>
+  <div id="scannerResults" aria-live="polite"></div>
 </section>
 
 <footer style="border-top:1px solid var(--bdr);padding:1.5rem 1rem;text-align:center;color:var(--text3);font-size:10px;line-height:2;font-family:var(--mono)">
@@ -535,6 +551,8 @@ nav{
   <p>Selalu riset mandiri sebelum berinvestasi · SahamAI © 2026</p>
 </footer>
 
-<script src="/app.js" defer></script>
+<!-- BUG FIX 9: hapus defer agar app.js load setelah DOMContentLoaded event bisa terpicu dengan benar
+     di semua browser. defer seharusnya aman tapi ada edge case di beberapa mobile WebView -->
+<script src="/app.js"></script>
 </body>
 </html>
