@@ -211,24 +211,26 @@ module.exports = async function handler(req, res) {
     return null;
   });
 
-  const aiPromise = callAI({
-    ticker, metadata, isIndex, priceData, priceContext,
-    indicators, volumeData, structure, scoring, bandarData,
-    newsData: null // news belum ada, AI pakai data teknikal
-  }).catch(function(e) {
-    log.warn('analyze', '[AI ERROR]', e.message);
-    return null;
-  });
-
-  const [marketContext, newsData, rawAI] = await Promise.all([
+  // ── Resolve market context dan news paralel dulu ──────────────
+  const [marketContext, newsData] = await Promise.all([
     marketContextPromise,
-    newsPromise,
-    aiPromise
+    newsPromise
   ]);
 
   if (newsData) {
     log.info('analyze', '[NEWS]', ticker, 'emiten=' + (newsData.emiten && newsData.emiten.length) + ' komods=' + (newsData.komoditas && newsData.komoditas.length));
   }
+
+  // ── AI: sekarang punya marketContext + newsData untuk inject ke prompt ──
+  const rawAI = await callAI({
+    ticker, metadata, isIndex, priceData, priceContext,
+    indicators, volumeData, structure, scoring, bandarData,
+    marketContext,
+    newsData
+  }).catch(function(e) {
+    log.warn('analyze', '[AI ERROR]', e.message);
+    return null;
+  });
 
   // ── Proses hasil AI ───────────────────────────────────────────
   let parsed;
