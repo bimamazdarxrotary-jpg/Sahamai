@@ -13,6 +13,7 @@ const tests = [
   'tests/volume.test.js',
   'tests/structure.test.js',
   'tests/context.test.js',
+  'tests/scanner.test.js',
   'tests/analyze.integration.test.js',
   'tests/scanner.integration.test.js'
 ];
