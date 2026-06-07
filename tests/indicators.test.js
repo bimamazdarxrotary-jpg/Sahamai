@@ -4,7 +4,7 @@
 
 const {
   sma, ema, rsi, macd, bollingerBands, atr,
-  stochastic, maCrossover, mfi, computeAll
+  maCrossover, computeAll
 } = require('../lib/indicators');
 
 // ── Helper ────────────────────────────────────────────────────────
@@ -183,21 +183,48 @@ test('ATR > 0 pada data normal', () => {
 });
 
 // ══════════════════════════════════════════════════════════════════
-console.log('\n📊 MFI');
+console.log('\n📊 relativeVolume (RVOL)');
 // ══════════════════════════════════════════════════════════════════
 
-test('MFI data kurang — return null', () => {
-  assert(mfi(makeCandles([100, 200]), 14) === null);
+test('RVOL data kurang — return null', () => {
+  const { relativeVolume } = require('../lib/indicators');
+  assert(relativeVolume(makeCandles([100, 200]), 20) === null);
 });
 
-test('MFI return field mfi', () => {
-  const result = mfi(makeCandles(range(100, 120)), 14);
-  assert(result !== null && 'mfi' in result);
+test('RVOL return field rvol dan label', () => {
+  const { relativeVolume } = require('../lib/indicators');
+  const candles = makeCandles(range(100, 125));
+  const result  = relativeVolume(candles, 20);
+  assert(result !== null && 'rvol' in result && 'label' in result, 'got: ' + JSON.stringify(result));
 });
 
-test('MFI range 0–100', () => {
-  const result = mfi(makeCandles(range(100, 120)), 14);
-  assert(result !== null && result.mfi >= 0 && result.mfi <= 100, 'got ' + (result && result.mfi));
+test('RVOL spike terdeteksi saat volume 3x', () => {
+  const { relativeVolume } = require('../lib/indicators');
+  const candles = makeCandles(range(100, 125));
+  candles[candles.length - 1].volume = 3000000; // 3x dari default baseVol 1000000
+  const result = relativeVolume(candles, 20);
+  assert(result !== null && result.isSpike === true, 'got isSpike=' + (result && result.isSpike) + ' rvol=' + (result && result.rvol));
+});
+
+// ══════════════════════════════════════════════════════════════════
+console.log('\n📊 position52w');
+// ══════════════════════════════════════════════════════════════════
+
+test('position52w data kurang — return null', () => {
+  const { position52w } = require('../lib/indicators');
+  assert(position52w([]) === null);
+});
+
+test('position52w return semua field utama', () => {
+  const { position52w } = require('../lib/indicators');
+  const result = position52w(makeCandles(range(100, 165)));
+  assert(result !== null && 'positionPct' in result && 'high52w' in result && 'low52w' in result, 'got: ' + JSON.stringify(result));
+});
+
+test('position52w positionPct 0–100', () => {
+  const { position52w } = require('../lib/indicators');
+  const result = position52w(makeCandles(range(100, 165)));
+  assert(result !== null && result.positionPct >= 0 && result.positionPct <= 100, 'got ' + (result && result.positionPct));
 });
 
 // ══════════════════════════════════════════════════════════════════
@@ -207,7 +234,7 @@ console.log('\n📊 computeAll');
 test('computeAll return semua field utama', () => {
   const result = computeAll(makeCandles(range(100, 165)));
   assert(result !== null);
-  ['rsi', 'macd', 'bb', 'ma', 'atr', 'stoch', 'mfi', 'trend'].forEach(f => {
+  ['rsi', 'macd', 'bb', 'ma', 'atr', 'trend', 'rvol', 'position52w', 'obv'].forEach(f => {
     assert(f in result, 'Harus ada field: ' + f);
   });
 });
