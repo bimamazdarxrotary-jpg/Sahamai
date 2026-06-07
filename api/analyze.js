@@ -186,12 +186,7 @@ module.exports = async function handler(req, res) {
   const scoring = computeScore(indicators, volumeData, structure, priceData);
   log.info('analyze', '[SCORE]', ticker + ': ' + scoring.final + '/10 ->', scoring.recommendation);
 
-  // ── 6. Market context ──────────────────────────────────────────
-  // ── 7. Quick scan signals ──────────────────────────────────────
-  // ── 8. Bandar analysis ─────────────────────────────────────────
-  const marketContextPromise = (!isIndex && candles.length >= 5)
-    ? analyzeMarketContext(ticker, candles, indicators, volumeData, structure)
-    : Promise.resolve(null);
+  // ── 6. Market context, Quick scan, Bandar — dihitung lokal ────
 
   const scanSignals = !isIndex && candles.length >= 20
     ? quickScan(ticker, candles, indicators, volumeData, structure, scoring, priceData && priceData.changePct, cacheGet)
@@ -202,16 +197,24 @@ module.exports = async function handler(req, res) {
     : null;
   if (bandarData) log.info('analyze', '[BANDAR]', ticker, 'score=' + bandarData.bandarScore, bandarData.smartMoney && bandarData.smartMoney.label);
 
-  // ── 9 & 10. News + AI + Market context — PARALEL ──────────────
-  // Jalankan semua sekaligus untuk hemat 2-3 detik latency
+  // ── 9 & 10. Market context + News — PARALEL, AI tunggu keduanya ──
+  // Kedua berjalan bersamaan (~3-5 detik), AI dipanggil setelah keduanya selesai
+  // Ini hemat ~2-3 detik vs sequential
   const priceContext = buildPriceContext(priceData);
 
-  const newsPromise = fetchAllNews(ticker, metadata, isIndex).catch(e => {
+  const marketContextPromise = (!isIndex && candles.length >= 5)
+    ? analyzeMarketContext(ticker, candles, indicators, volumeData, structure).catch(function(e) {
+        log.warn('analyze', '[CONTEXT ERROR]', e.message);
+        return null;
+      })
+    : Promise.resolve(null);
+
+  const newsPromise = fetchAllNews(ticker, metadata, isIndex).catch(function(e) {
     log.warn('analyze', '[NEWS ERROR]', e.message);
     return null;
   });
 
-  // ── Resolve market context dan news paralel dulu ──────────────
+  // Resolve market context dan news paralel — AI inject keduanya
   const [marketContext, newsData] = await Promise.all([
     marketContextPromise,
     newsPromise
@@ -221,7 +224,7 @@ module.exports = async function handler(req, res) {
     log.info('analyze', '[NEWS]', ticker, 'emiten=' + (newsData.emiten && newsData.emiten.length) + ' komods=' + (newsData.komoditas && newsData.komoditas.length));
   }
 
-  // ── AI: sekarang punya marketContext + newsData untuk inject ke prompt ──
+  // AI dipanggil setelah context + news tersedia — injeksi keduanya ke prompt
   const rawAI = await callAI({
     ticker, metadata, isIndex, priceData, priceContext,
     indicators, volumeData, structure, scoring, bandarData,
@@ -292,23 +295,21 @@ module.exports = async function handler(req, res) {
       candles:   priceData.candles
     } : null,
     indicators: {
-      rsi:    indicators.rsi,
-      ma:     indicators.ma,
-      ma20:   indicators.ma && indicators.ma.ma20,
-      ma50:   indicators.ma && indicators.ma.ma50,
-      macd:   indicators.macd,
-      bb:     indicators.bb,
-      atr:    indicators.atr,
-      stoch:  indicators.stoch,
-      trend:  indicators.trend,
-      levels: indicators.levels,
-      // NEW: indikator baru masuk cache
-      mfi:         indicators.mfi        || null,
-      divergence:  indicators.divergence || null,
-      fibonacci:   indicators.fibonacci  || null,
+      rsi:         indicators.rsi         || null,
+      ma:          indicators.ma          || null,
+      macd:        indicators.macd        || null,
+      bb:          indicators.bb          || null,
+      atr:         indicators.atr         || null,
+      trend:       indicators.trend       || null,
+      levels:      indicators.levels      || null,
+      obv:         indicators.obv         || null,
+      rvol:        indicators.rvol        || null,
+      position52w: indicators.position52w || null,
+      divergence:  indicators.divergence  || null,
+      fibonacci:   indicators.fibonacci   || null,
       candlestick: indicators.candlestick || null,
       relStrength: indicators.relStrength || null,
-      pivots:      indicators.pivots     || null
+      trendSummary: indicators.trendSummary || null
     },
     volumeData: volumeData ? {
       bias:           volumeData.accDist && volumeData.accDist.bias,
