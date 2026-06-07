@@ -24,24 +24,28 @@ function assert(condition, msg) {
 // ── Fixtures ──────────────────────────────────────────────────────
 const bullishIndicators = {
   rsi: 35,
-  ma: { aboveMA20: true, aboveMA50: true, ma20vs50: 'bullish_alignment', type: 'golden_cross', ma20: 1000 },
+  ma: { aboveMA20: true, aboveMA50: true, ma20vs50: 'bullish_alignment', type: 'golden_cross', ma20: 1000, ema9: 1050 },
   macd: { trend: 'bullish', crossover: 'golden_cross', histogram: 10, signal: 5 },
-  bb: { position: 'oversold_zone', bandwidth: 8 },
-  stoch: { signal: 'oversold' },
-  atr: { atrPct: 1.2 },
-  mfi: { mfi: 25 },
-  trend: { strength: 'strong', adx: 30 }
+  bb: { position: 'oversold_zone', bandwidth: 8, isSqueeze: false },
+  atr: { atrPct: 1.2, atr: 120 },
+  trend: { strength: 'strong', adx: 30, direction: 'uptrend' },
+  rvol: { rvol: 1.8, medianVolume: 5000000, label: 'Tinggi (1.5x+)', isSpike: false },
+  position52w: { positionPct: 35, pctFromHigh: 20, isNearLow: false, isNearHigh: false },
+  obv: { trend: 'rising', divergence: null },
+  relStrength: { rsScore: 70, trend: 'outperform' }
 };
 
 const bearishIndicators = {
   rsi: 75,
-  ma: { aboveMA20: false, aboveMA50: false, ma20vs50: 'bearish_alignment', type: 'death_cross', ma20: 900 },
+  ma: { aboveMA20: false, aboveMA50: false, ma20vs50: 'bearish_alignment', type: 'death_cross', ma20: 900, ema9: 880 },
   macd: { trend: 'bearish', crossover: 'death_cross', histogram: -10, signal: -5 },
-  bb: { position: 'overbought_zone', bandwidth: 18 },
-  stoch: { signal: 'overbought' },
-  atr: { atrPct: 6 },
-  mfi: { mfi: 85 },
-  trend: { strength: 'strong', adx: 30 }
+  bb: { position: 'overbought_zone', bandwidth: 18, isSqueeze: false },
+  atr: { atrPct: 6, atr: 600 },
+  trend: { strength: 'strong', adx: 30, direction: 'downtrend' },
+  rvol: { rvol: 2.5, medianVolume: 5000000, label: 'Sangat Tinggi (2x+)', isSpike: true },
+  position52w: { positionPct: 85, pctFromHigh: 2, isNearLow: false, isNearHigh: true },
+  obv: { trend: 'falling', divergence: null },
+  relStrength: { rsScore: 30, trend: 'underperform' }
 };
 
 const bullishStructure = {
@@ -140,10 +144,14 @@ test('Score >= 8 → BELI', () => {
 test('Score 4–5 → TAHAN', () => {
   // Neutral indicators
   const neutralInd = {
-    rsi: 50, ma: { aboveMA20: true, aboveMA50: false, ma20vs50: 'bearish_alignment' },
+    rsi: 50,
+    ma: { aboveMA20: true, aboveMA50: false, ma20vs50: 'bearish_alignment' },
     macd: { trend: 'bullish', histogram: 1, signal: 1 },
-    bb: { position: 'middle' }, stoch: {}, atr: { atrPct: 2 }, mfi: { mfi: 50 },
-    trend: { strength: 'no_trend' }
+    bb: { position: 'middle' },
+    atr: { atrPct: 2 },
+    trend: { strength: 'no_trend' },
+    rvol: { rvol: 1.0, medianVolume: 5000000, isSpike: false },
+    position52w: { positionPct: 50, isNearLow: false, isNearHigh: false }
   };
   const neutralVol = { score: 5, accDist: { bias: 'mixed' }, spike: { isSpike: false } };
   const neutralStr = { trend: { direction: 'sideways', strength: 'no_trend' }, hhll: { pattern: 'consolidation' }, setups: [] };
@@ -199,6 +207,26 @@ test('Divergence bullish → momentum naik', () => {
   const withoutDiv = computeScore(bullishIndicators, bullishVolume, bullishStructure, {});
   assert(withDiv.breakdown.momentum.score >= withoutDiv.breakdown.momentum.score,
     'Divergence bullish harus naikkan momentum');
+});
+
+test('Penalti likuiditas — saham illikuid risk lebih tinggi', () => {
+  const liquidInd   = { ...bullishIndicators, rvol: { rvol: 1.5, medianVolume: 10000000, isSpike: false } };
+  const illiquidInd = { ...bullishIndicators, rvol: { rvol: 1.5, medianVolume: 50000,    isSpike: false } };
+  const liquidPD    = { current: 1000 };
+  const illiquidPD  = { current: 1000 };
+  const liquid   = computeScore(liquidInd,   bullishVolume, bullishStructure, liquidPD);
+  const illiquid = computeScore(illiquidInd, bullishVolume, bullishStructure, illiquidPD);
+  assert(illiquid.breakdown.risk.score >= liquid.breakdown.risk.score,
+    'Saham illikuid harus punya risk score >= saham likuid, got liquid=' + liquid.breakdown.risk.score + ' illiquid=' + illiquid.breakdown.risk.score);
+});
+
+test('52W near high → risk meningkat', () => {
+  const nearHigh   = { ...bullishIndicators, position52w: { positionPct: 92, pctFromHigh: 1.5, isNearHigh: true, isNearLow: false } };
+  const notNearHigh = { ...bullishIndicators, position52w: { positionPct: 40, pctFromHigh: 30, isNearHigh: false, isNearLow: false } };
+  const rNear = computeScore(nearHigh,    bullishVolume, bullishStructure, {});
+  const rNot  = computeScore(notNearHigh, bullishVolume, bullishStructure, {});
+  assert(rNear.breakdown.risk.score >= rNot.breakdown.risk.score,
+    'Near 52W high harus risk >= not near high');
 });
 
 // ══════════════════════════════════════════════════════════════════
