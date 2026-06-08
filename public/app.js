@@ -511,7 +511,43 @@ function buildResult(ticker,d){
     </div>`;}).join('')}
   </div>`:'' ;
 
-  // ── SMART MONEY CARD
+  // ── FOREIGN FLOW CARD
+  const foreignCard = d.foreignData ? (function() {
+    const f = d.foreignData;
+    const isPos = f.isNetBuy;
+    const color = isPos ? 'var(--green)' : 'var(--red)';
+    const bg    = isPos ? 'var(--gdim)' : 'var(--rdim)';
+    const border = isPos ? 'rgba(0,214,143,.2)' : 'rgba(240,79,94,.2)';
+    const netStr = Math.abs(f.foreignNet) >= 1e6
+      ? (f.foreignNet / 1e6).toFixed(1) + ' jt lot'
+      : Math.abs(f.foreignNet) >= 1e3
+      ? (f.foreignNet / 1e3).toFixed(0) + ' rb lot'
+      : f.foreignNet.toLocaleString('id-ID') + ' lot';
+    return `<div class="card" style="border-left:3px solid ${color}">
+      <div class="clbl ${isPos ? '' : 'red'}">🌏 Net Foreign Flow</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.5rem;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-family:var(--mono);font-size:1.4rem;font-weight:800;color:${color}">${isPos ? '+' : ''}${netStr}</div>
+          <div style="font-size:10px;color:var(--text2);margin-top:2px">${esc(f.label)}</div>
+        </div>
+        <div style="text-align:right">
+          <span class="pill ${isPos ? 'pill-g' : 'pill-r'}">${isPos ? '+' : ''}${f.netBuyRatio}% net ratio</span>
+          ${f.foreignPct != null ? `<div style="font-size:9px;color:var(--text3);margin-top:3px;font-family:var(--mono)">${f.foreignPct}% dari total transaksi</div>` : ''}
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:.6rem">
+        <div style="flex:1;background:var(--bg3);border-radius:7px;padding:.5rem .7rem">
+          <div style="font-size:8px;color:var(--text3);font-family:var(--mono);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">BELI</div>
+          <div style="font-family:var(--mono);font-size:.85rem;font-weight:700;color:var(--green)">${f.foreignBuy ? f.foreignBuy.toLocaleString('id-ID') : '—'}</div>
+        </div>
+        <div style="flex:1;background:var(--bg3);border-radius:7px;padding:.5rem .7rem">
+          <div style="font-size:8px;color:var(--text3);font-family:var(--mono);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">JUAL</div>
+          <div style="font-family:var(--mono);font-size:.85rem;font-weight:700;color:var(--red)">${f.foreignSell ? f.foreignSell.toLocaleString('id-ID') : '—'}</div>
+        </div>
+      </div>
+      ${d.scoringData && d.scoringData.foreignAdj ? `<div style="margin-top:.5rem;font-size:9px;font-family:var(--mono);color:${isPos?'var(--green)':'var(--red)'}">Score adjustment: ${d.scoringData.foreignAdj > 0 ? '+' : ''}${d.scoringData.foreignAdj} (${esc(d.scoringData.foreignReason || '')})</div>` : ''}
+    </div>`;
+  })() : '';
   const smCard=(d.bandarSmartMoney||d.smartMoneySignal)&&(d.bandarSmartMoney||d.smartMoneySignal)!=='Tidak terdeteksi.'
     ?`<div class="sm-card"><div class="sm-lbl">🧠 Smart Money & Bandar</div><div class="sm-text">${esc(d.bandarSmartMoney||d.smartMoneySignal)}</div></div>`:'' ;
 
@@ -620,6 +656,7 @@ function buildResult(ticker,d){
     ${setupsSection}
     ${proSection}
     ${smCard}
+    ${foreignCard}
     ${mainCard}
     ${thesis}
     ${analysisCards}
