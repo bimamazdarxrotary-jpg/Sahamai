@@ -14,6 +14,7 @@ const { quickScan }                         = require('../lib/scanner');
 const { analyzeBandar }                     = require('../lib/bandar');
 const { fetchAllNews }                      = require('../lib/news');
 const { fetchPriceDataWithFallback }        = require('../lib/datasource');
+const { fetchForeignFlow, getForeignScoreAdjustment } = require('../lib/foreign');
 const { applyCompression }                  = require('../lib/compress');
 const log                                   = require('../lib/logger');
 
@@ -197,9 +198,8 @@ module.exports = async function handler(req, res) {
     : null;
   if (bandarData) log.info('analyze', '[BANDAR]', ticker, 'score=' + bandarData.bandarScore, bandarData.smartMoney && bandarData.smartMoney.label);
 
-  // ── 9 & 10. Market context + News — PARALEL, AI tunggu keduanya ──
-  // Kedua berjalan bersamaan (~3-5 detik), AI dipanggil setelah keduanya selesai
-  // Ini hemat ~2-3 detik vs sequential
+  // ── 9 & 10 & 11. Market context + News + Foreign flow — PARALEL ─
+  // Semua berjalan bersamaan (~3-5 detik), AI dipanggil setelah ketiganya selesai
   const priceContext = buildPriceContext(priceData);
 
   const marketContextPromise = (!isIndex && candles.length >= 5)
@@ -214,22 +214,55 @@ module.exports = async function handler(req, res) {
     return null;
   });
 
-  // Resolve market context dan news paralel — AI inject keduanya
-  const [marketContext, newsData] = await Promise.all([
+  const foreignPromise = !isIndex
+    ? fetchForeignFlow(ticker).catch(function(e) {
+        log.warn('analyze', '[FOREIGN ERROR]', e.message);
+        return null;
+      })
+    : Promise.resolve(null);
+
+  // Resolve semua paralel — AI inject ketiganya
+  const [marketContext, newsData, foreignData] = await Promise.all([
     marketContextPromise,
-    newsPromise
+    newsPromise,
+    foreignPromise
   ]);
 
   if (newsData) {
     log.info('analyze', '[NEWS]', ticker, 'emiten=' + (newsData.emiten && newsData.emiten.length) + ' komods=' + (newsData.komoditas && newsData.komoditas.length));
   }
+  if (foreignData) {
+    log.info('analyze', '[FOREIGN]', ticker, foreignData.label, 'net=' + foreignData.foreignNet);
+  }
 
-  // AI dipanggil setelah context + news tersedia — injeksi keduanya ke prompt
+  // ── Apply foreign flow adjustment ke scoring ──────────────────
+  // Inject setelah scoring deterministik, sebagai adjustment terpisah
+  let scoringFinal = scoring;
+  if (foreignData) {
+    const adj = getForeignScoreAdjustment(foreignData);
+    if (adj.adjustment !== 0) {
+      const newFinal = Math.max(0, Math.min(10, scoring.final + adj.adjustment));
+      const newRec   = newFinal >= 8 ? 'BELI'
+                     : newFinal >= 6 ? 'AKUMULASI'
+                     : newFinal >= 4 ? 'TAHAN'
+                     : newFinal >= 2 ? 'KURANGI'
+                     : 'JUAL';
+      scoringFinal = Object.assign({}, scoring, {
+        final:          newFinal,
+        recommendation: newRec,
+        foreignAdj:     adj.adjustment,
+        foreignReason:  adj.reason
+      });
+      log.info('analyze', '[FOREIGN ADJ]', ticker, 'score ' + scoring.final + ' → ' + newFinal + ' (' + adj.reason + ')');
+    }
+  }
+
+  // AI dipanggil setelah context + news + foreign tersedia
   const rawAI = await callAI({
     ticker, metadata, isIndex, priceData, priceContext,
-    indicators, volumeData, structure, scoring, bandarData,
-    marketContext,
-    newsData
+    indicators, volumeData, structure,
+    scoring: scoringFinal,
+    bandarData, marketContext, newsData, foreignData
   }).catch(function(e) {
     log.warn('analyze', '[AI ERROR]', e.message);
     return null;
@@ -333,8 +366,8 @@ module.exports = async function handler(req, res) {
       hhll:       structure.hhll
     } : null,
     scoringData:   isMarketCrash && !isIndex && parsed.crashOverride
-      ? Object.assign({}, scoring, { recommendation: 'TAHAN' })
-      : scoring,
+      ? Object.assign({}, scoringFinal, { recommendation: 'TAHAN' })
+      : scoringFinal,
     bandarData:    bandarData ? {
       bandarScore: bandarData.bandarScore,
       narrative:   bandarData.narrative,
@@ -345,6 +378,7 @@ module.exports = async function handler(req, res) {
       stockType:   bandarData.stockType
     } : null,
     marketContext: marketContext,
+    foreignData:   foreignData || null,
     scanSignals:   scanSignals ? scanSignals.signals : [],
     newsData:      newsData ? {
       emiten:    newsData.emiten    || [],
