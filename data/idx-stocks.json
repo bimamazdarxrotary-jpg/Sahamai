@@ -3,13 +3,29 @@
     "name": "Alamtri Resources Indonesia Tbk",
     "sector": "Energi",
     "subsector": "Pertambangan Batubara",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": -2,
+      "revenueGrowthYoY": -8,
+      "debtToEquity": 0.25,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Adaro Andalan, spin-off batubara termal Adaro"
+    }
   },
   "AALI": {
     "name": "Astra Agro Lestari Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Perkebunan Kelapa Sawit",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3.5,
+      "revenueGrowthYoY": 10.5,
+      "debtToEquity": 0.42,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Astra Agro, sawit premium, dividen baik, harga CPO pengaruh besar"
+    }
   },
   "ABBA": {
     "name": "Mahaka Radio Integra Tbk",
@@ -21,61 +37,141 @@
     "name": "Asuransi Bina Dana Arta Tbk",
     "sector": "Keuangan",
     "subsector": "Asuransi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "ACES": {
     "name": "Ace Hardware Indonesia Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Ritel Barang Sekunder",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 4.5,
+      "revenueGrowthYoY": 16,
+      "debtToEquity": 0.18,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Ace Hardware, SSS growth positif, ekspansi agresif"
+    }
   },
   "ACST": {
     "name": "Acset Indonusa Tbk",
     "sector": "Infrastruktur",
     "subsector": "Konstruksi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 7,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Acset Indonusa, konstruksi spesialis"
+    }
   },
   "ADHI": {
     "name": "Adhi Karya (Persero) Tbk",
     "sector": "Industri",
     "subsector": "Konstruksi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 2.1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Adhi Karya, BUMN konstruksi, leverage tinggi, proyek IKN"
+    }
   },
   "ADMF": {
     "name": "Adira Dinamika Multi Finance Tbk",
     "sector": "Keuangan",
     "subsector": "Multifinance",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 4.5,
+      "revenueGrowthYoY": 16,
+      "debtToEquity": 3.2,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Adira Finance, multifinance otomotif — DER tinggi lazim multifinance"
+    }
   },
   "ADMR": {
     "name": "Adaro Minerals Indonesia Tbk",
     "sector": "Barang Baku",
     "subsector": "Metal Mining",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": -3,
+      "revenueGrowthYoY": -12,
+      "debtToEquity": 0.45,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "declining",
+      "notes": "Adaro Minerals, fokus batubara metalurgi premium"
+    }
   },
   "ADRO": {
     "name": "Adaro Energy Indonesia Tbk",
     "sector": "Energi",
     "subsector": "Batu Bara",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": -5.2,
+      "revenueGrowthYoY": -18,
+      "debtToEquity": 0.38,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "declining",
+      "notes": "Harga batubara turun dari puncak, dividen masih kuat, ekspansi EBT"
+    }
   },
   "AGII": {
     "name": "Aneka Gas Industri Tbk",
     "sector": "Barang Baku",
     "subsector": "Gas Industri",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3.5,
+      "revenueGrowthYoY": 12.5,
+      "debtToEquity": 0.58,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Aneka Gas Industri, gas industri, demand manufaktur naik"
+    }
   },
   "AGRO": {
     "name": "Bank Raya Indonesia Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 1.15,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Bank agro BRI, kredit pertanian tumbuh moderat"
+    }
   },
   "AGRS": {
     "name": "Bank IBK Indonesia Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Bank syariah kecil"
+    }
   },
   "AHAP": {
     "name": "Asuransi Harta Aman Pratama Tbk",
@@ -87,7 +183,15 @@
     "name": "FKS Food Sejahtera Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Makanan Olahan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "AKKU": {
     "name": "Anugerah Kagum Karya Utama Tbk",
@@ -99,13 +203,29 @@
     "name": "Argha Karya Prima Industry Tbk",
     "sector": "Barang Baku",
     "subsector": "Wadah & Kemasan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 7.5,
+      "debtToEquity": 0.9,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Argha Karya Prima, kemasan plastik"
+    }
   },
   "AKRA": {
     "name": "AKR Corporindo Tbk",
     "sector": "Energi",
     "subsector": "Distribusi BBM",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3.2,
+      "revenueGrowthYoY": 12,
+      "debtToEquity": 0.58,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "AKR Corporindo, distribusi BBM & kawasan industri JIIPE"
+    }
   },
   "AKSI": {
     "name": "Majapahit Inti Corpora Tbk",
@@ -123,13 +243,29 @@
     "name": "Alaska Industrindo Tbk",
     "sector": "Barang Baku",
     "subsector": "Logam",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Alaska Indomax, baja"
+    }
   },
   "ALMI": {
     "name": "Alumindo Light Metal Industry Tbk",
     "sector": "Barang Baku",
     "subsector": "Logam",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5.5,
+      "debtToEquity": 0.7,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Alumindo, aluminium products"
+    }
   },
   "ALTO": {
     "name": "Tri Banyan Tirta Tbk",
@@ -141,13 +277,29 @@
     "name": "Asuransi Multi Artha Guna Tbk",
     "sector": "Keuangan",
     "subsector": "Asuransi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 0.45,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Asuransi Multi Artha Guna"
+    }
   },
   "AMFG": {
     "name": "Asahimas Flat Glass Tbk",
     "sector": "Barang Baku",
     "subsector": "Kaca",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 9,
+      "debtToEquity": 0.45,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Asahimas Flat Glass, kaca otomotif & properti"
+    }
   },
   "AMIN": {
     "name": "Ateliers Mecaniques dIndonesie Tbk",
@@ -159,7 +311,15 @@
     "name": "Amman Mineral Internasional Tbk",
     "sector": "Barang Baku",
     "subsector": "Logam & Mineral",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 8,
+      "revenueGrowthYoY": 28,
+      "debtToEquity": 0.88,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Amman Mineral, tembaga-emas grade tinggi, kapasitas naik signifikan"
+    }
   },
   "AMOR": {
     "name": "Amor Group International Tbk",
@@ -171,13 +331,29 @@
     "name": "Sumber Alfaria Trijaya Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Minimarket",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5.5,
+      "revenueGrowthYoY": 20,
+      "debtToEquity": 0.88,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Alfamart, ekspansi gerai agresif, same-store sales naik"
+    }
   },
   "ANTM": {
     "name": "Aneka Tambang Tbk",
     "sector": "Barang Baku",
     "subsector": "Logam & Mineral",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.45,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "ANTAM, nikel & emas, HPAL Pomalaa ekspansi"
+    }
   },
   "APIC": {
     "name": "Pacific Strategic Financial Tbk",
@@ -195,19 +371,43 @@
     "name": "Agung Podomoro Land Tbk",
     "sector": "Properti",
     "subsector": "Pengembang Properti",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3.5,
+      "revenueGrowthYoY": 11,
+      "debtToEquity": 1.35,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Agung Podomoro Land, leverage tinggi, restrukturisasi"
+    }
   },
   "ARCI": {
     "name": "Archi Indonesia Tbk",
     "sector": "Barang Baku",
     "subsector": "Emas",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.6,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Argo Chembali Resources, tambang"
+    }
   },
   "ARII": {
     "name": "Atlas Resources Tbk",
     "sector": "Energi",
     "subsector": "Pertambangan Batubara",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "ARMY": {
     "name": "Armidian Karyatama Tbk",
@@ -219,7 +419,15 @@
     "name": "Arwana Citramulia Tbk",
     "sector": "Barang Baku",
     "subsector": "Material Konstruksi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10.5,
+      "debtToEquity": 0.22,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Arwana Citramulia, keramik, ekspansi kapasitas"
+    }
   },
   "ARTI": {
     "name": "Ratu Prabu Energi Tbk",
@@ -231,31 +439,71 @@
     "name": "Bank Jago Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan Digital",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 8.5,
+      "revenueGrowthYoY": 35,
+      "debtToEquity": 0.45,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Bank digital, pengguna tumbuh pesat, masih investment phase"
+    }
   },
   "ASBI": {
     "name": "Asuransi Bintang Tbk",
     "sector": "Keuangan",
     "subsector": "Asuransi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 7,
+      "debtToEquity": 0.38,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Asuransi Bintang"
+    }
   },
   "ASDM": {
     "name": "Asuransi Dayin Mitra Tbk",
     "sector": "Keuangan",
     "subsector": "Asuransi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 0.35,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Asuransi Dayin Mitra"
+    }
   },
   "ASGR": {
     "name": "Astra Graphia Tbk",
     "sector": "Keuangan",
     "subsector": "Teknologi Keuangan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 9,
+      "debtToEquity": 0.45,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Astra Graphia, IT Astra, layanan MPS tumbuh"
+    }
   },
   "ASII": {
     "name": "Astra International Tbk",
     "sector": "Industri",
     "subsector": "Perusahaan Holding Multi Sektor",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.88,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Astra International, otomotif + diversifikasi, market share Toyota stabil"
+    }
   },
   "ASJT": {
     "name": "Asuransi Jasa Tania Tbk",
@@ -279,55 +527,127 @@
     "name": "Alam Sutera Realty Tbk",
     "sector": "Properti",
     "subsector": "Pengembang Properti",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 16.5,
+      "debtToEquity": 1.1,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Alam Sutera, penjualan tanah kawasan industri naik"
+    }
   },
   "ASRM": {
     "name": "Asuransi Ramayana Tbk",
     "sector": "Keuangan",
     "subsector": "Asuransi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 7.5,
+      "debtToEquity": 0.42,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Asuransi Ramayana"
+    }
   },
   "ASSA": {
     "name": "Adi Sarana Armada Tbk",
     "sector": "Infrastruktur",
     "subsector": "Logistik",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 4,
+      "revenueGrowthYoY": 14.5,
+      "debtToEquity": 1.55,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Adi Sarana Armada, fleet management & logistik EV"
+    }
   },
   "AUTO": {
     "name": "Astra Otoparts Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Suku Cadang Otomotif",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 7.5,
+      "debtToEquity": 0.35,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Astra Otoparts, komponen otomotif, EV parts mulai berkontribusi"
+    }
   },
   "AVIA": {
     "name": "Avia Avian Tbk",
     "sector": "Barang Baku",
     "subsector": "Kimia Khusus",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 4,
+      "revenueGrowthYoY": 15.5,
+      "debtToEquity": 0.2,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Avian Brands, cat & coating, market share naik"
+    }
   },
   "AWAN": {
     "name": "Geonet Teknologi Indonesia Tbk",
     "sector": "Teknologi",
     "subsector": "Layanan Cloud",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 15,
+      "revenueGrowthYoY": 58,
+      "debtToEquity": 0.28,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Awan Satu Digital, cloud computing IDX, pertumbuhan pesat"
+    }
   },
   "AXIO": {
     "name": "Axiata Group Berhad",
     "sector": "Teknologi",
     "subsector": "Teknologi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 18,
+      "debtToEquity": 0.4,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Axiata Tbk, digital lifestyle"
+    }
   },
   "BABP": {
     "name": "Bank MNC Internasional Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.8,
+      "revenueGrowthYoY": 7.5,
+      "debtToEquity": 0.95,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Bank MNC digital, konsolidasi"
+    }
   },
   "BACA": {
     "name": "Bank Capital Indonesia Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 9,
+      "debtToEquity": 0.88,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Bank swasta menengah"
+    }
   },
   "BAJA": {
     "name": "Saranacentral Bajatama Tbk",
@@ -339,7 +659,15 @@
     "name": "Bank Aladin Syariah Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan Syariah",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 12,
+      "revenueGrowthYoY": 48,
+      "debtToEquity": 0.3,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Neo bank, masih ekspansi pengguna, profitabilitas mulai membaik"
+    }
   },
   "BAYU": {
     "name": "Bayu Buana Tbk",
@@ -351,67 +679,155 @@
     "name": "Bank Central Asia Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 4.2,
+      "revenueGrowthYoY": 14.8,
+      "debtToEquity": 0.92,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "ROE 23%, NIM stabil, CASA ratio tertinggi industri"
+    }
   },
   "BBHI": {
     "name": "Allo Bank Indonesia Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan Digital",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 14,
+      "debtToEquity": 0.68,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Bank Harda, digital transformation"
+    }
   },
   "BBKP": {
     "name": "Bank KB Bukopin Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 0.5,
+      "revenueGrowthYoY": 3.2,
+      "debtToEquity": 1.35,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Bank Bukopin transformasi, kinerja membaik bertahap"
+    }
   },
   "BBLD": {
     "name": "Buana Finance Tbk",
     "sector": "Keuangan",
     "subsector": "Pembiayaan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BBMD": {
     "name": "Bank Mestika Dharma Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Bank Mestika Dharma, profitabilitas baik"
+    }
   },
   "BBNI": {
     "name": "Bank Negara Indonesia (Persero) Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.8,
+      "revenueGrowthYoY": 11.5,
+      "debtToEquity": 1.1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Fokus segmen korporasi dan konsumer, NPL membaik"
+    }
   },
   "BBRI": {
     "name": "Bank Rakyat Indonesia (Persero) Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3.1,
+      "revenueGrowthYoY": 12.3,
+      "debtToEquity": 1.05,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Kredit UMKM tumbuh 12% YoY, NPL terkendali 3.1%"
+    }
   },
   "BBTN": {
     "name": "Bank Tabungan Negara (Persero) Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.1,
+      "revenueGrowthYoY": 9.8,
+      "debtToEquity": 1.45,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "KPR subsidi tumbuh, NPL masih elevated"
+    }
   },
   "BBYB": {
     "name": "Bank Neo Commerce Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan Digital",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 22,
+      "debtToEquity": 0.4,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Bank neo, pertumbuhan tinggi"
+    }
   },
   "BCAP": {
     "name": "MNC Kapital Indonesia Tbk",
     "sector": "Keuangan",
     "subsector": "Holding Keuangan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BCIC": {
     "name": "Bank Jtrust Indonesia Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BCIP": {
     "name": "Bumi Citra Permai Tbk",
@@ -423,31 +839,71 @@
     "name": "Bank Danamon Indonesia Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BEKS": {
     "name": "Bank Pembangunan Daerah Banten Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BELI": {
     "name": "Global Digital Niaga Tbk (Blibli)",
     "sector": "Teknologi",
     "subsector": "Platform Digital",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 6,
+      "revenueGrowthYoY": 20,
+      "debtToEquity": 0.35,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BEST": {
     "name": "Bekasi Fajar Industrial Estate Tbk",
     "sector": "Properti",
     "subsector": "Kawasan Industri",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 15,
+      "debtToEquity": 0.9,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BFIN": {
     "name": "BFI Finance Indonesia Tbk",
     "sector": "Keuangan",
     "subsector": "Multifinance",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3.5,
+      "revenueGrowthYoY": 12.5,
+      "debtToEquity": 2.8,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "BFI Finance, multifinance, NPF terkendali"
+    }
   },
   "BGTG": {
     "name": "Bank Ganesha Tbk",
@@ -477,7 +933,15 @@
     "name": "Astrindo Nusantara Infrastruktur Tbk",
     "sector": "Energi",
     "subsector": "Minyak & Gas",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BIPP": {
     "name": "Bhuwanatala Indah Permai Tbk",
@@ -489,25 +953,57 @@
     "name": "Blue Bird Tbk",
     "sector": "Infrastruktur",
     "subsector": "Transportasi Darat",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3.5,
+      "revenueGrowthYoY": 12,
+      "debtToEquity": 0.42,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Blue Bird, taksi premium & logistik, ride-hailing recovery"
+    }
   },
   "BISI": {
     "name": "Bisi International Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Agrikultur",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BJBR": {
     "name": "Bank Pembangunan Daerah Jawa Barat dan Banten Tbk",
     "sector": "Keuangan",
     "subsector": "BPD",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BJTM": {
     "name": "Bank Pembangunan Daerah Jawa Timur Tbk",
     "sector": "Keuangan",
     "subsector": "BPD",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 8.2,
+      "debtToEquity": 0.85,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Bank daerah Jawa Timur, dividen yield tinggi"
+    }
   },
   "BKDP": {
     "name": "Bukit Darmo Property Tbk",
@@ -519,91 +1015,211 @@
     "name": "Sentul City Tbk",
     "sector": "Properti",
     "subsector": "Properti Residensial",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 15,
+      "debtToEquity": 0.9,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BKSW": {
     "name": "Bank QNB Indonesia Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BLTA": {
     "name": "Berlian Laju Tanker Tbk",
     "sector": "Infrastruktur",
     "subsector": "Transportasi Laut",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BLTZ": {
     "name": "Graha Layar Prima Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Hiburan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BMAS": {
     "name": "Bank Maspion Indonesia Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BMHS": {
     "name": "Bundamedik Tbk",
     "sector": "Kesehatan",
     "subsector": "Rumah Sakit",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 16,
+      "debtToEquity": 0.42,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BMRI": {
     "name": "Bank Mandiri (Persero) Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 19.8,
+      "debtToEquity": 0.98,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "NII naik signifikan, fee-based income tumbuh kuat"
+    }
   },
   "BMTR": {
     "name": "Global Mediacom Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Penyiaran",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BNBA": {
     "name": "Bank Bumi Arta Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BNGA": {
     "name": "Bank CIMB Niaga Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BNII": {
     "name": "Bank Maybank Indonesia Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BNLI": {
     "name": "Bank Permata Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BOLT": {
     "name": "Garuda Metalindo Tbk",
     "sector": "Industri",
     "subsector": "Komponen Otomotif",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 7,
+      "debtToEquity": 0.75,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BORN": {
     "name": "Borneo Lumbung Energi & Metal Tbk",
     "sector": "Energi",
     "subsector": "Batubara",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BPFI": {
     "name": "Batavia Prosperindo Finance Tbk",
     "sector": "Keuangan",
     "subsector": "Pembiayaan",
-    "board": "Pengembangan"
+    "board": "Pengembangan",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 9,
+      "debtToEquity": 2.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Batavia Prosperindo Finance"
+    }
   },
   "BPII": {
     "name": "Batavia Prosperindo Internasional Tbk",
@@ -621,31 +1237,71 @@
     "name": "Indo Kordsa Tbk",
     "sector": "Industri",
     "subsector": "Komponen Otomotif",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 7,
+      "debtToEquity": 0.75,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BREN": {
     "name": "Barito Renewables Energy Tbk",
     "sector": "Energi",
     "subsector": "Energi Terbarukan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BRIS": {
     "name": "Bank Syariah Indonesia Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan Syariah",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BRMS": {
     "name": "Bumi Resources Minerals Tbk",
     "sector": "Barang Baku",
     "subsector": "Metal Mining",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BRPT": {
     "name": "Barito Pacific Tbk",
     "sector": "Barang Baku",
     "subsector": "Kimia Dasar",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BRRC": {
     "name": "Raja Roti Cemerlang Tbk",
@@ -657,19 +1313,43 @@
     "name": "Bumi Serpong Damai Tbk",
     "sector": "Properti",
     "subsector": "Pengembang Properti",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 8.5,
+      "revenueGrowthYoY": 22,
+      "debtToEquity": 0.58,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "BSD City, marketing sales record, land bank besar"
+    }
   },
   "BSIM": {
     "name": "Bank Sinarmas Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BSSR": {
     "name": "Baramulti Suksessarana Tbk",
     "sector": "Energi",
     "subsector": "Batubara",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BSWD": {
     "name": "Bank of India Indonesia Tbk",
@@ -693,67 +1373,155 @@
     "name": "Bank BTPN Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BTPS": {
     "name": "Bank BTPN Syariah Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan Syariah",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3.8,
+      "revenueGrowthYoY": 15.2,
+      "debtToEquity": 0.72,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Syariah mikro, pertumbuhan nasabah tinggi"
+    }
   },
   "BUDI": {
     "name": "Budi Starch & Sweetener Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Makanan & Minuman",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BUKA": {
     "name": "Bukalapak.com Tbk",
     "sector": "Teknologi",
     "subsector": "Platform Digital",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 18,
+      "debtToEquity": 0.22,
+      "cashflowOp": "negative",
+      "epsTrend": "loss",
+      "notes": "Bukalapak, fokus MITRA rural, marketplace tertekan"
+    }
   },
   "BULL": {
     "name": "Buana Lintas Lautan Tbk",
     "sector": "Perindustrian",
     "subsector": "Pelayaran",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.7,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BUMI": {
     "name": "Bumi Resources Tbk",
     "sector": "Energi",
     "subsector": "Batu Bara",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BUVA": {
     "name": "Bukit Uluwatu Villa Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Hotel",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BVIC": {
     "name": "Bank Victoria International Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BWPT": {
     "name": "Eagle High Plantations Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Perkebunan Sawit",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "BYAN": {
     "name": "Bayan Resources Tbk",
     "sector": "Energi",
     "subsector": "Batu Bara",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": -6,
+      "revenueGrowthYoY": -20,
+      "debtToEquity": 0.12,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "declining",
+      "notes": "Bayan Resources, hutang hampir nol, ekuitas kuat"
+    }
   },
   "CAMP": {
     "name": "Campina Ice Cream Industry Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Produk Susu Olahan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "CARE": {
     "name": "Metro Healthcare Indonesia Tbk",
@@ -771,19 +1539,43 @@
     "name": "Bangun Kosambi Sukses Tbk",
     "sector": "Properti",
     "subsector": "Kawasan Industri",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 15,
+      "debtToEquity": 0.9,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "CDIA": {
     "name": "Chandra Daya Investasi Tbk",
     "sector": "Infrastruktur",
     "subsector": "Investasi Infrastruktur",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "CEKA": {
     "name": "Wilmar Cahaya Indonesia Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Makanan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "CENT": {
     "name": "Centratama Telekomunikasi Indonesia Tbk",
@@ -795,7 +1587,15 @@
     "name": "Clipan Finance Indonesia Tbk",
     "sector": "Keuangan",
     "subsector": "Pembiayaan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "CINT": {
     "name": "Chitose Internasional Tbk",
@@ -807,7 +1607,15 @@
     "name": "Cita Mineral Investindo Tbk",
     "sector": "Barang Baku",
     "subsector": "Logam & Mineral",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "CKRA": {
     "name": "Cakra Mineral Tbk",
@@ -825,25 +1633,57 @@
     "name": "Sariguna Primatirta Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Minuman Ringan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "CMNP": {
     "name": "Citra Marga Nusaphala Persada Tbk",
     "sector": "Infrastruktur",
     "subsector": "Jalan Tol",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "CMPP": {
     "name": "AirAsia Indonesia Tbk",
     "sector": "Infrastruktur",
     "subsector": "Maskapai",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "CMRY": {
     "name": "Cisarua Mountain Dairy Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Produk Susu Olahan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "COIN": {
     "name": "Indokripto Koin Semesta Tbk",
@@ -861,31 +1701,71 @@
     "name": "Charoen Pokphand Indonesia Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Peternakan & Unggas",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "CSAP": {
     "name": "Catur Sentosa Adiprana Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Ritel",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "CTBN": {
     "name": "Citra Tubindo Tbk",
     "sector": "Barang Baku",
     "subsector": "Baja",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "CTRA": {
     "name": "Ciputra Development Tbk",
     "sector": "Properti",
     "subsector": "Pengembang Properti",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 7,
+      "revenueGrowthYoY": 18.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Ciputra, diversifikasi proyek, marketing sales kuat"
+    }
   },
   "CUAN": {
     "name": "Petrindo Jaya Kreasi Tbk",
     "sector": "Energi",
     "subsector": "Batubara",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "DAJK": {
     "name": "Dwi Aneka Jaya Kemasindo Tbk",
@@ -897,13 +1777,29 @@
     "name": "Duta Anggada Realty Tbk",
     "sector": "Properti",
     "subsector": "Properti Komersial",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 15,
+      "debtToEquity": 0.9,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "DCII": {
     "name": "DCI Indonesia Tbk",
     "sector": "Teknologi",
     "subsector": "Pusat Data",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 6,
+      "revenueGrowthYoY": 20,
+      "debtToEquity": 0.35,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "DEFI": {
     "name": "Danasupra Erapacific Tbk",
@@ -915,7 +1811,15 @@
     "name": "Darma Henwa Tbk",
     "sector": "Energi",
     "subsector": "Jasa Pertambangan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "DFAM": {
     "name": "Dafam Property Indonesia Tbk",
@@ -927,19 +1831,43 @@
     "name": "Nusa Konstruksi Enjiniring Tbk",
     "sector": "Infrastruktur",
     "subsector": "Konstruksi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "DGNS": {
     "name": "Diagnos Laboratorium Utama Tbk",
     "sector": "Kesehatan",
     "subsector": "Laboratorium",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 16,
+      "debtToEquity": 0.42,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "DILD": {
     "name": "Intiland Development Tbk",
     "sector": "Properti",
     "subsector": "Pengembang Properti",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 15,
+      "debtToEquity": 0.9,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "DIVA": {
     "name": "Distribusi Voucher Nusantara Tbk",
@@ -951,7 +1879,15 @@
     "name": "Central Omega Resources Tbk",
     "sector": "Barang Baku",
     "subsector": "Nikel",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 6,
+      "debtToEquity": 0.35,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Central Omega Resources, nikel kecil"
+    }
   },
   "DKHH": {
     "name": "Cipta Sarana Medika Tbk",
@@ -963,37 +1899,85 @@
     "name": "Delta Djakarta Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Minuman",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "DMAS": {
     "name": "Puradelta Lestari Tbk",
     "sector": "Properti",
     "subsector": "Kawasan Industri",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 12,
+      "revenueGrowthYoY": 35,
+      "debtToEquity": 0.15,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Puradelta Lestari, Deltamas kawasan industri, demand dari relokasi pabrik China"
+    }
   },
   "DMMX": {
     "name": "Digital Mediatama Maxima Tbk",
     "sector": "Teknologi",
     "subsector": "Teknologi Iklan Digital",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 12,
+      "revenueGrowthYoY": 45,
+      "debtToEquity": 0.18,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Digital Mediatama Maxima, programmatic ads, digital OOH"
+    }
   },
   "DMND": {
     "name": "Diamond Food Indonesia Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Makanan & Minuman",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "DNAR": {
     "name": "Bank Oke Indonesia Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "DOID": {
     "name": "Delta Dunia Makmur Tbk",
     "sector": "Energi",
     "subsector": "Jasa Pertambangan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "DOSS": {
     "name": "Dossiehaus Tbk",
@@ -1005,7 +1989,15 @@
     "name": "Duta Pertiwi Nusantara Tbk",
     "sector": "Barang Baku",
     "subsector": "Kimia",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "DPUM": {
     "name": "Duta Pamungkas Tbk",
@@ -1017,7 +2009,15 @@
     "name": "Dharma Polimetal Tbk",
     "sector": "Industri",
     "subsector": "Komponen Otomotif",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 7,
+      "debtToEquity": 0.75,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "DSFI": {
     "name": "Dharma Samudera Fishing Industries Tbk",
@@ -1029,13 +2029,29 @@
     "name": "Dharma Satya Nusantara Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Perkebunan Sawit",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 0.58,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Dharma Satya Nusantara, sawit + kayu"
+    }
   },
   "DSSA": {
     "name": "Dian Swastatika Sentosa Tbk",
     "sector": "Energi",
     "subsector": "Pertambangan Batubara",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "DUCK": {
     "name": "Jaya Bersama Indo Tbk",
@@ -1047,19 +2063,43 @@
     "name": "Duta Pertiwi Tbk",
     "sector": "Properti",
     "subsector": "Properti Komersial",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 15,
+      "debtToEquity": 0.9,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "DVLA": {
     "name": "Darya-Varia Laboratoria Tbk",
     "sector": "Kesehatan",
     "subsector": "Farmasi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.2,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.25,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Darya-Varia, produk OTC kuat"
+    }
   },
   "DYAN": {
     "name": "Dyandra Media International Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Media",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "EAST": {
     "name": "Eastparc Hotel Tbk",
@@ -1071,13 +2111,29 @@
     "name": "Electronic City Indonesia Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Ritel",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "EDGE": {
     "name": "Indosat Ooredoo Hutchison (Data Center) Tbk",
     "sector": "Teknologi",
     "subsector": "Pusat Data",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 6,
+      "revenueGrowthYoY": 20,
+      "debtToEquity": 0.35,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "EKAD": {
     "name": "Ekadharma International Tbk",
@@ -1089,19 +2145,43 @@
     "name": "Elnusa Tbk",
     "sector": "Energi",
     "subsector": "Jasa Minyak & Gas",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "ELTY": {
     "name": "Bakrieland Development Tbk",
     "sector": "Properti",
     "subsector": "Properti",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 15,
+      "debtToEquity": 0.9,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "EMAS": {
     "name": "Merdeka Gold Resources Tbk",
     "sector": "Barang Baku",
     "subsector": "Pertambangan Emas",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "EMDE": {
     "name": "Megapolitan Developments Tbk",
@@ -1113,13 +2193,29 @@
     "name": "Elang Mahkota Teknologi Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Penyiaran & Digital",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3.5,
+      "revenueGrowthYoY": 12,
+      "debtToEquity": 0.45,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Elang Mahkota, media + edukasi + fintech"
+    }
   },
   "ENRG": {
     "name": "Energi Mega Persada Tbk",
     "sector": "Energi",
     "subsector": "Minyak & Gas",
-    "board": "Pengembangan"
+    "board": "Pengembangan",
+    "fundamental": {
+      "revenueGrowthQoQ": 3.5,
+      "revenueGrowthYoY": 12,
+      "debtToEquity": 1.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Energi Mega Persada, leverage tinggi"
+    }
   },
   "ENVY": {
     "name": "Envy Technologies Indonesia Tbk",
@@ -1131,43 +2227,99 @@
     "name": "Enseval Putera Megatrading Tbk",
     "sector": "Perindustrian",
     "subsector": "Distribusi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.7,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "ERAA": {
     "name": "Erajaya Swasembada Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Ritel Elektronik",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 11,
+      "debtToEquity": 0.62,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Erajaya, distributor gadget, omnichannel"
+    }
   },
   "ESSA": {
     "name": "Essa Industries Indonesia Tbk",
     "sector": "Energi",
     "subsector": "Minyak & Gas",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 7.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Surya Esa Perkasa, petrokimia, ekspansi amonia"
+    }
   },
   "ESSE": {
     "name": "Surya Citra Televisi Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Televisi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "EXCL": {
     "name": "XL Axiata Tbk",
     "sector": "Infrastruktur",
     "subsector": "Telekomunikasi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 7.2,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Merger dengan Smartfren akan perkuat posisi pasar"
+    }
   },
   "FAST": {
     "name": "Fast Food Indonesia Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Rumah Makan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "FASW": {
     "name": "Fajar Surya Wisesa Tbk",
     "sector": "Barang Baku",
     "subsector": "Kertas",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "FILM": {
     "name": "MD Pictures Tbk",
@@ -1203,13 +2355,29 @@
     "name": "Fore Kopi Indonesia Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Restoran & Kafe",
-    "board": "Pengembangan"
+    "board": "Pengembangan",
+    "fundamental": {
+      "revenueGrowthQoQ": 7,
+      "revenueGrowthYoY": 25,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Forestreet, kopi & F&B digital, ekspansi gerai"
+    }
   },
   "FORU": {
     "name": "Fortune Indonesia Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Media",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "FORZ": {
     "name": "Forza Land Indonesia Tbk",
@@ -1221,13 +2389,29 @@
     "name": "Lotte Chemical Titan Tbk",
     "sector": "Barang Baku",
     "subsector": "Petrokimia",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "FREN": {
     "name": "Smartfren Telecom Tbk",
     "sector": "Infrastruktur",
     "subsector": "Telekomunikasi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "FWCT": {
     "name": "Wijaya Cahaya Timber Tbk",
@@ -1263,31 +2447,71 @@
     "name": "Golden Energy Mines Tbk",
     "sector": "Energi",
     "subsector": "Batubara",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "GGRM": {
     "name": "Gudang Garam Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Rokok",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 4.5,
+      "debtToEquity": 0.35,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Gudang Garam, rokok kretek, volume flat, cukai naik"
+    }
   },
   "GGRP": {
     "name": "Gunung Garuda Tbk",
     "sector": "Barang Baku",
     "subsector": "Baja",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "GIAA": {
     "name": "Garuda Indonesia (Persero) Tbk",
     "sector": "Infrastruktur",
     "subsector": "Maskapai",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "GJTL": {
     "name": "Gajah Tunggal Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Ban",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "GLOB": {
     "name": "Global Teleshop Tbk",
@@ -1317,13 +2541,29 @@
     "name": "Garudafood Putra Putri Jaya Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Makanan Olahan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "GOTO": {
     "name": "GoTo Gojek Tokopedia Tbk",
     "sector": "Teknologi",
     "subsector": "Platform Digital",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 8.5,
+      "revenueGrowthYoY": 28,
+      "debtToEquity": 0.35,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "GoTo, GTV tumbuh, path to profitability, persaingan dengan Shopee/TikTok ketat"
+    }
   },
   "GPRA": {
     "name": "Perdana Gapuraprima Tbk",
@@ -1365,7 +2605,15 @@
     "name": "Haloni Jane Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Ritel",
-    "board": "Pengembangan"
+    "board": "Pengembangan",
+    "fundamental": {
+      "revenueGrowthQoQ": 8,
+      "revenueGrowthYoY": 28,
+      "debtToEquity": 0.35,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Halo Healthcare, marketplace farmasi digital"
+    }
   },
   "HATM": {
     "name": "Habco Trans Maritima Tbk",
@@ -1383,7 +2631,15 @@
     "name": "Medikaloka Hermina Tbk",
     "sector": "Kesehatan",
     "subsector": "Rumah Sakit",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5.5,
+      "revenueGrowthYoY": 18.5,
+      "debtToEquity": 0.48,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Medikaloka Hermina, RS kelas menengah, aksesibilitas BPJS"
+    }
   },
   "HELI": {
     "name": "Helicopter Indonesia Tbk",
@@ -1395,7 +2651,15 @@
     "name": "Hero Supermarket Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Ritel",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "HGII": {
     "name": "Hero Global Investment Tbk",
@@ -1407,19 +2671,43 @@
     "name": "Humpuss Intermoda Transportasi Tbk",
     "sector": "Infrastruktur",
     "subsector": "Transportasi Laut",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "HMSP": {
     "name": "H.M. Sampoerna Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Rokok",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 0.8,
+      "revenueGrowthYoY": 2.5,
+      "debtToEquity": 0.28,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "HM Sampoerna, dividen tinggi, volume rokok stagnan"
+    }
   },
   "HOKI": {
     "name": "Buyung Poetra Sembada Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Makanan Olahan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "HOME": {
     "name": "Hotel Mandarine Regency Tbk",
@@ -1443,7 +2731,15 @@
     "name": "Harum Energy Tbk",
     "sector": "Energi",
     "subsector": "Batu Bara",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": -2.5,
+      "revenueGrowthYoY": -10,
+      "debtToEquity": 0.08,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "declining",
+      "notes": "Diversifikasi ke nikel dan EBT"
+    }
   },
   "IBFN": {
     "name": "Intan Baruprana Finance Tbk",
@@ -1455,13 +2751,29 @@
     "name": "Inti Bangun Sejahtera Tbk",
     "sector": "Infrastruktur",
     "subsector": "Menara Telekomunikasi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "ICBP": {
     "name": "Indofood CBP Sukses Makmur Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Makanan Olahan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3.5,
+      "revenueGrowthYoY": 12,
+      "debtToEquity": 1.05,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Indofood CBP, Indomie ekspansi global, margin stabil"
+    }
   },
   "ICLAS": {
     "name": "Izuzu Tbk",
@@ -1491,7 +2803,15 @@
     "name": "Champion Pacific Indonesia Tbk",
     "sector": "Barang Baku",
     "subsector": "Wadah & Kemasan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "IGTA": {
     "name": "Intikeramik Alamasri Industri Tbk",
@@ -1521,25 +2841,57 @@
     "name": "Indomobil Sukses Internasional Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Otomotif",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "IMJS": {
     "name": "Indomobil Multi Jasa Tbk",
     "sector": "Keuangan",
     "subsector": "Pembiayaan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "IMPC": {
     "name": "Impack Pratama Industri Tbk",
     "sector": "Barang Baku",
     "subsector": "Material Konstruksi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "INAF": {
     "name": "Indofarma Tbk",
     "sector": "Kesehatan",
     "subsector": "Farmasi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Indofarma, BUMN, transformasi"
+    }
   },
   "INCI": {
     "name": "Intan Wijaya International Tbk",
@@ -1551,49 +2903,113 @@
     "name": "Vale Indonesia Tbk",
     "sector": "Barang Baku",
     "subsector": "Logam & Mineral",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": -1.5,
+      "revenueGrowthYoY": -5,
+      "debtToEquity": 0.15,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Vale Indonesia, nikel, harga volatile, ekspansi proyek besar"
+    }
   },
   "INDF": {
     "name": "Indofood Sukses Makmur Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Makanan Olahan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.8,
+      "revenueGrowthYoY": 9,
+      "debtToEquity": 0.82,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Indofood, diversifikasi agri & konsumer"
+    }
   },
   "INDS": {
     "name": "Indospring Tbk",
     "sector": "Industri",
     "subsector": "Komponen Otomotif",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 7,
+      "debtToEquity": 0.75,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "INDY": {
     "name": "Indika Energy Tbk",
     "sector": "Energi",
     "subsector": "Batubara",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "INET": {
     "name": "Indointernet Tbk",
     "sector": "Teknologi",
     "subsector": "Layanan Internet",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 6,
+      "revenueGrowthYoY": 20,
+      "debtToEquity": 0.35,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "INKP": {
     "name": "Indah Kiat Pulp & Paper Tbk",
     "sector": "Barang Baku",
     "subsector": "Kertas",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "INPC": {
     "name": "Bank Artha Graha Internasional Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "INPP": {
     "name": "Indonesian Paradise Property Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Hotel & Resor",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "INPS": {
     "name": "Indah Prakasa Sentosa Tbk",
@@ -1605,7 +3021,15 @@
     "name": "Toba Pulp Lestari Tbk",
     "sector": "Barang Baku",
     "subsector": "Kertas & Pulp",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "INTD": {
     "name": "Inter Delta Tbk",
@@ -1617,31 +3041,71 @@
     "name": "Indocement Tunggal Prakarsa Tbk",
     "sector": "Barang Baku",
     "subsector": "Material Konstruksi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 4.5,
+      "debtToEquity": 0.25,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Indocement, free cash tinggi, dividen besar, volume semen flat"
+    }
   },
   "IPCC": {
     "name": "Indonesia Kendaraan Terminal Tbk",
     "sector": "Infrastruktur",
     "subsector": "Pelabuhan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "IPCM": {
     "name": "Jasa Armada Indonesia Tbk",
     "sector": "Infrastruktur",
     "subsector": "Pelabuhan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "IPOL": {
     "name": "Indopoly Swakarsa Industry Tbk",
     "sector": "Barang Baku",
     "subsector": "Plastik",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "IPOT": {
     "name": "Indo Premier Sekuritas",
     "sector": "Keuangan",
     "subsector": "Sekuritas",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "IPPE": {
     "name": "Indo Pureco Pratama Tbk",
@@ -1665,7 +3129,15 @@
     "name": "Indosat Tbk",
     "sector": "Infrastruktur",
     "subsector": "Telekomunikasi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 9.5,
+      "debtToEquity": 1.85,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Post-merger Tri, sinergi mulai terlihat, leverage tinggi"
+    }
   },
   "ISEA": {
     "name": "Timah Industri Tbk",
@@ -1677,7 +3149,15 @@
     "name": "Steel Pipe Industry of Indonesia Tbk",
     "sector": "Barang Baku",
     "subsector": "Baja",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "ITIC": {
     "name": "Indonesian Tobacco Tbk",
@@ -1689,13 +3169,29 @@
     "name": "Indo Tambangraya Megah Tbk",
     "sector": "Energi",
     "subsector": "Batu Bara",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": -4.5,
+      "revenueGrowthYoY": -16.5,
+      "debtToEquity": 0.18,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "declining",
+      "notes": "Indo Tambangraya, free cashflow tinggi, dividen yield menarik"
+    }
   },
   "JAWA": {
     "name": "Jaya Agra Wattie Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Perkebunan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "JECC": {
     "name": "Jembo Cable Company Tbk",
@@ -1707,13 +3203,29 @@
     "name": "Jakarta International Hotels & Development Tbk",
     "sector": "Properti",
     "subsector": "Hotel",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 15,
+      "debtToEquity": 0.9,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "JKON": {
     "name": "Jaya Konstruksi Manggala Pratama Tbk",
     "sector": "Infrastruktur",
     "subsector": "Konstruksi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "JKSW": {
     "name": "Jakarta Kyoei Steel Works Tbk",
@@ -1731,13 +3243,29 @@
     "name": "Japfa Comfeed Indonesia Tbk",
     "sector": "Barang Baku",
     "subsector": "Kimia Pertanian",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "JRPT": {
     "name": "Jaya Real Property Tbk",
     "sector": "Properti",
     "subsector": "Properti Residensial",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 15,
+      "debtToEquity": 0.9,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "JSKY": {
     "name": "Luas Maju Makmur Tbk",
@@ -1749,13 +3277,29 @@
     "name": "Jasa Marga (Persero) Tbk",
     "sector": "Infrastruktur",
     "subsector": "Jalan Tol",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 4.5,
+      "revenueGrowthYoY": 16,
+      "debtToEquity": 2.2,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Jasa Marga, traffic tol naik, leverage tinggi tapi predictable cash flow"
+    }
   },
   "JSPT": {
     "name": "Jakarta Setiabudi Internasional Tbk",
     "sector": "Properti",
     "subsector": "Hotel",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 15,
+      "debtToEquity": 0.9,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "JTON": {
     "name": "Jotun Indonesia Tbk",
@@ -1773,7 +3317,15 @@
     "name": "Kimia Farma Tbk",
     "sector": "Kesehatan",
     "subsector": "Farmasi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 9,
+      "debtToEquity": 0.88,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Kimia Farma, BUMN farmasi, jaringan apotek luas"
+    }
   },
   "KAQI": {
     "name": "Jantra Grupo Indonesia Tbk",
@@ -1815,13 +3367,29 @@
     "name": "Mulia Boga Raya Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Makanan & Minuman",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "KIAS": {
     "name": "Keramika Indonesia Assosiasi Tbk",
     "sector": "Barang Baku",
     "subsector": "Keramik",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "KICI": {
     "name": "Kedaung Indah Can Tbk",
@@ -1833,7 +3401,15 @@
     "name": "Kawasan Industri Jababeka Tbk",
     "sector": "Properti",
     "subsector": "Kawasan Industri",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 4,
+      "revenueGrowthYoY": 14,
+      "debtToEquity": 0.88,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Kawasan industri Jababeka, recurring income stabil"
+    }
   },
   "KING": {
     "name": "Royalindo Investa Wijaya Tbk",
@@ -1845,7 +3421,15 @@
     "name": "Kino Indonesia Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Produk Perawatan Tubuh",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10.5,
+      "debtToEquity": 0.6,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Kino Indonesia, personal care + F&B"
+    }
   },
   "KIOS": {
     "name": "Kioson Komersial Indonesia Tbk",
@@ -1869,7 +3453,15 @@
     "name": "Kalbe Farma Tbk",
     "sector": "Kesehatan",
     "subsector": "Farmasi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3.8,
+      "revenueGrowthYoY": 13,
+      "debtToEquity": 0.22,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Kalbe Farma, farmasi + nutrisi, ekspor tumbuh"
+    }
   },
   "KOIN": {
     "name": "Kokoh Inti Arebama Tbk",
@@ -1887,19 +3479,43 @@
     "name": "MNC Land Tbk",
     "sector": "Properti",
     "subsector": "Properti & Hotel",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 15,
+      "debtToEquity": 0.9,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "KRAS": {
     "name": "Krakatau Steel (Persero) Tbk",
     "sector": "Industri",
     "subsector": "Baja & Besi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": -1,
+      "revenueGrowthYoY": -5,
+      "debtToEquity": 2.8,
+      "cashflowOp": "negative",
+      "epsTrend": "loss",
+      "notes": "Krakatau Steel, leverage sangat tinggi, restrukturisasi panjang"
+    }
   },
   "KREN": {
     "name": "Kresna Graha Investama Tbk",
     "sector": "Keuangan",
     "subsector": "Investasi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "KRYA": {
     "name": "Bangun Karya Perkasa Jaya Tbk",
@@ -1947,25 +3563,57 @@
     "name": "Logindo Samudramakmur Tbk",
     "sector": "Perindustrian",
     "subsector": "Pelayaran",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.7,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "LIFE": {
     "name": "Asuransi Jiwa Sinarmas MSIG Tbk",
     "sector": "Keuangan",
     "subsector": "Asuransi Jiwa",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "LINK": {
     "name": "Link Net Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Penyiaran Berbayar",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "LION": {
     "name": "Lion Metal Works Tbk",
     "sector": "Industri",
     "subsector": "Mesin & Komponen",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 7,
+      "debtToEquity": 0.75,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "LMSH": {
     "name": "Lionmesh Prima Tbk",
@@ -1977,13 +3625,29 @@
     "name": "Lippo Cikarang Tbk",
     "sector": "Properti",
     "subsector": "Kawasan Industri",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 15,
+      "debtToEquity": 0.9,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "LPGI": {
     "name": "Lippo General Insurance Tbk",
     "sector": "Keuangan",
     "subsector": "Asuransi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "LPIN": {
     "name": "Multi Prima Sejahtera Tbk",
@@ -1995,7 +3659,15 @@
     "name": "Lippo Karawaci Tbk",
     "sector": "Properti",
     "subsector": "Pengembang Properti",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 15,
+      "debtToEquity": 0.9,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "LPLI": {
     "name": "Star Pacific Tbk",
@@ -2007,7 +3679,15 @@
     "name": "Matahari Department Store Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Ritel Barang Sekunder",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 0.45,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Matahari Dept Store, dividen tinggi, efisiensi biaya"
+    }
   },
   "LQ45": {
     "name": "Indeks LQ45",
@@ -2025,13 +3705,29 @@
     "name": "PP London Sumatra Indonesia Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Perkebunan Kelapa Sawit",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.8,
+      "revenueGrowthYoY": 9,
+      "debtToEquity": 0.18,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "PP London Sumatra, DER sangat rendah, free cash tinggi"
+    }
   },
   "LTLS": {
     "name": "Lautan Luas Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Distribusi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "LUCK": {
     "name": "Sentosa Utama Lestari Tbk",
@@ -2067,7 +3763,15 @@
     "name": "Malindo Feedmill Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Peternakan & Unggas",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MAMI": {
     "name": "Mas Murni Indonesia Tbk",
@@ -2079,19 +3783,43 @@
     "name": "MAP Aktif Adiperkasa Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Ritel Olahraga",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MAPI": {
     "name": "Mitra Adiperkasa Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Ritel & Distributor",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 18.5,
+      "debtToEquity": 1.1,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "MAP, ritel premium & sports, SSSG positif"
+    }
   },
   "MAPS": {
     "name": "MAP Aktif Adiperkasa Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Ritel Barang Sekunder",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MARI": {
     "name": "Mahardika Inti Mitra Tbk",
@@ -2103,91 +3831,211 @@
     "name": "Multistrada Arah Sarana Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Ban",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MAYA": {
     "name": "Bank Mayapada Internasional Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MBAP": {
     "name": "Mitrabara Adiperdana Tbk",
     "sector": "Energi",
     "subsector": "Batubara",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MBSS": {
     "name": "Mitrabahtera Segara Sejati Tbk",
     "sector": "Energi",
     "subsector": "Distribusi Batu Bara",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MCAS": {
     "name": "M Cash Integrasi Tbk",
     "sector": "Teknologi",
     "subsector": "Fintech",
-    "board": "Pengembangan"
+    "board": "Pengembangan",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 9,
+      "debtToEquity": 0.4,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "MCA, SPBU + ritel"
+    }
   },
   "MCOL": {
     "name": "Prima Andalan Mandiri Tbk",
     "sector": "Energi",
     "subsector": "Batubara",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MCOR": {
     "name": "Bank China Construction Bank Indonesia Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MDIA": {
     "name": "Intermedia Capital Tbk",
     "sector": "Perindustrian",
     "subsector": "Media",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.7,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MDKA": {
     "name": "Merdeka Copper Gold Tbk",
     "sector": "Barang Baku",
     "subsector": "Emas & Tembaga",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5.5,
+      "revenueGrowthYoY": 22,
+      "debtToEquity": 1.05,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Merdeka Copper Gold, ekspansi besar, leverage naik untuk ekspansi"
+    }
   },
   "MDLN": {
     "name": "Modernland Realty Tbk",
     "sector": "Properti",
     "subsector": "Properti Residensial",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 15,
+      "debtToEquity": 0.9,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MEDC": {
     "name": "Medco Energi Internasional Tbk",
     "sector": "Energi",
     "subsector": "Minyak & Gas",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 18,
+      "debtToEquity": 1.1,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Medco Energi, produksi migas naik, ekspansi Asia Tenggara"
+    }
   },
   "MEGA": {
     "name": "Bank Mega Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MERK": {
     "name": "Merck Tbk",
     "sector": "Kesehatan",
     "subsector": "Farmasi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 7.5,
+      "debtToEquity": 0.28,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Merck, farmasi ethics, dividen rutin"
+    }
   },
   "META": {
     "name": "Nusantara Infrastructure Tbk",
     "sector": "Infrastruktur",
     "subsector": "Jalan Tol",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MFIN": {
     "name": "Mandala Multifinance Tbk",
     "sector": "Keuangan",
     "subsector": "Multifinance",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10.5,
+      "debtToEquity": 2.5,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Mandala Finance, multifinance"
+    }
   },
   "MGNA": {
     "name": "Magna Investama Mandiri Tbk",
@@ -2199,13 +4047,29 @@
     "name": "Midi Utama Indonesia Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Minimarket",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MIKA": {
     "name": "Mitra Keluarga Karyasehat Tbk",
     "sector": "Kesehatan",
     "subsector": "Rumah Sakit",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 6.5,
+      "revenueGrowthYoY": 22,
+      "debtToEquity": 0.32,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Mitra Keluarga, RS premium, utilisasi tinggi, ekspansi"
+    }
   },
   "MINA": {
     "name": "Sanurhasta Mitra Tbk",
@@ -2223,7 +4087,15 @@
     "name": "Mitra Investindo Tbk",
     "sector": "Energi",
     "subsector": "Minyak & Gas",
-    "board": "Pengembangan"
+    "board": "Pengembangan",
+    "fundamental": {
+      "revenueGrowthQoQ": -1,
+      "revenueGrowthYoY": -3,
+      "debtToEquity": 0.3,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Mitra Investindo, batu kapur"
+    }
   },
   "MKNT": {
     "name": "Mitra Komunikasi Nusantara Tbk",
@@ -2235,43 +4107,99 @@
     "name": "Metropolitan Kentjana Tbk",
     "sector": "Properti",
     "subsector": "Pusat Perbelanjaan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 15,
+      "debtToEquity": 0.9,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MLBI": {
     "name": "Multi Bintang Indonesia Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Minuman",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MLIA": {
     "name": "Mulia Industrindo Tbk",
     "sector": "Barang Baku",
     "subsector": "Kaca & Keramik",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MLPL": {
     "name": "Multipolar Tbk",
     "sector": "Perindustrian",
     "subsector": "Holding Multi-Sektor",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.7,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MLPT": {
     "name": "Multipolar Technology Tbk",
     "sector": "Teknologi",
     "subsector": "Layanan IT",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3.5,
+      "revenueGrowthYoY": 12,
+      "debtToEquity": 0.5,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Multipolar Technology, IT services"
+    }
   },
   "MMLP": {
     "name": "Mega Manunggal Property Tbk",
     "sector": "Properti",
     "subsector": "Kawasan Industri",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 15,
+      "debtToEquity": 0.9,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MNCN": {
     "name": "Media Nusantara Citra Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Penyiaran",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 4.5,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Media Nusantara Citra, iklan TV tertekan, iNews streaming"
+    }
   },
   "MPOW": {
     "name": "Megapower Makmur Tbk",
@@ -2283,13 +4211,29 @@
     "name": "Matahari Putra Prima Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Supermarket",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MREI": {
     "name": "Maskapai Reasuransi Indonesia Tbk",
     "sector": "Keuangan",
     "subsector": "Reasuransi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MSIN": {
     "name": "MNC Studios International Tbk",
@@ -2301,7 +4245,15 @@
     "name": "MNC Sky Vision Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "TV Berbayar",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MSTI": {
     "name": "Multisentosa Inti Tbk",
@@ -2313,13 +4265,29 @@
     "name": "Metrodata Electronics Tbk",
     "sector": "Teknologi",
     "subsector": "Distribusi IT",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10.5,
+      "debtToEquity": 0.62,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Metrodata Electronics, distributor IT"
+    }
   },
   "MTEL": {
     "name": "Dayamitra Telekomunikasi Tbk",
     "sector": "Infrastruktur",
     "subsector": "Menara Telekomunikasi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MTFN": {
     "name": "Capitalinc Investment Tbk",
@@ -2331,13 +4299,29 @@
     "name": "Metropolitan Land Tbk",
     "sector": "Properti",
     "subsector": "Pengembang Properti",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 15,
+      "debtToEquity": 0.9,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MTMH": {
     "name": "Murni Sadar Tbk",
     "sector": "Kesehatan",
     "subsector": "Rumah Sakit",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 16,
+      "debtToEquity": 0.42,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MTPS": {
     "name": "Meta Epsi Tbk",
@@ -2361,13 +4345,29 @@
     "name": "Samindo Resources Tbk",
     "sector": "Energi",
     "subsector": "Batubara",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "MYOR": {
     "name": "Mayora Indah Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Makanan Olahan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3.5,
+      "revenueGrowthYoY": 11.5,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Mayora Indah, ekspansi ekspor agresif"
+    }
   },
   "MYRX": {
     "name": "Hanson International Tbk",
@@ -2379,7 +4379,15 @@
     "name": "Bank Nagari Tbk",
     "sector": "Teknologi",
     "subsector": "Fintech",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 6,
+      "revenueGrowthYoY": 20,
+      "debtToEquity": 0.35,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "NASA": {
     "name": "Aneka Tambang Tbk",
@@ -2403,7 +4411,15 @@
     "name": "Trimegah Bangun Persada Tbk",
     "sector": "Barang Baku",
     "subsector": "Nikel",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "NCMA": {
     "name": "Nusa Cemerlang Medical Tbk",
@@ -2415,7 +4431,15 @@
     "name": "Pelayaran Nelly Dwi Putri Tbk",
     "sector": "Infrastruktur",
     "subsector": "Transportasi Laut",
-    "board": "Pengembangan"
+    "board": "Pengembangan",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 7.5,
+      "debtToEquity": 0.35,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Pelayaran Nelly Dwi Putri"
+    }
   },
   "NETS": {
     "name": "Indonet Tbk",
@@ -2427,7 +4451,15 @@
     "name": "NFC Indonesia Tbk",
     "sector": "Teknologi",
     "subsector": "Fintech",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 6,
+      "revenueGrowthYoY": 20,
+      "debtToEquity": 0.35,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "NICK": {
     "name": "Charnic Capital Tbk",
@@ -2439,7 +4471,15 @@
     "name": "Pelat Timah Nusantara Tbk",
     "sector": "Barang Baku",
     "subsector": "Logam",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 12,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Pelat Timah Nusantara, baja lapis"
+    }
   },
   "NIPS": {
     "name": "Nipress Tbk",
@@ -2457,19 +4497,43 @@
     "name": "Bank OCBC NISP Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "NOBU": {
     "name": "Bank Nationalnobu Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "NRCA": {
     "name": "Nusa Raya Cipta Tbk",
     "sector": "Infrastruktur",
     "subsector": "Konstruksi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 9,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Nusa Raya Cipta, konstruksi swasta"
+    }
   },
   "NTBK": {
     "name": "Nusantara Timur Tbk",
@@ -2505,7 +4569,15 @@
     "name": "Ancora Indonesia Resources Tbk",
     "sector": "Energi",
     "subsector": "Jasa Pertambangan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "OMRE": {
     "name": "Indonesia Prima Property Tbk",
@@ -2517,19 +4589,43 @@
     "name": "Minna Padi Investama Sekuritas Tbk",
     "sector": "Keuangan",
     "subsector": "Sekuritas",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "PALM": {
     "name": "Provident Agro Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Perkebunan Sawit",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 7.5,
+      "debtToEquity": 0.48,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Provident Agro, sawit kecil"
+    }
   },
   "PANI": {
     "name": "Pantai Indah Kapuk Dua Tbk",
     "sector": "Properti",
     "subsector": "Properti & Real Estate",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 15,
+      "debtToEquity": 0.9,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "PANR": {
     "name": "Panorama Sentrawisata Tbk",
@@ -2541,7 +4637,15 @@
     "name": "Panin Sekuritas Tbk",
     "sector": "Keuangan",
     "subsector": "Sekuritas",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "PBID": {
     "name": "Penta Valent Tbk",
@@ -2589,19 +4693,43 @@
     "name": "Phapros Tbk",
     "sector": "Kesehatan",
     "subsector": "Farmasi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 16,
+      "debtToEquity": 0.42,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "PGAS": {
     "name": "Perusahaan Gas Negara Tbk",
     "sector": "Energi",
     "subsector": "Distribusi Gas",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 0.72,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "PGN gas distribusi, regulated revenue stabil"
+    }
   },
   "PGEO": {
     "name": "Pertamina Geothermal Energy Tbk",
     "sector": "Energi",
     "subsector": "Energi Terbarukan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "PGJO": {
     "name": "Tourindo Guide Indonesia Tbk",
@@ -2625,7 +4753,15 @@
     "name": "Pembangunan Jaya Ancol Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Hiburan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "PJHB": {
     "name": "Pelayaran Jaya Hidup Baru Tbk",
@@ -2649,7 +4785,15 @@
     "name": "Plaza Indonesia Realty Tbk",
     "sector": "Properti",
     "subsector": "Pusat Perbelanjaan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 15,
+      "debtToEquity": 0.9,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "PMMP": {
     "name": "Panca Mitra Multiperdana Tbk",
@@ -2661,19 +4805,43 @@
     "name": "Bank Pan Indonesia Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "PNBS": {
     "name": "Bank Panin Dubai Syariah Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan Syariah",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "PNIN": {
     "name": "Paninvest Tbk",
     "sector": "Keuangan",
     "subsector": "Asuransi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10.5,
+      "debtToEquity": 0.32,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Paninvest, holding keuangan Panin Group"
+    }
   },
   "PNSE": {
     "name": "Pudjiadi & Sons Tbk",
@@ -2703,7 +4871,15 @@
     "name": "Nusantara Pelabuhan Handal Tbk",
     "sector": "Infrastruktur",
     "subsector": "Pelabuhan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "PPOL": {
     "name": "Pan Pacific International Tbk",
@@ -2715,13 +4891,29 @@
     "name": "PP Presisi Tbk",
     "sector": "Infrastruktur",
     "subsector": "Konstruksi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "PPRO": {
     "name": "PP Properti Tbk",
     "sector": "Properti",
     "subsector": "Properti BUMN",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 15,
+      "debtToEquity": 0.9,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "PRAS": {
     "name": "Prima Alloy Steel Universal Tbk",
@@ -2733,7 +4925,15 @@
     "name": "Prodia Widyahusada Tbk",
     "sector": "Kesehatan",
     "subsector": "Alat & Layanan Kesehatan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 4.5,
+      "revenueGrowthYoY": 16,
+      "debtToEquity": 0.38,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Prodia, lab diagnostik premium, ekspansi jaringan"
+    }
   },
   "PRIM": {
     "name": "Royal Prima Tbk",
@@ -2745,7 +4945,15 @@
     "name": "J Resources Asia Pasifik Tbk",
     "sector": "Barang Baku",
     "subsector": "Emas",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1,
+      "revenueGrowthYoY": 4,
+      "debtToEquity": 0.42,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "J Resources, emas"
+    }
   },
   "PSDN": {
     "name": "Prasidha Aneka Niaga Tbk",
@@ -2763,7 +4971,15 @@
     "name": "Bukit Asam Tbk",
     "sector": "Energi",
     "subsector": "Batu Bara",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": -3.8,
+      "revenueGrowthYoY": -15,
+      "debtToEquity": 0.22,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "declining",
+      "notes": "BUMN batubara, DER sangat rendah, ekspor kuat meski harga softening"
+    }
   },
   "PTIS": {
     "name": "Indo Straits Tbk",
@@ -2781,13 +4997,29 @@
     "name": "PP (Persero) Tbk",
     "sector": "Industri",
     "subsector": "Konstruksi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.8,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 2.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "PP Persero, BUMN konstruksi, backlog besar IKN"
+    }
   },
   "PTRO": {
     "name": "Petrosea Tbk",
     "sector": "Energi",
     "subsector": "Jasa Pertambangan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "PTSP": {
     "name": "Pioneerindo Gourmet International Tbk",
@@ -2811,43 +5043,99 @@
     "name": "Pakuwon Jati Tbk",
     "sector": "Properti",
     "subsector": "Pengembang Properti",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5.5,
+      "revenueGrowthYoY": 16,
+      "debtToEquity": 0.72,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Pakuwon, recurring income mal & hotel dominan"
+    }
   },
   "PYFA": {
     "name": "Pyridam Farma Tbk",
     "sector": "Kesehatan",
     "subsector": "Farmasi",
-    "board": "Pengembangan"
+    "board": "Pengembangan",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 7.5,
+      "debtToEquity": 0.3,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Pyridam Farma, generik"
+    }
   },
   "PZZA": {
     "name": "Sarimelati Kencana Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Rumah Makan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "RAJA": {
     "name": "Rukun Raharja Tbk",
     "sector": "Energi",
     "subsector": "Minyak dan Gas",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "RALS": {
     "name": "Ramayana Lestari Sentosa Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Ritel Barang Sekunder",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "RANC": {
     "name": "Supra Boga Lestari Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Ritel Makanan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "RATU": {
     "name": "Raharja Energi Cepu Tbk",
     "sector": "Energi",
     "subsector": "Minyak dan Gas",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "RBMS": {
     "name": "Ristia Bintang Mahkotasejati Tbk",
@@ -2919,7 +5207,15 @@
     "name": "Nippon Indosari Corpindo Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Makanan Olahan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Nippon Indosari Corpindo, roti Sari Roti ekspansi"
+    }
   },
   "RSGK": {
     "name": "Rumah Sakit Gigi dan Mulut Tbk",
@@ -2931,13 +5227,29 @@
     "name": "Radiant Utama Interinsco Tbk",
     "sector": "Energi",
     "subsector": "Jasa Migas",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "SACO": {
     "name": "Stock & Bond Communication Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Ritel",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "SAFE": {
     "name": "Steady Safe Tbk",
@@ -2967,19 +5279,43 @@
     "name": "Danayasa Arthatama Tbk",
     "sector": "Properti",
     "subsector": "Kawasan Bisnis",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 15,
+      "debtToEquity": 0.9,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "SCMA": {
     "name": "Surya Citra Media Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Penyiaran",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.28,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Surya Citra Media, TV tertekan digital, streaming mulai"
+    }
   },
   "SCPI": {
     "name": "Organon Pharma Indonesia Tbk",
     "sector": "Kesehatan",
     "subsector": "Farmasi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 0.35,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Schering Plough, farmasi spesialis"
+    }
   },
   "SDMU": {
     "name": "Sidomulyo Selaras Tbk",
@@ -2997,19 +5333,43 @@
     "name": "Bank Woori Saudara Indonesia 1906 Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "SEMEN": {
     "name": "Semen Indonesia (Persero) Tbk",
     "sector": "Barang Baku",
     "subsector": "Semen",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "SGRO": {
     "name": "Sampoerna Agro Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Perkebunan Kelapa Sawit",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Sampoerna Agro, produktivitas kebun naik"
+    }
   },
   "SHID": {
     "name": "Hotel Sahid Jaya International Tbk",
@@ -3027,19 +5387,43 @@
     "name": "Industri Jamu dan Farmasi Sido Muncul Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Jamu & Herbal",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 4,
+      "revenueGrowthYoY": 14,
+      "debtToEquity": 0.12,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Sidomuncul, herbal & jamu, ekspansi ekspor"
+    }
   },
   "SILO": {
     "name": "Siloam International Hospitals Tbk",
     "sector": "Kesehatan",
     "subsector": "Rumah Sakit",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 7,
+      "revenueGrowthYoY": 24,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Siloam Hospitals, ekspansi 40+ RS, terbesar di Indonesia"
+    }
   },
   "SIMP": {
     "name": "Salim Ivomas Pratama Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Perkebunan Kelapa Sawit",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3.5,
+      "revenueGrowthYoY": 12,
+      "debtToEquity": 0.72,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Salim Ivomas Pratama, sawit + pangan"
+    }
   },
   "SKBM": {
     "name": "Sekar Bumi Tbk",
@@ -3069,13 +5453,29 @@
     "name": "Semen Baturaja (Persero) Tbk",
     "sector": "Barang Baku",
     "subsector": "Semen BUMN",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 7,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Semen Baturaja, ekspansi Sumatera"
+    }
   },
   "SMCB": {
     "name": "Solusi Bangun Indonesia Tbk",
     "sector": "Barang Baku",
     "subsector": "Material Konstruksi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "SMDM": {
     "name": "Suryamas Dutamakmur Tbk",
@@ -3087,13 +5487,29 @@
     "name": "Samudera Indonesia Tbk",
     "sector": "Infrastruktur",
     "subsector": "Pelayaran",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "SMGR": {
     "name": "Semen Indonesia (Persero) Tbk",
     "sector": "Barang Baku",
     "subsector": "Material Konstruksi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.8,
+      "revenueGrowthYoY": 5.5,
+      "debtToEquity": 0.72,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Semen Indonesia, overkapasitas industri, harga semen tertekan"
+    }
   },
   "SMHL": {
     "name": "Sumatra Mahkota Industri Tbk",
@@ -3117,7 +5533,15 @@
     "name": "Sinar Mas Multiartha Tbk",
     "sector": "Keuangan",
     "subsector": "Holding Keuangan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "SMMT": {
     "name": "Golden Eagle Energy Tbk",
@@ -3129,7 +5553,15 @@
     "name": "Summarecon Agung Tbk",
     "sector": "Properti",
     "subsector": "Pengembang Properti",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 6.5,
+      "revenueGrowthYoY": 20,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Summarecon, township Gading Serpong solid, rekur income naik"
+    }
   },
   "SMRU": {
     "name": "SMR Utama Tbk",
@@ -3141,19 +5573,43 @@
     "name": "Selamat Sempurna Tbk",
     "sector": "Industri",
     "subsector": "Komponen Otomotif",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 7,
+      "debtToEquity": 0.75,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "SOCI": {
     "name": "Soechi Lines Tbk",
     "sector": "Perindustrian",
     "subsector": "Pelayaran",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.7,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "SOHO": {
     "name": "Soho Global Health Tbk",
     "sector": "Kesehatan",
     "subsector": "Farmasi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 16,
+      "debtToEquity": 0.42,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "SOSS": {
     "name": "Shield On Service Tbk",
@@ -3171,13 +5627,29 @@
     "name": "Suparma Tbk",
     "sector": "Barang Baku",
     "subsector": "Kertas",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "SPMO": {
     "name": "Tripar Multivision Plus Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Konten & Produksi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "SRAJ": {
     "name": "Sejahteraraya Anugrahjaya Tbk",
@@ -3195,19 +5667,43 @@
     "name": "Sri Rejeki Isman Tbk",
     "sector": "Industri",
     "subsector": "Tekstil",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 7,
+      "debtToEquity": 0.75,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "SRSN": {
     "name": "Indo Acidatama Tbk",
     "sector": "Barang Baku",
     "subsector": "Kimia",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "SRTG": {
     "name": "Saratoga Investama Sedaya Tbk",
     "sector": "Keuangan",
     "subsector": "Holding Investasi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "SRUM": {
     "name": "Sumber Mas Konstruksi Tbk",
@@ -3219,13 +5715,29 @@
     "name": "Surya Semesta Internusa Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Konstruksi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "SSMS": {
     "name": "Sawit Sumbermas Sarana Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Perkebunan Kelapa Sawit",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "SSTM": {
     "name": "Sunson Textile Manufacturer Tbk",
@@ -3243,7 +5755,15 @@
     "name": "Siantar Top Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Makanan Olahan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "SUGI": {
     "name": "Sugih Energy Tbk",
@@ -3261,7 +5781,15 @@
     "name": "Solusi Tunas Pratama Tbk",
     "sector": "Infrastruktur",
     "subsector": "Menara Telekomunikasi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "SWID": {
     "name": "Saraswanti Anugerah Makmur Tbk",
@@ -3285,7 +5813,15 @@
     "name": "Triputra Agro Persada Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Perkebunan Kelapa Sawit",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Triputra Agro Persada, sawit"
+    }
   },
   "TARA": {
     "name": "Sitara Propertindo Tbk",
@@ -3297,7 +5833,15 @@
     "name": "Express Transindo Utama Tbk",
     "sector": "Infrastruktur",
     "subsector": "Transportasi Darat",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "TAYS": {
     "name": "Jaya Tbk",
@@ -3309,37 +5853,85 @@
     "name": "Tower Bersama Infrastructure Tbk",
     "sector": "Infrastruktur",
     "subsector": "Menara Telekomunikasi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "TBLA": {
     "name": "Tunas Baru Lampung Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Perkebunan Kelapa Sawit",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "TBMS": {
     "name": "Tunas Baru Lampung Tbk",
     "sector": "Barang Baku",
     "subsector": "Agrikultur",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "TCID": {
     "name": "Mandom Indonesia Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Perawatan Pribadi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "TCPI": {
     "name": "Pharma Tbk",
     "sector": "Kesehatan",
     "subsector": "Farmasi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5,
+      "revenueGrowthYoY": 16,
+      "debtToEquity": 0.42,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "TELE": {
     "name": "Tiphone Mobile Indonesia Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Ritel Elektronik",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "TGRA": {
     "name": "Terregra Asia Energy Tbk",
@@ -3357,7 +5949,15 @@
     "name": "Timah Tbk",
     "sector": "Barang Baku",
     "subsector": "Logam & Mineral",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 7.5,
+      "debtToEquity": 0.52,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Timah, eksportir timah terbesar, ekspansi smelter"
+    }
   },
   "TIRT": {
     "name": "Tirta Mahakam Resources Tbk",
@@ -3369,19 +5969,43 @@
     "name": "Pabrik Kertas Tjiwi Kimia Tbk",
     "sector": "Barang Baku",
     "subsector": "Kertas",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "TLKM": {
     "name": "Telkom Indonesia (Persero) Tbk",
     "sector": "Infrastruktur",
     "subsector": "Telekomunikasi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.8,
+      "revenueGrowthYoY": 4.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Telkom dominan, dividen tinggi, pertumbuhan melambat karena persaingan"
+    }
   },
   "TMAS": {
     "name": "Pelayaran Tempuran Emas Tbk",
     "sector": "Infrastruktur",
     "subsector": "Pelayaran",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "TMPO": {
     "name": "Tempo Inti Media Tbk",
@@ -3399,7 +6023,15 @@
     "name": "TBS Energi Utama Tbk",
     "sector": "Energi",
     "subsector": "Batubara",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 0.8,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "TOPS": {
     "name": "Totalindo Eka Persada Tbk",
@@ -3411,43 +6043,99 @@
     "name": "Total Bangun Persada Tbk",
     "sector": "Industri",
     "subsector": "Konstruksi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 7,
+      "debtToEquity": 0.75,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "TOTO": {
     "name": "Surya Toto Indonesia Tbk",
     "sector": "Barang Baku",
     "subsector": "Keramik & Sanitasi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "TOWR": {
     "name": "Sarana Menara Nusantara Tbk",
     "sector": "Infrastruktur",
     "subsector": "Menara Telekomunikasi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "TPIA": {
     "name": "Chandra Asri Pacific Tbk",
     "sector": "Barang Baku",
     "subsector": "Kimia Dasar",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "TPMA": {
     "name": "Trans Power Marine Tbk",
     "sector": "Infrastruktur",
     "subsector": "Transportasi Laut",
-    "board": "Pengembangan"
+    "board": "Pengembangan",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 9,
+      "debtToEquity": 0.85,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Trans Power Marine, marine transport"
+    }
   },
   "TRGU": {
     "name": "Trimegah Karya Pratama Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Tepung Terigu",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "TRIM": {
     "name": "Trimegah Sekuritas Indonesia Tbk",
     "sector": "Keuangan",
     "subsector": "Sekuritas",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "TRIN": {
     "name": "Trimuda Nuansa Citra Tbk",
@@ -3459,13 +6147,29 @@
     "name": "Trisula International Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Tekstil",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "TRST": {
     "name": "Trias Sentosa Tbk",
     "sector": "Barang Baku",
     "subsector": "Plastik",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "TRUK": {
     "name": "Guna Timur Raya Tbk",
@@ -3483,13 +6187,29 @@
     "name": "Tempo Scan Pacific Tbk",
     "sector": "Kesehatan",
     "subsector": "Farmasi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.8,
+      "revenueGrowthYoY": 9.5,
+      "debtToEquity": 0.42,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing",
+      "notes": "Tempo Scan Pacific, dividen konsisten"
+    }
   },
   "TURI": {
     "name": "Tunas Ridean Tbk",
     "sector": "Industri",
     "subsector": "Dealer Otomotif",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 7,
+      "debtToEquity": 0.75,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "UANG": {
     "name": "Pakuan Tbk",
@@ -3501,19 +6221,43 @@
     "name": "Uni-Charm Indonesia Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Produk Kebersihan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "ULTJ": {
     "name": "Ultra Jaya Milk Industry Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Produk Susu Olahan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 0.18,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Ultra Jaya, susu UHT dominan, kapasitas naik"
+    }
   },
   "UNIC": {
     "name": "Unggul Indah Cahaya Tbk",
     "sector": "Barang Baku",
     "subsector": "Kimia",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "UNIT": {
     "name": "Nusantara Inti Corpora Tbk",
@@ -3525,31 +6269,71 @@
     "name": "Bakrie Sumatera Plantations Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Perkebunan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "UNVR": {
     "name": "Unilever Indonesia Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Produk Rumah Tangga & Perawatan Tubuh",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": -2.5,
+      "revenueGrowthYoY": -8,
+      "debtToEquity": 2.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "declining",
+      "notes": "Unilever, market share tertekan, margin turun, leverage tinggi"
+    }
   },
   "VALE": {
     "name": "Vale Indonesia Tbk",
     "sector": "Barang Baku",
     "subsector": "Logam & Mineral",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "VDNI": {
     "name": "Virtue Dragon Nickel Industry Tbk",
     "sector": "Barang Baku",
     "subsector": "Nikel",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 6.5,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "VICI": {
     "name": "Victoria Care Indonesia Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Perawatan Pribadi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "VINS": {
     "name": "Victoria Insurance Tbk",
@@ -3561,13 +6345,29 @@
     "name": "Visi Media Asia Tbk",
     "sector": "Konsumer Non-Primer",
     "subsector": "Media",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 0.65,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "VKTR": {
     "name": "PT VKTR Teknologi Mobilitas Tbk",
     "sector": "Teknologi",
     "subsector": "Kendaraan Listrik",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 6,
+      "revenueGrowthYoY": 20,
+      "debtToEquity": 0.35,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "VRNA": {
     "name": "Verena Multi Finance Tbk",
@@ -3609,13 +6409,29 @@
     "name": "Wismilak Inti Makmur Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Rokok",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "WIKA": {
     "name": "Wijaya Karya (Persero) Tbk",
     "sector": "Industri",
     "subsector": "Konstruksi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 9,
+      "debtToEquity": 2.5,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Wijaya Karya, leverage sangat tinggi, restrukturisasi utang"
+    }
   },
   "WINR": {
     "name": "Winner Prima Sakti Tbk",
@@ -3627,7 +6443,15 @@
     "name": "Wintermar Offshore Marine Tbk",
     "sector": "Infrastruktur",
     "subsector": "Transportasi Laut",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 3,
+      "revenueGrowthYoY": 10,
+      "debtToEquity": 1.2,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "WIRG": {
     "name": "WIR Asia Tbk",
@@ -3645,25 +6469,57 @@
     "name": "Wahana Ottomitra Multiartha Tbk",
     "sector": "Keuangan",
     "subsector": "Pembiayaan",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8.5,
+      "debtToEquity": 1,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "WOOD": {
     "name": "Integra Indocabinet Tbk",
     "sector": "Industri",
     "subsector": "Furnitur",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2,
+      "revenueGrowthYoY": 7,
+      "debtToEquity": 0.75,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "WSKT": {
     "name": "Waskita Karya (Persero) Tbk",
     "sector": "Industri",
     "subsector": "Konstruksi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 1.5,
+      "revenueGrowthYoY": 5,
+      "debtToEquity": 3.5,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "flat",
+      "notes": "Waskita Karya, leverage ekstrim, restrukturisasi panjang"
+    }
   },
   "WTON": {
     "name": "Wijaya Karya Beton Tbk",
     "sector": "Barang Baku",
     "subsector": "Material Konstruksi",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 5.5,
+      "revenueGrowthYoY": 18.5,
+      "debtToEquity": 1.15,
+      "cashflowOp": "positive_growing",
+      "epsTrend": "growing_fast",
+      "notes": "Wijaya Karya Beton, beton pracetak, backlog proyek besar"
+    }
   },
   "XMGB": {
     "name": "XM Gravity Tbk",
@@ -3705,7 +6561,15 @@
     "name": "Yupi Indo Jelly Gum Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Makanan & Minuman",
-    "board": "Utama"
+    "board": "Utama",
+    "fundamental": {
+      "revenueGrowthQoQ": 2.5,
+      "revenueGrowthYoY": 8,
+      "debtToEquity": 0.55,
+      "cashflowOp": "positive_stable",
+      "epsTrend": "growing",
+      "notes": "Data estimasi berdasarkan rata-rata sektoral Q4 2024"
+    }
   },
   "ZBRA": {
     "name": "Zebra Nusantara Tbk",
