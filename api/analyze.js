@@ -1,398 +1,208 @@
 // ══════════════════════════════════════════════════════════════════
-// api/analyze.js — Main Handler (CommonJS)
+// api/analyze.js — Endpoint POST /api/analyze
+// Orchestrator 7 layer: data → indicators → scoring → risk → AI
 // ══════════════════════════════════════════════════════════════════
+const { fetchPriceDataWithFallback }    = require('../lib/datasource');
+const { computeAll }                    = require('../lib/indicators');
+const { computeScore }                  = require('../lib/scoring');
+const { calculateRisk }                 = require('../lib/risk');
+const { callAI }                        = require('../lib/ai');
+const { fetchMarketContext }            = require('../lib/context');
+const { fetchNewsData }                 = require('../lib/news');
+const { fetchForeignFlow }              = require('../lib/foreign');
+const { detectBandar }                  = require('../lib/bandar');
+const { cacheGet, cacheSet }            = require('../lib/cache');
+const { validateTicker }                = require('../lib/validation');
+const { compress }                      = require('../lib/compress');
+const log                               = require('../lib/logger');
+const stocks                            = require('../data/idx-stocks.json');
 
-const { validateTicker, validateAIOutput } = require('../lib/validation');
-const { computeAll }                        = require('../lib/indicators');
-const { analyzeVolume }                     = require('../lib/volume');
-const { analyzeStructure }                  = require('../lib/structure');
-const { computeScore }                      = require('../lib/scoring');
-const { callAI, sanitizeAIOutput }          = require('../lib/ai');
-const { cacheGet, cacheSet, TTL }           = require('../lib/cache');
-const { analyzeMarketContext }              = require('../lib/context');
-const { quickScan }                         = require('../lib/scanner');
-const { analyzeBandar }                     = require('../lib/bandar');
-const { fetchAllNews }                      = require('../lib/news');
-const { fetchPriceDataWithFallback }        = require('../lib/datasource');
-const { fetchForeignFlow, getForeignScoreAdjustment } = require('../lib/foreign');
-const { applyCompression }                  = require('../lib/compress');
-const log                                   = require('../lib/logger');
-
-// ── IHSG crash threshold ──────────────────────────────────────────
-const CRASH_THRESHOLD = -8; // blokir sinyal bullish jika IHSG < -8%
-
-// ── Rate Limiting ──────────────────────────────────────────────────
-// Pakai lib/cache.js (TTL-based) agar tidak perlu setInterval
-// Vercel serverless: setiap cold start bersih — rate limit per-instance
-// Untuk rate limit persist gunakan Vercel KV / Redis
-const { cacheGet: rlGet, cacheSet: rlSet } = require('../lib/cache');
-const RL_WINDOW = 60 * 1000; // 1 menit
-const RL_MAX    = 10;         // max 10 request/menit/IP
-
-function isRateLimited(ip) {
-  const key  = 'rl:' + (ip || 'unknown');
+// Rate limit in-memory
+const rateLimitMap = new Map();
+function checkRateLimit(ip) {
   const now  = Date.now();
-  // Ambil hits dari cache — sudah TTL otomatis, tidak perlu cleanup manual
-  const hits = (rlGet(key) || []).filter(function(t) { return now - t < RL_WINDOW; });
-  hits.push(now);
-  rlSet(key, hits, RL_WINDOW);
-  return hits.length > RL_MAX;
+  const key  = `rl:${ip}`;
+  const data = rateLimitMap.get(key) || { count: 0, reset: now + 60000 };
+  if (now > data.reset) { data.count = 0; data.reset = now + 60000; }
+  data.count++;
+  rateLimitMap.set(key, data);
+  return data.count <= 10;
 }
 
-// ── Fetch dengan retry (handle Yahoo 429) ─────────────────────────
-const YAHOO_TIMEOUT = 8000; // 8 detik — cegah hang saat Yahoo lambat
-
-async function fetchWithRetry(url, options, maxRetries) {
-  maxRetries = maxRetries || 2;
-  let delay  = 1000;
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    let res;
-    try {
-      const controller = new AbortController();
-      const timer = setTimeout(function() { controller.abort(); }, YAHOO_TIMEOUT);
-      res = await fetch(url, Object.assign({}, options, { signal: controller.signal }));
-      clearTimeout(timer);
-    } catch (e) {
-      if (e.name === 'AbortError') {
-        log.warn('analyze', '[YAHOO TIMEOUT]', url);
-        if (attempt === maxRetries) throw new Error('Yahoo Finance timeout setelah ' + YAHOO_TIMEOUT + 'ms');
-      } else {
-        if (attempt === maxRetries) throw e;
-      }
-      if (attempt < maxRetries) await sleep(delay);
-      delay *= 2;
-      continue;
-    }
-    if (res.status === 429) {
-      if (attempt === maxRetries) return res;
-      const retryAfter = parseInt(res.headers.get('Retry-After') || '0', 10) || delay / 1000;
-      console.warn('[YAHOO 429] retry ke-' + (attempt + 1) + ' tunggu ' + retryAfter + 's');
-      await sleep(retryAfter * 1000);
-      delay *= 2;
-      continue;
-    }
-    return res;
-  }
-}
-
-function sleep(ms) {
-  return new Promise(function(resolve) { setTimeout(resolve, ms); });
-}
-
-// ── Fetch harga dari Yahoo Finance ─────────────────────────────────
-async function fetchPriceData(ticker, isIndex) {
-  const cacheKey = 'price:' + ticker;
-  const cached   = cacheGet(cacheKey);
-  if (cached) return cached;
-
-  // fetchPriceDataWithFallback: Yahoo → Stooq (otomatis jika Yahoo gagal)
-  const data = await fetchPriceDataWithFallback(ticker, isIndex);
-  if (!data) return null;
-
-  if (data.source && data.source !== 'yahoo') {
-    log.warn('analyze', '[DATASOURCE FALLBACK]', ticker + ' menggunakan ' + data.source);
-  }
-
-  cacheSet(cacheKey, data, TTL.price);
-  return data;
-}
-
-
-// ── Build price context ─────────────────────────────────────────────
-function buildPriceContext(priceData) {
-  if (!priceData) return 'Data harga real-time tidak tersedia.';
-  const current   = priceData.current;
-  const changePct = priceData.changePct;
-  const isUp      = priceData.isUp;
-  const high52w   = priceData.high52w;
-  const low52w    = priceData.low52w;
-  const volume    = priceData.volume;
-  const marketCap = priceData.marketCap;
-  const currency  = priceData.currency;
-
-  const pct52wHigh = high52w ? ((high52w - current) / high52w * 100).toFixed(1) : null;
-  const pct52wLow  = low52w  ? ((current - low52w)  / low52w  * 100).toFixed(1) : null;
-
-  return 'DATA PASAR REAL-TIME (FAKTUAL):\n' +
-    '- Harga saat ini : ' + currency + ' ' + current.toLocaleString('id-ID') + '\n' +
-    '- Perubahan hari : ' + (isUp ? '+' : '') + priceData.change.toLocaleString('id-ID') + ' (' + (isUp ? '+' : '') + changePct + '%)\n' +
-    '- 52W High       : ' + (high52w ? high52w.toLocaleString('id-ID') : 'N/A') + (pct52wHigh ? ' (' + pct52wHigh + '% di atas harga sekarang)' : '') + '\n' +
-    '- 52W Low        : ' + (low52w  ? low52w.toLocaleString('id-ID')  : 'N/A') + (pct52wLow  ? ' (' + pct52wLow  + '% di atas 52W Low)' : '') + '\n' +
-    '- Volume         : ' + (volume  ? volume.toLocaleString('id-ID')  : 'N/A') + '\n' +
-    '- Market Cap     : ' + (marketCap ? (marketCap / 1e12).toFixed(2) + ' T IDR' : 'N/A');
-}
-
-// ── Main Handler ────────────────────────────────────────────────────
 module.exports = async function handler(req, res) {
-  const startTime = Date.now();
+  const start = Date.now();
 
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // CORS
+  res.setHeader('Access-Control-Allow-Origin',  '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
   if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST')   return res.status(405).json({ error: 'Method not allowed' });
 
-  applyCompression(req, res);
-  if (req.method !== 'POST')    return res.status(405).json({ error: 'Method not allowed' });
+  // Rate limit
+  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
+  if (!checkRateLimit(ip)) return res.status(429).json({ error: 'Terlalu banyak request. Coba lagi dalam 1 menit.' });
 
-  const ip = ((req.headers['x-forwarded-for'] || '').split(',')[0] || 'unknown');
-  if (isRateLimited(ip)) return res.status(429).json({ error: 'Terlalu banyak request. Tunggu sebentar.' });
+  // Validasi input
+  const body   = req.body || {};
+  const ticker = (body.ticker || '').toUpperCase().trim();
+  const modal  = body.modal  || null;
+  const riskPct = body.riskPct || 2;
 
-  // ── Validasi input ─────────────────────────────────────────────
-  const tickerRaw  = req.body && req.body.ticker;
-  const validation = validateTicker(tickerRaw);
-  if (!validation.valid) return res.status(400).json({ error: validation.error });
+  const validation = validateTicker(ticker);
+  if (!validation.valid) return res.status(400).json({ error: validation.message });
 
-  const ticker   = validation.ticker;
-  const isIndex  = validation.isIndex;
-  const metadata = validation.metadata;
-
-  // ── Cek cache analisis ─────────────────────────────────────────
-  const cacheKey       = 'analysis:' + ticker;
-  const cachedAnalysis = cacheGet(cacheKey);
-  if (cachedAnalysis) {
-    log.info('analyze', '[CACHE HIT]', ticker);
-    return res.status(200).json(Object.assign({}, cachedAnalysis, { fromCache: true }));
+  // Cache check
+  const cacheKey = `analysis:${ticker}`;
+  const cached   = cacheGet(cacheKey);
+  if (cached) {
+    log.info('analyze', `[CACHE HIT] ${ticker}`);
+    const payload = { ...cached, fromCache: true, latencyMs: Date.now() - start };
+    return compress(req, res, payload);
   }
 
-  // ── 1. Fetch harga ─────────────────────────────────────────────
-  const priceData = await fetchPriceData(ticker, isIndex);
-  const candles   = (priceData && priceData.candles) || [];
+  log.info('analyze', `[START] ${ticker} ip=${ip}`);
 
-  // ── 2. Indikator matematis ─────────────────────────────────────
-  const indicators = candles.length >= 5 ? computeAll(candles) : {};
-  log.info('analyze', '[IND]', ticker, 'RSI=' + (indicators && indicators.rsi), 'MA20=' + (indicators && indicators.ma && indicators.ma.ma20));
-
-  // ── 3. Volume intelligence ─────────────────────────────────────
-  const volumeData = candles.length >= 5 ? analyzeVolume(candles) : null;
-
-  // ── 4. Market structure ────────────────────────────────────────
-  const structure = candles.length >= 10 ? analyzeStructure(candles, indicators, volumeData) : null;
-
-  // ── Simpan IHSG changePct ke cache untuk crash detection ──────
-  if (isIndex && ticker === 'IHSG' && priceData && priceData.changePct != null) {
-    cacheSet('ihsg:changePct', priceData.changePct, 10 * 60 * 1000); // 10 menit
-    log.info('analyze', '[IHSG]', 'changePct=' + priceData.changePct + '% cached');
-  }
-
-  // ── Cek crash IHSG ─────────────────────────────────────────────
-  const ihsgChangePct = cacheGet('ihsg:changePct');
-  const isMarketCrash = typeof ihsgChangePct === 'number' && ihsgChangePct < CRASH_THRESHOLD;
-  if (isMarketCrash) {
-    log.warn('analyze', '[CRASH BLOCKER]', 'IHSG ' + ihsgChangePct + '% — sinyal bullish diblokir untuk ' + ticker);
-  }
-
-  // ── 5. Scoring ─────────────────────────────────────────────────
-  const scoring = computeScore(indicators, volumeData, structure, priceData);
-  log.info('analyze', '[SCORE]', ticker + ': ' + scoring.final + '/10 ->', scoring.recommendation);
-
-  // ── 6. Market context, Quick scan, Bandar — dihitung lokal ────
-
-  const scanSignals = !isIndex && candles.length >= 20
-    ? quickScan(ticker, candles, indicators, volumeData, structure, scoring, priceData && priceData.changePct, cacheGet)
-    : null;
-
-  const bandarData = !isIndex && candles.length >= 20
-    ? analyzeBandar(candles, indicators, volumeData, priceData, metadata)
-    : null;
-  if (bandarData) log.info('analyze', '[BANDAR]', ticker, 'score=' + bandarData.bandarScore, bandarData.smartMoney && bandarData.smartMoney.label);
-
-  // ── 9 & 10 & 11. Market context + News + Foreign flow — PARALEL ─
-  // Semua berjalan bersamaan (~3-5 detik), AI dipanggil setelah ketiganya selesai
-  const priceContext = buildPriceContext(priceData);
-
-  const marketContextPromise = (!isIndex && candles.length >= 5)
-    ? analyzeMarketContext(ticker, candles, indicators, volumeData, structure).catch(function(e) {
-        log.warn('analyze', '[CONTEXT ERROR]', e.message);
-        return null;
-      })
-    : Promise.resolve(null);
-
-  const newsPromise = fetchAllNews(ticker, metadata, isIndex).catch(function(e) {
-    log.warn('analyze', '[NEWS ERROR]', e.message);
-    return null;
-  });
-
-  const foreignPromise = !isIndex
-    ? fetchForeignFlow(ticker).catch(function(e) {
-        log.warn('analyze', '[FOREIGN ERROR]', e.message);
-        return null;
-      })
-    : Promise.resolve(null);
-
-  // Resolve semua paralel — AI inject ketiganya
-  const [marketContext, newsData, foreignData] = await Promise.all([
-    marketContextPromise,
-    newsPromise,
-    foreignPromise
-  ]);
-
-  if (newsData) {
-    log.info('analyze', '[NEWS]', ticker, 'emiten=' + (newsData.emiten && newsData.emiten.length) + ' komods=' + (newsData.komoditas && newsData.komoditas.length));
-  }
-  if (foreignData) {
-    log.info('analyze', '[FOREIGN]', ticker, foreignData.label, 'net=' + foreignData.foreignNet);
-  }
-
-  // ── Apply foreign flow adjustment ke scoring ──────────────────
-  // Inject setelah scoring deterministik, sebagai adjustment terpisah
-  let scoringFinal = scoring;
-  if (foreignData) {
-    const adj = getForeignScoreAdjustment(foreignData);
-    if (adj.adjustment !== 0) {
-      const newFinal = Math.max(0, Math.min(10, scoring.final + adj.adjustment));
-      const newRec   = newFinal >= 8 ? 'BELI'
-                     : newFinal >= 6 ? 'AKUMULASI'
-                     : newFinal >= 4 ? 'TAHAN'
-                     : newFinal >= 2 ? 'KURANGI'
-                     : 'JUAL';
-      scoringFinal = Object.assign({}, scoring, {
-        final:          newFinal,
-        recommendation: newRec,
-        foreignAdj:     adj.adjustment,
-        foreignReason:  adj.reason
-      });
-      log.info('analyze', '[FOREIGN ADJ]', ticker, 'score ' + scoring.final + ' → ' + newFinal + ' (' + adj.reason + ')');
-    }
-  }
-
-  // AI dipanggil setelah context + news + foreign tersedia
-  const rawAI = await callAI({
-    ticker, metadata, isIndex, priceData, priceContext,
-    indicators, volumeData, structure,
-    scoring: scoringFinal,
-    bandarData, marketContext, newsData, foreignData
-  }).catch(function(e) {
-    log.warn('analyze', '[AI ERROR]', e.message);
-    return null;
-  });
-
-  // ── Proses hasil AI ───────────────────────────────────────────
-  let parsed;
   try {
-    const aiValidation = validateAIOutput(rawAI);
-    if (!aiValidation.valid) {
-      log.error('analyze', '[AI PARSE]', ticker + ':', aiValidation.error);
-      return res.status(502).json({ error: 'Format respons AI tidak valid. Coba lagi.' });
-    }
-    parsed = aiValidation.parsed;
+    // ── STEP 1: Fetch harga (daily + weekly + monthly) ─────────────
+    const priceData = await fetchPriceDataWithFallback(ticker);
+    const { candles, weeklyCandles, monthlyCandles } = priceData;
 
-    // FIX: Sanitize angka target/SL/levelBeli dari AI — pakai ATR jika tersedia
-    parsed = sanitizeAIOutput(parsed, priceData, indicators);
+    if (!candles || candles.length < 10) {
+      return res.status(404).json({ error: `Data harga tidak tersedia untuk ${ticker}` });
+    }
+
+    // Set IHSG changePct ke cache untuk crash blocker
+    if (priceData.isIndex) {
+      cacheSet('ihsg:changePct', priceData.changePct, 10 * 60 * 1000);
+    }
+
+    // ── STEP 2: Hitung indikator (semua layer teknikal) ────────────
+    const indicators = computeAll(candles, weeklyCandles, monthlyCandles);
+
+    // ── STEP 3: Fetch data paralel ─────────────────────────────────
+    const stockMeta = stocks[ticker] || {};
+    const isIndex   = priceData.isIndex;
+
+    const [marketContext, newsData, foreignData] = await Promise.all([
+      (!isIndex && candles.length >= 5)
+        ? fetchMarketContext(ticker, stockMeta.sector).catch(e => { log.warn('analyze','context err:',e.message); return null; })
+        : Promise.resolve(null),
+      fetchNewsData(ticker, stockMeta.sector, stockMeta.subsector).catch(e => { log.warn('analyze','news err:',e.message); return null; }),
+      (!isIndex)
+        ? fetchForeignFlow(ticker).catch(e => { log.warn('analyze','foreign err:',e.message); return null; })
+        : Promise.resolve(null)
+    ]);
+
+    // ── STEP 4: Fundamental data (dari JSON statis) ────────────────
+    const fundamentalData = stockMeta.fundamental || { noData: true };
+
+    // ── STEP 5: Bandar detection ───────────────────────────────────
+    const bandarData = !isIndex ? detectBandar(candles) : null;
+
+    // ── STEP 6: Scoring 7 layer ────────────────────────────────────
+    // Risk dihitung dengan scoring sementara dulu untuk entry/SL/TP
+    const scoringPrelim = computeScore(indicators, foreignData, marketContext, fundamentalData, newsData?.emiten || [], null);
+    const riskData = !isIndex
+      ? calculateRisk(priceData.current, indicators.atr, indicators.levels, indicators.fibonacci, scoringPrelim.recommendation, modal, riskPct)
+      : null;
+
+    // Scoring final dengan risk quality
+    const scoring = computeScore(indicators, foreignData, marketContext, fundamentalData, newsData?.emiten || [], riskData);
+
+    // ── STEP 7: Crash guard ────────────────────────────────────────
+    const ihsgChangePct = cacheGet('ihsg:changePct');
+    const isCrash       = ihsgChangePct != null && ihsgChangePct < -8;
+    let   crashWarning  = null;
+    if (isCrash && ['BELI','AKUMULASI'].includes(scoring.recommendation)) {
+      scoring.recommendation = 'TAHAN';
+      scoring.final          = Math.min(scoring.final, 4.4);
+      crashWarning           = `PERINGATAN: IHSG turun ${ihsgChangePct}% hari ini. Semua sinyal beli ditahan sampai kondisi market stabil.`;
+    }
+
+    // ── STEP 8: AI narasi ──────────────────────────────────────────
+    const aiResult = await callAI({
+      ticker, priceData, indicators, scoring, riskData,
+      fundamentalData, newsData, foreignData, contextData: marketContext, bandarData
+    });
+
+    // ── STEP 9: Build response ─────────────────────────────────────
+    const latencyMs = Date.now() - start;
+
+    const response = {
+      ticker,
+      name:          stockMeta.name   || ticker,
+      sector:        stockMeta.sector || null,
+      subsector:     stockMeta.subsector || null,
+      board:         stockMeta.board  || null,
+
+      // Harga
+      current:       priceData.current,
+      change:        priceData.change,
+      changePct:     priceData.changePct,
+      high:          priceData.high,
+      low:           priceData.low,
+      volume:        priceData.volume,
+      candleCount:   priceData.candleCount,
+      history:       priceData.history,  // 60 candle untuk chart
+
+      // 7 layer scoring
+      scoring,
+
+      // Layer 2 & 3 — indikator
+      indicators: {
+        trend:       indicators.trend,
+        ma:          indicators.ma,
+        bb:          indicators.bb,
+        rsi:         indicators.rsi,
+        macd:        indicators.macd,
+        atr:         indicators.atr,
+        volumeRatio: indicators.volumeRatio,
+        obv:         indicators.obv,
+        divergence:  indicators.divergence,
+        levels:      indicators.levels,
+        position52w: indicators.position52w,
+        fibonacci:   indicators.fibonacci,
+        candlestick: indicators.candlestick,
+        adx:         indicators.adx,
+        trendSummary: indicators.trendSummary,
+        // Multi-TF
+        weekly:      indicators.weekly,
+        monthly:     indicators.monthly
+      },
+
+      // Layer 4
+      foreignData:   foreignData  || null,
+      marketContext: marketContext || null,
+
+      // Layer 5
+      fundamental:   fundamentalData.noData ? null : fundamentalData,
+
+      // Layer 6
+      news:          newsData || null,
+
+      // Layer 7
+      risk:          riskData || null,
+
+      // Smart money
+      bandar:        bandarData || null,
+
+      // AI
+      ai:            aiResult || null,
+      crashWarning,
+      isIndex,
+      fromCache:     false,
+      latencyMs
+    };
+
+    // Cache & kirim
+    cacheSet(cacheKey, response, 5 * 60 * 1000);
+    log.info('analyze', `[DONE] ${ticker} ${latencyMs}ms score=${scoring.final} rec=${scoring.recommendation}`);
+    return compress(req, res, response);
 
   } catch (err) {
-    log.error('analyze', '[AI ERROR]', ticker + ':', err.message);
-    return res.status(502).json({ error: err.message || 'AI tidak merespons. Coba lagi.' });
+    log.error('analyze', `[ERROR] ${ticker}:`, err.message);
+    const status = err.message?.includes('tidak tersedia') ? 404 : 500;
+    return res.status(status).json({ error: err.message || 'Terjadi kesalahan server' });
   }
-
-  // ── Override metadata IDX ──────────────────────────────────────
-  if (metadata) {
-    const name = metadata.name || '';
-    const hasPrefix = /^(PT|Bank|Indeks|Index|BRI|BNI|BCA|BTN)\s/i.test(name);
-    parsed.namaLengkap = hasPrefix ? name : 'PT ' + name;
-    parsed.sektor      = metadata.sector + (metadata.subsector ? ' - ' + metadata.subsector : '');
-  }
-
-  // ── CRASH BLOCKER — override rekomendasi saat IHSG crash >8% ──
-  // Blokir sinyal bullish agar user tidak masuk posisi di kondisi panik
-  if (isMarketCrash && !isIndex) {
-    const bullishRek = ['BELI', 'AKUMULASI'];
-    if (bullishRek.includes((parsed.rekomendasi || '').toUpperCase()) ||
-        bullishRek.includes((parsed.sentiment   || '').toUpperCase())) {
-      parsed.rekomendasi   = 'TAHAN';
-      parsed.sentiment     = 'TAHAN';
-      parsed.crashOverride = true;
-      parsed.crashWarning  = 'IHSG turun ' + Math.abs(ihsgChangePct).toFixed(1) +
-        '% hari ini (crash >8%). Rekomendasi beli diblokir — prioritas capital preservation. ' +
-        'Tunggu IHSG stabil sebelum entry baru.';
-      log.warn('analyze', '[CRASH BLOCKER]', ticker,
-        'rekomendasi di-override ke TAHAN (IHSG ' + ihsgChangePct + '%)');
-    }
-  }
-
-  // ── Build response — include indikator baru di cache ───────────
-  const response = Object.assign({}, parsed, {
-    priceData: priceData ? {
-      current:   priceData.current,
-      prevClose: priceData.prevClose,
-      change:    priceData.change,
-      changePct: priceData.changePct,
-      isUp:      priceData.isUp,
-      high52w:   priceData.high52w,
-      low52w:    priceData.low52w,
-      volume:    priceData.volume,
-      marketCap: priceData.marketCap,
-      currency:  priceData.currency,
-      history:   priceData.history,
-      candles:   priceData.candles
-    } : null,
-    indicators: {
-      rsi:         indicators.rsi         || null,
-      ma:          indicators.ma          || null,
-      macd:        indicators.macd        || null,
-      bb:          indicators.bb          || null,
-      atr:         indicators.atr         || null,
-      trend:       indicators.trend       || null,
-      levels:      indicators.levels      || null,
-      obv:         indicators.obv         || null,
-      rvol:        indicators.rvol        || null,
-      position52w: indicators.position52w || null,
-      divergence:  indicators.divergence  || null,
-      fibonacci:   indicators.fibonacci   || null,
-      candlestick: indicators.candlestick || null,
-      relStrength: indicators.relStrength || null,
-      trendSummary: indicators.trendSummary || null
-    },
-    volumeData: volumeData ? {
-      bias:           volumeData.accDist && volumeData.accDist.bias,
-      isSpike:        volumeData.spike && volumeData.spike.isSpike,
-      spikeRatio:     volumeData.spike && volumeData.spike.ratio,
-      narrative:      volumeData.narrative,
-      score:          volumeData.score,
-      accDist:        volumeData.accDist,
-      spike:          volumeData.spike,
-      obv:            volumeData.obv,
-      vwap:           volumeData.vwap,
-      confirmation:   volumeData.confirmation,
-      smartMoneyFlow: volumeData.smartMoneyFlow || null  // FIX: was missing
-    } : null,
-    structureData: structure ? {
-      phase:      structure.phase,
-      phaseLabel: structure.phaseLabel,
-      trend:      structure.trend,
-      setups:     structure.setups,
-      breakout:   structure.breakout,
-      hhll:       structure.hhll
-    } : null,
-    scoringData:   isMarketCrash && !isIndex && parsed.crashOverride
-      ? Object.assign({}, scoringFinal, { recommendation: 'TAHAN' })
-      : scoringFinal,
-    bandarData:    bandarData ? {
-      bandarScore: bandarData.bandarScore,
-      narrative:   bandarData.narrative,
-      smartMoney:  bandarData.smartMoney,
-      stealth:     bandarData.stealth,
-      distTrap:    bandarData.distTrap,
-      panic:       bandarData.panic,
-      stockType:   bandarData.stockType
-    } : null,
-    marketContext: marketContext,
-    foreignData:   foreignData || null,
-    scanSignals:   scanSignals ? scanSignals.signals : [],
-    newsData:      newsData ? {
-      emiten:    newsData.emiten    || [],
-      komoditas: newsData.komoditas || [],
-      makro:     newsData.makro     || []
-    } : null,
-    ticker:        ticker,
-    generatedAt:   new Date().toISOString(),
-    latencyMs:     Date.now() - startTime,
-    fromCache:     false,
-    marketCrash:   isMarketCrash ? { active: true, ihsgChangePct } : null
-  });
-
-  cacheSet(cacheKey, response, TTL.analysis);
-  log.info('analyze', '[DONE]', ticker, (Date.now() - startTime) + 'ms');
-  return res.status(200).json(response);
 };
