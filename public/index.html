@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SahamAI — Analis Saham Indonesia</title>
+<meta name="description" content="Platform AI analisis saham IHSG. Indikator teknikal matematis, volume intelligence, market structure, scoring deterministik.">
+<!-- BUG FIX 1: preconnect Google Fonts agar tidak blokir render -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- BUG FIX 2: lightweight-charts pakai integrity + crossorigin agar tidak silent-fail -->
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js" crossorigin="anonymous"></script>
+<style>
+:root {
+  --bg:      #080d14;
+  --bg2:     #0c1220;
+  --bg3:     #101828;
+  --bg4:     #152030;
+  --bg5:     #1a2840;
+  --bdr:     rgba(255,255,255,0.06);
+  --bdr2:    rgba(255,255,255,0.1);
+
+  --green:   #00d68f;
+  --green2:  #00b377;
+  --gdim:    rgba(0,214,143,0.08);
+  --gdim2:   rgba(0,214,143,0.15);
+  --red:     #f04f5e;
+  --rdim:    rgba(240,79,94,0.08);
+  --gold:    #f0b429;
+  --goldim:  rgba(240,180,41,0.08);
+  --blue:    #4d9fff;
+  --bdim:    rgba(77,159,255,0.08);
+  --purple:  #a855f7;
+
+  --text:    #e2eaf4;
+  --text2:   #64748b;
+  --text3:   #2d3f52;
+
+  --r:       14px;
+  --r2:      10px;
+  --font:    'Inter', sans-serif;
+  --mono:    'JetBrains Mono', monospace;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* ── NAV ── */
+nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(8,13,20,0.92);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--bdr);
+  padding:0 1rem;height:54px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.nav-logo{display:flex;align-items:center;gap:9px}
+.nav-icon{
+  width:30px;height:30px;border-radius:8px;
+  background:linear-gradient(135deg,var(--green2),var(--green));
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;box-shadow:0 0 20px rgba(0,214,143,0.25);
+}
+.nav-brand{font-size:16px;font-weight:800;letter-spacing:-0.5px}
+.nav-brand span{color:var(--green)}
+.nav-tag{
+  font-size:9px;background:var(--gdim);color:var(--green);
+  padding:2px 8px;border-radius:20px;font-weight:600;
+  letter-spacing:1.5px;border:1px solid rgba(0,214,143,0.15);
+  font-family:var(--mono);display:none;
+}
+@media(min-width:400px){.nav-tag{display:inline}}
+.nav-right{display:flex;gap:6px;align-items:center}
+/* BUG FIX 3: nav-btn pakai <button> di HTML tapi di sini styled sebagai cursor:pointer — pastikan konsisten */
+.nav-btn{
+  font-size:11px;padding:6px 13px;border-radius:8px;
+  color:var(--text2);background:var(--bg3);border:1px solid var(--bdr2);
+  font-weight:600;cursor:pointer;transition:all .15s;font-family:var(--font);
+}
+.nav-btn:hover,.nav-btn.active{border-color:var(--green);color:var(--green);background:var(--gdim)}
+
+/* ── HERO ── */
+.hero{
+  padding:2.5rem 1rem 1.5rem;
+  animation:fadeUp .5s ease both;
+}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:10px;color:var(--text2);font-family:var(--mono);
+  letter-spacing:1.5px;text-transform:uppercase;margin-bottom:1.2rem;
+}
+.hero-dot{width:5px;height:5px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+.hero h1{font-size:1.9rem;font-weight:900;line-height:1.1;letter-spacing:-1.5px;margin-bottom:.75rem}
+.hero h1 em{font-style:normal;color:var(--green)}
+.hero p{font-size:.85rem;color:var(--text2);line-height:1.8;max-width:360px}
+
+/* ── SEARCH ── */
+.search-wrap{padding:0 1rem 1rem;animation:fadeUp .55s ease both}
+.search-box{
+  display:flex;background:var(--bg2);
+  border:1.5px solid var(--bdr2);border-radius:12px;
+  transition:all .2s;overflow:hidden;
+}
+.search-box:focus-within{border-color:var(--green);box-shadow:0 0 0 3px rgba(0,214,143,.07)}
+.s-icon{display:flex;align-items:center;padding:0 .75rem 0 1rem;color:var(--text3);font-size:16px;flex-shrink:0}
+#stockInput{
+  flex:1;background:transparent;border:none;outline:none;
+  padding:.9rem .4rem;font-size:1rem;font-family:var(--mono);
+  color:var(--text);font-weight:600;letter-spacing:2px;
+  text-transform:uppercase;min-width:0;
+}
+#stockInput::placeholder{text-transform:none;letter-spacing:0;font-weight:400;font-family:var(--font);color:var(--text3);font-size:.875rem}
+#analyzeBtn{
+  padding:.6rem 1rem;margin:5px;
+  background:var(--green);color:#000;border:none;border-radius:8px;
+  font-family:var(--font);font-size:.82rem;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;gap:5px;
+  transition:all .2s;white-space:nowrap;
+}
+#analyzeBtn:hover{background:#1aefaa}
+#analyzeBtn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── CHIPS ── */
+.chips{
+  display:flex;align-items:center;gap:5px;
+  padding:0 1rem .75rem;flex-wrap:wrap;
+  animation:fadeUp .6s ease both;
+}
+.chips-lbl{font-size:9px;color:var(--text3);font-weight:700;font-family:var(--mono);letter-spacing:1.5px}
+.chip{
+  font-size:10px;padding:4px 11px;border:1px solid var(--bdr2);
+  border-radius:6px;cursor:pointer;color:var(--text2);
+  background:var(--bg2);transition:all .15s;font-weight:600;
+  letter-spacing:1px;font-family:var(--mono);
+}
+.chip:hover,.chip.active{background:var(--gdim);border-color:var(--green);color:var(--green)}
+
+/* ── WATCHLIST ── */
+.watchlist-bar{padding:0 1rem .75rem}
+.wl-title{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:2px;font-family:var(--mono);margin-bottom:.5rem;display:block}
+.wl-items{display:flex;flex-wrap:wrap;gap:5px}
+.wl-item{display:flex;align-items:center;gap:5px;padding:4px 10px;background:var(--bg2);border:1px solid var(--bdr2);border-radius:6px;cursor:pointer;transition:all .15s}
+.wl-item:hover{border-color:var(--green)}
+.wl-ticker{font-size:10px;font-weight:700;font-family:var(--mono);color:var(--text)}
+/* BUG FIX 4: wl-remove pakai <button> semantik di JS-generated HTML tapi diklik via span — tambah role=button compat */
+.wl-remove{font-size:14px;color:var(--text3);cursor:pointer;line-height:1;padding:0 2px}
+.wl-remove:hover{color:var(--red)}
+.wl-add-btn{font-size:10px;padding:4px 10px;background:var(--gdim);border:1px solid rgba(0,214,143,.2);border-radius:6px;color:var(--green);cursor:pointer;font-weight:600;font-family:var(--mono);display:inline-block;margin-top:6px}
+
+/* ── RESULTS ── */
+#resultsSection{padding:0 1rem 5rem;display:none}
+
+/* ══════════════════════════════
+   CARD SYSTEM
+══════════════════════════════ */
+.card{
+  background:var(--bg2);border:1px solid var(--bdr);
+  border-radius:var(--r);padding:1rem;margin-bottom:8px;
+  animation:fadeUp .3s ease both;
+}
+
+/* ── TICKER HEADER ── */
+.ticker-hero{
+  background:var(--bg2);border:1px solid var(--bdr);
+  border-radius:var(--r);padding:1rem;margin-bottom:8px;
+  animation:fadeUp .25s ease both;
+  position:relative;overflow:hidden;
+}
+.ticker-hero::before{
+  content:'';position:absolute;top:0;right:0;
+  width:120px;height:120px;
+  background:radial-gradient(circle, rgba(0,214,143,0.06) 0%, transparent 70%);
+  pointer-events:none;
+}
+.th-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem}
+.th-code{font-size:2.2rem;font-weight:900;letter-spacing:-2px;font-family:var(--mono);line-height:1}
+.th-name{font-size:11px;color:var(--text2);margin-top:4px;font-weight:500}
+.th-badges{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
+.th-sector{
+  font-size:9px;padding:2px 8px;border-radius:4px;
+  background:var(--bg4);border:1px solid var(--bdr2);
+  color:var(--text3);letter-spacing:.5px;font-family:var(--mono);
+}
+.th-right{text-align:right;flex-shrink:0}
+.th-price{font-size:1.6rem;font-weight:800;letter-spacing:-1px;font-family:var(--mono);line-height:1}
+.th-chg{font-size:12px;font-weight:600;margin-top:3px;font-family:var(--mono)}
+.th-chg.up{color:var(--green)}.th-chg.down{color:var(--red)}
+
+/* Score bar */
+.score-bar-wrap{
+  background:var(--bg3);border-radius:10px;padding:.85rem;
+  border:1px solid var(--bdr);
+}
+.sb-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.sb-label{font-size:9px;color:var(--text3);font-family:var(--mono);font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
+.sb-score{font-family:var(--mono);font-size:2rem;font-weight:800;line-height:1}
+.sb-reco{font-size:11px;font-family:var(--mono);font-weight:700;margin-top:2px}
+.sb-track{height:4px;background:var(--bg5);border-radius:4px;overflow:hidden;margin-bottom:6px;position:relative}
+.sb-fill{height:100%;border-radius:4px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.sb-poles{display:flex;justify-content:space-between}
+.sb-pole{font-size:8px;color:var(--text3);font-family:var(--mono)}
+
+/* ── GRID ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px}
+/* BUG FIX 5: grid-3 tidak pernah dipakai di app.js — hapus agar tidak membingungkan.
+   grid-4 dipakai untuk 2-kolom (stat row), biarkan */
+.grid-4{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-bottom:8px}
+
+/* ── PANEL CARDS ── */
+.panel{border-radius:var(--r2);padding:.9rem;}
+.p-green{background:linear-gradient(135deg,rgba(0,214,143,.07),rgba(0,214,143,.02));border:1px solid rgba(0,214,143,.12)}
+.p-gold{background:linear-gradient(135deg,rgba(240,180,41,.07),rgba(240,180,41,.02));border:1px solid rgba(240,180,41,.12)}
+.p-blue{background:linear-gradient(135deg,rgba(77,159,255,.07),rgba(77,159,255,.02));border:1px solid rgba(77,159,255,.12)}
+.p-dark{background:var(--bg3);border:1px solid var(--bdr2)}
+.p-label{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;font-family:var(--mono);margin-bottom:.6rem;display:flex;align-items:center;gap:5px}
+.p-label.green{color:var(--green)}.p-label.gold{color:var(--gold)}.p-label.blue{color:var(--blue)}.p-label.muted{color:var(--text2)}
+.p-num{font-family:var(--mono);font-size:2rem;font-weight:800;line-height:1;letter-spacing:-1.5px}
+.p-num.green{color:var(--green)}.p-num.gold{color:var(--gold)}.p-num.blue{color:var(--blue)}.p-num.red{color:var(--red)}
+.p-sub{font-size:10px;color:var(--text2);margin-top:4px;font-family:var(--mono)}
+
+/* Smart money flow bar */
+.smf-bar{margin-top:.7rem}
+.smf-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.smf-lbl{font-size:9px;color:var(--text3);width:26px;font-family:var(--mono)}
+.smf-track{flex:1;height:3px;background:var(--bg5);border-radius:2px;overflow:hidden}
+.smf-g{height:100%;background:var(--green);border-radius:2px;transition:width .8s ease}
+.smf-r{height:100%;background:var(--red);border-radius:2px;transition:width .8s ease}
+.smf-val{font-size:9px;font-family:var(--mono);font-weight:600;width:30px;text-align:right}
+
+/* Cond chips */
+.cond-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:.6rem}
+.cchip{font-size:9px;padding:3px 8px;border-radius:4px;font-weight:700;font-family:var(--mono);letter-spacing:.3px}
+.cok{background:rgba(0,214,143,.1);color:var(--green);border:1px solid rgba(0,214,143,.2)}
+.cwarn{background:var(--goldim);color:var(--gold);border:1px solid rgba(240,180,41,.2)}
+.cbad{background:var(--rdim);color:var(--red);border:1px solid rgba(240,79,94,.2)}
+
+/* Entry range */
+.entry-range{font-family:var(--mono);font-size:1.3rem;font-weight:800;color:var(--blue);letter-spacing:-1px;margin:.4rem 0}
+.entry-sub{font-size:8px;color:var(--text3);font-family:var(--mono);letter-spacing:1px;text-transform:uppercase}
+
+/* ── RISK MANAGEMENT ── */
+.risk-card{
+  background:var(--bg2);border:1px solid var(--bdr);
+  border-radius:var(--r);padding:1rem;margin-bottom:8px;
+}
+.risk-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
+.risk-title{font-size:9px;color:var(--text3);font-family:var(--mono);font-weight:700;letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.risk-title::before{content:'';width:2px;height:10px;border-radius:2px;background:var(--red);flex-shrink:0}
+.risk-sl{
+  background:rgba(240,79,94,.06);border:1px solid rgba(240,79,94,.15);
+  border-radius:10px;padding:.85rem;margin-bottom:.75rem;
+}
+.risk-sl-label{font-size:9px;color:var(--red);font-family:var(--mono);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px}
+.risk-sl-val{font-family:var(--mono);font-size:1.6rem;font-weight:800;color:var(--red);letter-spacing:-1px}
+.risk-sl-note{font-size:9px;color:var(--text3);margin-top:2px;font-family:var(--mono)}
+.risk-targets{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.risk-t{background:var(--bg3);border-radius:9px;padding:.75rem}
+.risk-t-lbl{font-size:8px;color:var(--text3);font-family:var(--mono);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px}
+.risk-t-val{font-family:var(--mono);font-size:1rem;font-weight:700}
+.risk-t-val.g{color:var(--green)}.risk-t-val.gold{color:var(--gold)}
+.risk-t-sub{font-size:9px;color:var(--text3);margin-top:2px;font-family:var(--mono)}
+.risk-note-bar{
+  margin-top:.75rem;padding:.6rem .75rem;
+  background:var(--bg3);border-radius:8px;
+  font-size:10px;color:var(--text2);line-height:1.6;
+  border-left:2px solid var(--gold);
+}
+
+/* ── SIGNAL STRIP ── */
+.signals{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;animation:fadeUp .28s ease both}
+.sig{display:flex;align-items:center;gap:3px;padding:4px 9px;border-radius:5px;font-size:9px;font-weight:700;font-family:var(--mono);letter-spacing:.5px}
+.sig.high{background:var(--gdim);border:1px solid rgba(0,214,143,.2);color:var(--green)}
+.sig.medium{background:var(--goldim);border:1px solid rgba(240,180,41,.2);color:var(--gold)}
+.sig.low{background:var(--bg3);border:1px solid var(--bdr);color:var(--text3)}
+
+/* ── BADGE/PILL ── */
+.badge{display:inline-flex;align-items:center;padding:4px 12px;border-radius:6px;font-weight:700;font-size:11px;letter-spacing:.5px;font-family:var(--mono)}
+.sent-beli{background:rgba(0,214,143,.1);color:var(--green);border:1px solid rgba(0,214,143,.2)}
+.sent-tahan{background:var(--goldim);color:var(--gold);border:1px solid rgba(240,180,41,.2)}
+.sent-jual{background:var(--rdim);color:var(--red);border:1px solid rgba(240,79,94,.2)}
+.conf{font-size:8px;padding:2px 8px;border-radius:4px;font-weight:700;letter-spacing:1px;font-family:var(--mono)}
+.conf-high{background:var(--gdim);color:var(--green);border:1px solid rgba(0,214,143,.2)}
+.conf-medium{background:var(--goldim);color:var(--gold);border:1px solid rgba(240,180,41,.2)}
+.conf-low{background:var(--bg3);color:var(--text3);border:1px solid var(--bdr)}
+.pill{display:inline-flex;align-items:center;font-size:9px;padding:2px 8px;border-radius:4px;font-weight:700;letter-spacing:.3px;font-family:var(--mono)}
+.pill-g{background:var(--gdim);color:var(--green);border:1px solid rgba(0,214,143,.2)}
+.pill-r{background:var(--rdim);color:var(--red);border:1px solid rgba(240,79,94,.2)}
+.pill-gold{background:var(--goldim);color:var(--gold);border:1px solid rgba(240,180,41,.2)}
+.pill-b{background:var(--bdim);color:var(--blue);border:1px solid rgba(77,159,255,.2)}
+.pill-gray{background:var(--bg3);color:var(--text3);border:1px solid var(--bdr)}
+
+/* ── TAGS ── */
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:.5rem}
+.tag{font-size:10px;padding:4px 10px;background:var(--bg3);border:1px solid var(--bdr);border-radius:5px;color:var(--text2);line-height:1.4}
+.tag.g{background:var(--gdim);border-color:rgba(0,214,143,.2);color:var(--green)}
+.tag.r{background:var(--rdim);border-color:rgba(240,79,94,.2);color:var(--red)}
+.tag.gold{background:var(--goldim);border-color:rgba(240,180,41,.2);color:var(--gold)}
+
+/* ── CARD LABEL ── */
+.clbl{
+  font-size:9px;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:2px;font-family:var(--mono);
+  display:flex;align-items:center;gap:6px;margin-bottom:.85rem;
+}
+.clbl::before{content:'';width:2px;height:10px;border-radius:2px;background:var(--green);flex-shrink:0}
+.clbl.gold::before{background:var(--gold)}
+.clbl.red::before{background:var(--red)}
+.clbl.blue::before{background:var(--blue)}
+
+/* ── STAT BOX ── */
+.stat{background:var(--bg3);border:1px solid var(--bdr);border-radius:9px;padding:.75rem}
+.stat-l{font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;font-weight:700;font-family:var(--mono)}
+.stat-v{font-family:var(--mono);font-size:.9rem;font-weight:700}
+.stat-v.g{color:var(--green)}.stat-v.r{color:var(--red)}.stat-v.gold{color:var(--gold)}
+
+/* ── CHART ── */
+.chart-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r);padding:1rem;margin-bottom:8px}
+.chart-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem;flex-wrap:wrap;gap:6px}
+.chart-title{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:2px;font-family:var(--mono)}
+.chart-ctrls{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.ctab{font-size:9px;padding:3px 9px;border-radius:4px;cursor:pointer;color:var(--text2);background:var(--bg3);border:1px solid var(--bdr);font-family:var(--mono);font-weight:600;transition:all .15s}
+.ctab.active,.ctab:hover{background:var(--gdim);border-color:var(--green);color:var(--green)}
+/* BUG FIX 6: ctab-type hover tidak boleh override dengan warna green — pakai blue khusus */
+.ctab-type:hover:not(.active){background:var(--bdim);border-color:var(--blue);color:var(--blue)}
+.ctab-type.active{background:var(--bdim);border-color:var(--blue);color:var(--blue)}
+#tvChart{width:100%;height:240px;border-radius:6px;overflow:hidden}
+#rsiChart{width:100%;height:75px;border-radius:6px;overflow:hidden;margin-top:3px}
+#macdChart{width:100%;height:75px;border-radius:6px;overflow:hidden;margin-top:3px}
+.ind-toggles{display:flex;flex-wrap:wrap;gap:3px;margin-top:7px}
+.ind-toggle{font-size:8px;padding:2px 8px;border-radius:4px;cursor:pointer;font-family:var(--mono);font-weight:700;letter-spacing:.5px;border:1px solid;transition:all .15s;user-select:none}
+.on-ma20{background:rgba(240,180,41,.1);border-color:rgba(240,180,41,.4);color:var(--gold)}
+.off-ma20,.off-ma50,.off-ema9,.off-bb,.off-rsi,.off-macd{background:transparent;border-color:var(--bdr);color:var(--text3)}
+.on-ma50{background:var(--bdim);border-color:rgba(77,159,255,.4);color:var(--blue)}
+.on-ema9{background:var(--gdim);border-color:rgba(0,214,143,.4);color:var(--green)}
+.on-bb{background:rgba(168,85,247,.1);border-color:rgba(168,85,247,.4);color:var(--purple)}
+.on-rsi{background:var(--rdim);border-color:rgba(240,79,94,.4);color:var(--red)}
+.on-macd{background:var(--gdim);border-color:rgba(0,214,143,.3);color:var(--green)}
+.subpanel{display:none;background:var(--bg3);border-radius:6px;padding:4px 6px;margin-top:3px}
+.subpanel.visible{display:block}
+.subpanel-lbl{font-size:7px;color:var(--text3);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;font-family:var(--mono)}
+
+/* ── BREAKDOWN ── */
+.breakdown-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:7px}
+.bk-item{background:var(--bg3);border-radius:9px;padding:.8rem}
+.bk-lbl{font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:5px;font-family:var(--mono)}
+.bk-num{font-family:var(--mono);font-size:1.3rem;font-weight:700;margin-bottom:4px}
+.bk-bar{height:2px;background:var(--bg5);border-radius:2px;overflow:hidden;margin-bottom:4px}
+.bk-fill{height:100%;border-radius:2px;transition:width 1.2s ease}
+.bk-reasons{font-size:9px;color:var(--text3);line-height:1.6}
+
+/* ── SETUP ── */
+.setup{background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;padding:.8rem;margin-bottom:5px;border-left:2px solid transparent}
+.setup.high{border-left-color:var(--green)}.setup.medium{border-left-color:var(--gold)}
+.setup-type{font-family:var(--mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.setup-reason{font-size:10px;color:var(--text2);line-height:1.6}
+
+/* ── INTEL ── */
+.intel{background:var(--bg3);border:1px solid var(--bdr);border-radius:9px;padding:.85rem}
+.intel-l{font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:5px;font-family:var(--mono)}
+.intel-v{font-family:var(--mono);font-size:.88rem;font-weight:700;margin-bottom:3px}
+.intel-s{font-size:10px;color:var(--text2);line-height:1.5}
+
+/* ── WHY NOW ── */
+.why-card{
+  background:linear-gradient(135deg,rgba(0,214,143,.06),transparent);
+  border:1px solid rgba(0,214,143,.15);border-radius:var(--r);
+  padding:1rem;margin-bottom:8px;
+}
+.why-lbl{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:6px;font-family:var(--mono);display:flex;align-items:center;gap:5px}
+.why-text{font-size:.875rem;color:var(--text);line-height:1.85}
+
+/* ── SMART MONEY ── */
+.sm-card{
+  background:linear-gradient(135deg,rgba(240,180,41,.06),transparent);
+  border:1px solid rgba(240,180,41,.12);border-radius:var(--r);
+  padding:1rem;margin-bottom:8px;
+}
+.sm-lbl{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;font-family:var(--mono)}
+.sm-text{font-size:.86rem;color:rgba(240,180,41,.85);line-height:1.75}
+
+/* ── INFO TABLE ── */
+.info-table{width:100%;border-collapse:collapse}
+.info-table tr{border-bottom:1px solid var(--bdr)}
+.info-table tr:last-child{border-bottom:none}
+.info-table td{padding:7px 0;font-size:11px}
+.info-table td:first-child{color:var(--text2)}
+.info-table td:last-child{text-align:right;font-weight:600;color:var(--text);font-family:var(--mono)}
+
+/* ── SKELETON ── */
+.sk{background:linear-gradient(90deg,var(--bg2) 25%,var(--bg3) 50%,var(--bg2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:5px}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--bdr2);padding:8px 16px;border-radius:8px;font-size:11px;color:var(--text);z-index:999;animation:fadeUp .3s ease;box-shadow:0 8px 32px rgba(0,0,0,.6);white-space:nowrap;max-width:90vw;font-family:var(--mono)}
+.toast.error{border-color:rgba(240,79,94,.4);color:var(--red)}
+.toast.ok{border-color:rgba(0,214,143,.4);color:var(--green)}
+
+/* ══════════════════════════════
+   SCANNER
+══════════════════════════════ */
+#scannerSection{padding:0 1rem 5rem;display:none}
+.scanner-hdr{padding:.75rem 0 1rem}
+.scanner-title{font-size:1.1rem;font-weight:800;letter-spacing:-.5px;margin-bottom:2px}
+.scanner-sub{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.scan-filters{display:flex;gap:5px;margin-bottom:1rem;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;white-space:nowrap}
+.scan-filters::-webkit-scrollbar{display:none}
+.sf-btn{font-size:9px;padding:5px 12px;border-radius:6px;cursor:pointer;color:var(--text2);background:var(--bg2);border:1px solid var(--bdr2);font-family:var(--mono);font-weight:700;letter-spacing:.5px;transition:all .15s;flex-shrink:0}
+.sf-btn:hover,.sf-btn.active{background:var(--gdim);border-color:var(--green);color:var(--green)}
+.scan-run-btn{padding:7px 18px;background:var(--green);color:#000;border:none;border-radius:8px;font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s}
+.scan-run-btn:hover{background:#1aefaa}
+.scan-run-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* Scanner rows */
+.scan-list{display:flex;flex-direction:column;gap:6px}
+.sc-row{
+  background:var(--bg2);border:1px solid var(--bdr);
+  border-left:2px solid transparent;border-radius:var(--r);
+  padding:.85rem .9rem;cursor:pointer;transition:all .2s;
+  display:grid;grid-template-columns:40px 1fr auto auto;
+  align-items:center;gap:.75rem;
+}
+.sc-row:active{transform:scale(.99)}
+.sc-row.bull{border-left-color:var(--green)}
+.sc-row.bear{border-left-color:var(--red)}
+.sc-row.neutral{border-left-color:var(--text3)}
+.sc-avatar{
+  width:40px;height:40px;border-radius:10px;
+  background:var(--bg3);border:1px solid var(--bdr2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:800;font-family:var(--mono);color:var(--text2);
+}
+.sc-ticker{font-family:var(--mono);font-size:.95rem;font-weight:700;letter-spacing:-.5px}
+.sc-name{font-size:9px;color:var(--text3);font-family:var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;margin-top:1px}
+.sc-sigs{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
+.sc-sig{font-size:8px;padding:2px 6px;border-radius:3px;font-weight:700;font-family:var(--mono)}
+.sc-sig.high{background:var(--gdim);border:1px solid rgba(0,214,143,.2);color:var(--green)}
+.sc-sig.medium{background:var(--goldim);border:1px solid rgba(240,180,41,.2);color:var(--gold)}
+.sc-price-col{text-align:right}
+.sc-price{font-family:var(--mono);font-size:.88rem;font-weight:700}
+.sc-chg{font-size:9px;font-weight:700;font-family:var(--mono)}
+.sc-chg.up{color:var(--green)}.sc-chg.down{color:var(--red)}
+.sc-score-col{text-align:right;min-width:42px}
+.sc-score-val{font-family:var(--mono);font-size:1.1rem;font-weight:800}
+.sc-score-lbl{font-size:8px;color:var(--text3);font-family:var(--mono)}
+.scan-stats{display:flex;gap:16px;margin-bottom:.75rem}
+.scan-stat{display:flex;align-items:center;gap:5px}
+.scan-stat-num{font-family:var(--mono);font-size:1rem;font-weight:700}
+.scan-stat-lbl{font-size:9px;color:var(--text3)}
+.scanner-loading{text-align:center;padding:2.5rem 1rem}
+.progress-bar{height:2px;background:var(--bg3);border-radius:2px;overflow:hidden;max-width:200px;margin:1rem auto 0}
+.progress-fill{height:100%;background:var(--green);transition:width .3s ease;border-radius:2px}
+.scanner-empty{text-align:center;padding:3rem;color:var(--text3);font-size:12px;font-family:var(--mono)}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.spin{animation:spin .8s linear infinite;display:inline-block}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    <div class="nav-icon" aria-hidden="true">📈</div>
+    <span class="nav-brand">Saham<span>AI</span></span>
+    <span class="nav-tag">IHSG INTELLIGENCE</span>
+  </div>
+  <div class="nav-right">
+    <!-- BUG FIX 7: nav-btn pakai <button> bukan <span> untuk aksesibilitas keyboard & screen reader -->
+    <button class="nav-btn" id="navScannerBtn" onclick="toggleScanner()" type="button">⚡ Scanner</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-tag">
+    <div class="hero-dot" aria-hidden="true"></div>
+    <span>LIVE · AI-Powered · IHSG</span>
+  </div>
+  <h1>Analisis Saham<br><em>Indonesia</em></h1>
+  <p>Indikator teknikal matematis, volume intelligence, market structure &amp; scoring deterministik.</p>
+</section>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <div class="s-icon" aria-hidden="true">🔍</div>
+    <!-- BUG FIX 8: tambah inputmode="text" + enterkeyhint="search" untuk keyboard mobile yang lebih baik -->
+    <input type="text" id="stockInput"
+      placeholder="Ketik kode saham: BBCA, TLKM..."
+      maxlength="10"
+      inputmode="text"
+      enterkeyhint="search"
+      onkeydown="if(event.key==='Enter') analyzeStock()"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="characters"
+      spellcheck="false"
+      aria-label="Kode saham"/>
+    <button id="analyzeBtn" onclick="analyzeStock()" type="button" aria-label="Analisis saham">
+      <span id="btnIcon" aria-hidden="true">✦</span> Analisis
+    </button>
+  </div>
+</div>
+
+<div class="chips" role="list" aria-label="Saham populer">
+  <span class="chips-lbl">POPULER:</span>
+  <span id="popularChips"></span>
+</div>
+
+<div class="watchlist-bar" id="watchlistBar" style="display:none">
+  <span class="wl-title">⭐ Watchlist</span>
+  <div class="wl-items" id="watchlistItems"></div>
+</div>
+
+<section id="resultsSection" aria-live="polite" aria-label="Hasil analisis">
+  <div id="resultsContent"></div>
+</section>
+
+<section id="scannerSection" aria-label="Scanner IHSG">
+  <div class="scanner-hdr">
+    <div class="scanner-title">⚡ Scanner IHSG</div>
+    <div class="scanner-sub">Scan <span id="scanUniverse">200+</span> saham IHSG — setup real-time</div>
+  </div>
+  <div class="scan-filters" role="group" aria-label="Filter scanner">
+    <button class="sf-btn active" onclick="setScanFilter(this,'all')" type="button">Semua</button>
+    <button class="sf-btn" onclick="setScanFilter(this,'breakout')" type="button">🚀 Breakout</button>
+    <button class="sf-btn" onclick="setScanFilter(this,'volume_spike')" type="button">📊 Vol Spike</button>
+    <button class="sf-btn" onclick="setScanFilter(this,'oversold')" type="button">🔻 Oversold</button>
+    <button class="sf-btn" onclick="setScanFilter(this,'golden_cross')" type="button">✨ Golden Cross</button>
+    <button class="sf-btn" onclick="setScanFilter(this,'accumulation')" type="button">📦 Akumulasi</button>
+    <button class="sf-btn" onclick="setScanFilter(this,'death_cross')" type="button">💀 Death Cross</button>
+    <button class="sf-btn" onclick="setScanFilter(this,'ready_pump')" type="button">🎯 Ready Pump</button>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;flex-wrap:wrap">
+    <button class="scan-run-btn" id="scanRunBtn" onclick="runScanner()" type="button">
+      <span id="scanBtnIcon" aria-hidden="true">⚡</span> Mulai Scan
+    </button>
+    <span style="font-size:10px;color:var(--text3);font-family:var(--mono)" id="scanLastRun" aria-live="polite"></span>
+  </div>
+  <div id="scannerResults" aria-live="polite"></div>
+</section>
+
+<footer style="border-top:1px solid var(--bdr);padding:1.5rem 1rem;text-align:center;color:var(--text3);font-size:10px;line-height:2;font-family:var(--mono)">
+  <p>⚠️ Hanya untuk tujuan edukasi. Bukan saran investasi resmi.</p>
+  <p>Selalu riset mandiri sebelum berinvestasi · SahamAI © 2026</p>
+</footer>
+
+<!-- BUG FIX 9: hapus defer agar app.js load setelah DOMContentLoaded event bisa terpicu dengan benar
+     di semua browser. defer seharusnya aman tapi ada edge case di beberapa mobile WebView -->
+<script src="/app.js"></script>
+</body>
+</html>
