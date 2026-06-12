@@ -361,8 +361,8 @@ function buildResult(ticker,d){
 
   // BUG FIX 9: optional chaining diganti dengan null-safe access agar tidak error di browser lama
   const rsi=ind.rsi;
-  const ma20ok=ind.ma&&pd.current&&ind.ma.ma20&&pd.current>ind.ma.ma20;
-  const ma50ok=ind.ma&&pd.current&&ind.ma.ma50&&pd.current>ind.ma.ma50;
+  const ma20ok=ind.ma&&pd.current&&ind.ma.ema9&&pd.current>ind.ma.ema9;
+  const ma50ok=ind.ma&&pd.current&&ind.ma.sma50&&pd.current>ind.ma.sma50;
   const macdOk=ind.macd&&ind.macd.trend==='bullish';
   const atrPct=(ind.atr&&ind.atr.atrPct)||0;
   const p3=`
@@ -373,8 +373,8 @@ function buildResult(ticker,d){
       <span style="font-size:9px;color:var(--text3);font-family:var(--mono)">RSI</span>
     </div>
     <div class="cond-chips">
-      <span class="cchip ${ma20ok?'cok':'cbad'}">MA20 ${ma20ok?'✓':'✗'}</span>
-      <span class="cchip ${ma50ok?'cok':'cbad'}">MA50 ${ma50ok?'✓':'✗'}</span>
+      <span class="cchip ${ma20ok?'cok':'cbad'}">EMA9 ${ma20ok?'✓':'✗'}</span>
+      <span class="cchip ${ma50ok?'cok':'cbad'}">SMA50 ${ma50ok?'✓':'✗'}</span>
       <span class="cchip ${macdOk?'cok':'cwarn'}">MACD ${macdOk?'BULL':'BEAR'}</span>
       ${ind.atr?`<span class="cchip ${atrPct>4?'cbad':atrPct>2?'cwarn':'cok'}">ATR ${atrPct}%</span>`:''}
     </div>
@@ -598,7 +598,8 @@ function buildResult(ticker,d){
   if(ind.divergence&&ind.divergence.detected)proInds.push(`<span class="pill pill-${ind.divergence.bias==='bullish'?'g':'r'}">${ind.divergence.bias==='bullish'?'Bullish':'Bearish'} Divergence</span>`);
   if(ind.candlestick&&ind.candlestick.topPattern)proInds.push(`<span class="pill pill-gold">${esc(ind.candlestick.topPattern.name)}</span>`);
   if(ind.fibonacci&&ind.fibonacci.atKeyLevel)proInds.push(`<span class="pill pill-b">Fib Level Kunci</span>`);
-  if(ind.relStrength&&ind.relStrength.trend==='outperform')proInds.push(`<span class="pill pill-g">RS Outperform ${ind.relStrength.rsScore}</span>`);
+  if(ind.smartMoney&&ind.smartMoney.bias==='strong_buying')proInds.push(`<span class="pill pill-g">Smart Money Buy ${ind.smartMoney.ratio}%</span>`);
+  if(ind.smartMoney&&ind.smartMoney.bias==='strong_selling')proInds.push(`<span class="pill pill-r">Smart Money Sell ${ind.smartMoney.ratio}%</span>`);
   const proSection=proInds.length?`
   <div class="card">
     <div class="clbl">🔬 Indikator Pro</div>
