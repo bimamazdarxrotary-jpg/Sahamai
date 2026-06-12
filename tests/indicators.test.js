@@ -234,7 +234,7 @@ console.log('\n📊 computeAll');
 test('computeAll return semua field utama', () => {
   const result = computeAll(makeCandles(range(100, 165)));
   assert(result !== null);
-  ['rsi', 'macd', 'bb', 'ma', 'atr', 'trend', 'rvol', 'position52w', 'obv'].forEach(f => {
+  ['rsi', 'macd', 'bb', 'ma', 'atr', 'rvol', 'obv', 'smartMoney', 'levels', 'fibonacci', 'position52w', 'divergence', 'candlestick'].forEach(f => {
     assert(f in result, 'Harus ada field: ' + f);
   });
 });
