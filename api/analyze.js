@@ -162,7 +162,7 @@ module.exports = async function handler(req, res) {
 
   // ── 2. Indikator matematis ─────────────────────────────────────
   const indicators = candles.length >= 5 ? computeAll(candles) : {};
-  log.info('analyze', '[IND]', ticker, 'RSI=' + (indicators && indicators.rsi), 'MA20=' + (indicators && indicators.ma && indicators.ma.ma20));
+  log.info('analyze', '[IND]', ticker, 'RSI=' + (indicators && indicators.rsi), 'EMA9=' + (indicators && indicators.ma && indicators.ma.ema9));
 
   // ── 3. Volume intelligence ─────────────────────────────────────
   const volumeData = candles.length >= 5 ? analyzeVolume(candles) : null;
@@ -333,15 +333,14 @@ module.exports = async function handler(req, res) {
       macd:        indicators.macd        || null,
       bb:          indicators.bb          || null,
       atr:         indicators.atr         || null,
-      trend:       indicators.trend       || null,
       levels:      indicators.levels      || null,
       obv:         indicators.obv         || null,
       rvol:        indicators.rvol        || null,
+      smartMoney:  indicators.smartMoney  || null,
       position52w: indicators.position52w || null,
       divergence:  indicators.divergence  || null,
       fibonacci:   indicators.fibonacci   || null,
       candlestick: indicators.candlestick || null,
-      relStrength: indicators.relStrength || null,
       trendSummary: indicators.trendSummary || null
     },
     volumeData: volumeData ? {
