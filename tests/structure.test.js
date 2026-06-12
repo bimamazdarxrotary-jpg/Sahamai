@@ -30,17 +30,19 @@ function range(s, e, step = 1) {
 }
 
 const bullishIndicators = {
-  ma: { aboveMA20: true, aboveMA50: true, ma20vs50: 'bullish_alignment', type: null, ma20: 110 },
+  ma: { aboveEMA9: true, aboveSMA50: true, alignment: 'bullish', type: null, ema9: 110, sma50: 105,
+        // backward compat aliases
+        aboveMA20: true, aboveMA50: true, ma20vs50: 'bullish_alignment', ma20: 110 },
   rsi: 55,
-  bb: { position: 'middle', bandwidth: 8 },
-  trend: { strength: 'strong', adx: 30 }
+  bb: { position: 'middle', bandwidth: 8 }
 };
 
 const bearishIndicators = {
-  ma: { aboveMA20: false, aboveMA50: false, ma20vs50: 'bearish_alignment', type: null, ma20: 90 },
+  ma: { aboveEMA9: false, aboveSMA50: false, alignment: 'bearish', type: null, ema9: 90, sma50: 95,
+        // backward compat aliases
+        aboveMA20: false, aboveMA50: false, ma20vs50: 'bearish_alignment', ma20: 90 },
   rsi: 40,
-  bb: { position: 'middle', bandwidth: 8 },
-  trend: { strength: 'strong', adx: 30 }
+  bb: { position: 'middle', bandwidth: 8 }
 };
 
 // ══════════════════════════════════════════════════════════════════
