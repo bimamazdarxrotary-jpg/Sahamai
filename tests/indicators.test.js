@@ -228,8 +228,59 @@ test('position52w positionPct 0–100', () => {
 });
 
 // ══════════════════════════════════════════════════════════════════
-console.log('\n📊 computeAll');
+console.log('\n📊 candlestickPatterns — Morning/Evening Star');
 // ══════════════════════════════════════════════════════════════════
+
+test('Morning Star terdeteksi — 3 candle reversal bullish setelah downtrend', () => {
+  const { candlestickPatterns } = require('../lib/indicators');
+  // Downtrend → red candle besar → doji/kecil → green candle besar menutup >50% candle pertama
+  const candles = makeCandles(range(120, 100, -1)); // downtrend
+  // Override 3 candle terakhir: big red, small body, big green
+  candles[candles.length - 3] = { date: '2024-02-01', open: 108, high: 110, low: 99,  close: 100, volume: 1000000 }; // big red
+  candles[candles.length - 2] = { date: '2024-02-02', open: 100, high: 102, low: 98,  close: 101, volume: 1000000 }; // small doji
+  candles[candles.length - 1] = { date: '2024-02-03', open: 101, high: 112, low: 100, close: 110, volume: 1500000 }; // big green
+  const result = candlestickPatterns(candles);
+  assert(result !== null, 'candlestickPatterns harus return object');
+  const hasMorningStar = result.patterns && result.patterns.some(p => p.name === 'Morning Star');
+  assert(hasMorningStar, 'Harus terdeteksi Morning Star, patterns=' + JSON.stringify(result.patterns && result.patterns.map(p => p.name)));
+});
+
+test('Evening Star terdeteksi — 3 candle reversal bearish setelah uptrend', () => {
+  const { candlestickPatterns } = require('../lib/indicators');
+  // Uptrend → green candle besar → doji/kecil → red candle besar menutup <50% candle pertama
+  const candles = makeCandles(range(80, 110)); // uptrend
+  // Override 3 candle terakhir: big green, small body, big red
+  candles[candles.length - 3] = { date: '2024-02-01', open: 100, high: 112, low: 99,  close: 110, volume: 1000000 }; // big green
+  candles[candles.length - 2] = { date: '2024-02-02', open: 110, high: 113, low: 108, close: 111, volume: 1000000 }; // small body
+  candles[candles.length - 1] = { date: '2024-02-03', open: 111, high: 112, low: 99,  close: 101, volume: 1500000 }; // big red
+  const result = candlestickPatterns(candles);
+  assert(result !== null, 'candlestickPatterns harus return object');
+  const hasEveningStar = result.patterns && result.patterns.some(p => p.name === 'Evening Star');
+  assert(hasEveningStar, 'Harus terdeteksi Evening Star, patterns=' + JSON.stringify(result.patterns && result.patterns.map(p => p.name)));
+});
+
+// ══════════════════════════════════════════════════════════════════
+console.log('\n📊 maCrossover — death_cross / golden_cross');
+// ══════════════════════════════════════════════════════════════════
+
+test('Golden Cross terdeteksi pada tren naik kuat', () => {
+  // Harga naik kuat dari 50 ke 150 — EMA9 akan melampaui SMA50
+  const closes = range(50, 150);
+  const result = maCrossover(closes);
+  assert(result !== null, 'maCrossover harus return object');
+  assert(result.aboveEMA9  === true,  'Harus aboveEMA9 pada tren naik, got ' + result.aboveEMA9);
+  assert(result.aboveSMA50 === true,  'Harus aboveSMA50 pada tren naik, got ' + result.aboveSMA50);
+  assert(result.alignment  === 'bullish', 'alignment harus bullish, got ' + result.alignment);
+});
+
+test('Death Cross terdeteksi pada tren turun kuat', () => {
+  const closes = range(150, 50, -1);
+  const result = maCrossover(closes);
+  assert(result !== null, 'maCrossover harus return object');
+  assert(result.aboveEMA9  === false, 'Harus !aboveEMA9 pada tren turun, got ' + result.aboveEMA9);
+  assert(result.aboveSMA50 === false, 'Harus !aboveSMA50 pada tren turun, got ' + result.aboveSMA50);
+  assert(result.alignment  === 'bearish', 'alignment harus bearish, got ' + result.alignment);
+});
 
 test('computeAll return semua field utama', () => {
   const result = computeAll(makeCandles(range(100, 165)));

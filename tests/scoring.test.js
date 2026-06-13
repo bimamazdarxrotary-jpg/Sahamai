@@ -238,6 +238,27 @@ test('52W near high → risk meningkat', () => {
     'Near 52W high harus risk >= not near high');
 });
 
+test('Death cross → risk score lebih tinggi dari alignment bearish biasa', () => {
+  const withDeathCross    = computeScore({ ...bearishIndicators, ma: { ...bearishIndicators.ma, type: 'death_cross' } }, bearishVolume, bearishStructure, {});
+  const withoutDeathCross = computeScore({ ...bearishIndicators, ma: { ...bearishIndicators.ma, type: null } }, bearishVolume, bearishStructure, {});
+  assert(withDeathCross.breakdown.risk.score >= withoutDeathCross.breakdown.risk.score,
+    'Death cross harus risk >= tanpa death cross, got ' + withDeathCross.breakdown.risk.score + ' vs ' + withoutDeathCross.breakdown.risk.score);
+});
+
+test('trendSummary bullish → setup score naik', () => {
+  const withTs    = computeScore({ ...bullishIndicators, trendSummary: 'strong_bullish' }, bullishVolume, bullishStructure, {});
+  const withoutTs = computeScore({ ...bullishIndicators, trendSummary: null },             bullishVolume, bullishStructure, {});
+  assert(withTs.breakdown.setup.score >= withoutTs.breakdown.setup.score,
+    'trendSummary bullish harus setup >= tanpa trendSummary, got ' + withTs.breakdown.setup.score + ' vs ' + withoutTs.breakdown.setup.score);
+});
+
+test('trendSummary bearish → setup score turun', () => {
+  const withBearTs = computeScore({ ...bullishIndicators, trendSummary: 'strong_bearish' }, bullishVolume, bullishStructure, {});
+  const withoutTs  = computeScore({ ...bullishIndicators, trendSummary: null },             bullishVolume, bullishStructure, {});
+  assert(withBearTs.breakdown.setup.score <= withoutTs.breakdown.setup.score,
+    'trendSummary bearish harus setup <= tanpa trendSummary');
+});
+
 // ══════════════════════════════════════════════════════════════════
 console.log('\n══════════════════════════════════');
 console.log(`Hasil: ${passed} passed, ${failed} failed`);
