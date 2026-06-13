@@ -24,28 +24,36 @@ function assert(condition, msg) {
 // ── Fixtures ──────────────────────────────────────────────────────
 const bullishIndicators = {
   rsi: 35,
-  ma: { aboveMA20: true, aboveMA50: true, ma20vs50: 'bullish_alignment', type: 'golden_cross', ma20: 1000, ema9: 1050 },
-  macd: { trend: 'bullish', crossover: 'golden_cross', histogram: 10, signal: 5 },
-  bb: { position: 'oversold_zone', bandwidth: 8, isSqueeze: false },
-  atr: { atrPct: 1.2, atr: 120 },
-  trend: { strength: 'strong', adx: 30, direction: 'uptrend' },
-  rvol: { rvol: 1.8, medianVolume: 5000000, label: 'Tinggi (1.5x+)', isSpike: false },
+  ma: {
+    aboveEMA9: true, aboveSMA50: true, alignment: 'bullish', type: 'golden_cross',
+    ema9: 1050, sma50: 1000,
+    // backward compat aliases
+    aboveMA20: true, aboveMA50: true, ma20vs50: 'bullish_alignment', ma20: 1000
+  },
+  macd:       { trend: 'bullish', crossover: 'golden_cross', histogram: 10, signal: 5 },
+  bb:         { position: 'oversold_zone', bandwidth: 8, isSqueeze: false },
+  atr:        { atrPct: 1.2, atr: 120 },
+  rvol:       { rvol: 1.8, medianVolume: 5000000, label: 'Tinggi (1.5x+)', isSpike: false },
   position52w: { positionPct: 35, pctFromHigh: 20, isNearLow: false, isNearHigh: false },
-  obv: { trend: 'rising', divergence: null },
-  relStrength: { rsScore: 70, trend: 'outperform' }
+  obv:        { trend: 'rising', divergence: null },
+  smartMoney: { ratio: 65, bias: 'strong_buying' }
 };
 
 const bearishIndicators = {
   rsi: 75,
-  ma: { aboveMA20: false, aboveMA50: false, ma20vs50: 'bearish_alignment', type: 'death_cross', ma20: 900, ema9: 880 },
-  macd: { trend: 'bearish', crossover: 'death_cross', histogram: -10, signal: -5 },
-  bb: { position: 'overbought_zone', bandwidth: 18, isSqueeze: false },
-  atr: { atrPct: 6, atr: 600 },
-  trend: { strength: 'strong', adx: 30, direction: 'downtrend' },
-  rvol: { rvol: 2.5, medianVolume: 5000000, label: 'Sangat Tinggi (2x+)', isSpike: true },
+  ma: {
+    aboveEMA9: false, aboveSMA50: false, alignment: 'bearish', type: 'death_cross',
+    ema9: 880, sma50: 900,
+    // backward compat aliases
+    aboveMA20: false, aboveMA50: false, ma20vs50: 'bearish_alignment', ma20: 900
+  },
+  macd:       { trend: 'bearish', crossover: 'death_cross', histogram: -10, signal: -5 },
+  bb:         { position: 'overbought_zone', bandwidth: 18, isSqueeze: false },
+  atr:        { atrPct: 6, atr: 600 },
+  rvol:       { rvol: 2.5, medianVolume: 5000000, label: 'Sangat Tinggi (2x+)', isSpike: true },
   position52w: { positionPct: 85, pctFromHigh: 2, isNearLow: false, isNearHigh: true },
-  obv: { trend: 'falling', divergence: null },
-  relStrength: { rsScore: 30, trend: 'underperform' }
+  obv:        { trend: 'falling', divergence: null },
+  smartMoney: { ratio: 32, bias: 'strong_selling' }
 };
 
 const bullishStructure = {
@@ -145,13 +153,14 @@ test('Score 4–5 → TAHAN', () => {
   // Neutral indicators
   const neutralInd = {
     rsi: 50,
-    ma: { aboveMA20: true, aboveMA50: false, ma20vs50: 'bearish_alignment' },
-    macd: { trend: 'bullish', histogram: 1, signal: 1 },
-    bb: { position: 'middle' },
-    atr: { atrPct: 2 },
-    trend: { strength: 'no_trend' },
-    rvol: { rvol: 1.0, medianVolume: 5000000, isSpike: false },
-    position52w: { positionPct: 50, isNearLow: false, isNearHigh: false }
+    ma: { aboveEMA9: true, aboveSMA50: false, alignment: 'bearish',
+          aboveMA20: true, aboveMA50: false, ma20vs50: 'bearish_alignment' },
+    macd:       { trend: 'bullish', histogram: 1, signal: 1 },
+    bb:         { position: 'middle' },
+    atr:        { atrPct: 2 },
+    rvol:       { rvol: 1.0, medianVolume: 5000000, isSpike: false },
+    position52w: { positionPct: 50, isNearLow: false, isNearHigh: false },
+    smartMoney: null
   };
   const neutralVol = { score: 5, accDist: { bias: 'mixed' }, spike: { isSpike: false } };
   const neutralStr = { trend: { direction: 'sideways', strength: 'no_trend' }, hhll: { pattern: 'consolidation' }, setups: [] };

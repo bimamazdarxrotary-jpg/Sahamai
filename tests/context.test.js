@@ -102,7 +102,7 @@ test('Return field mode, score, signals, label', () => {
 });
 
 test('Semua bullish — risk_on atau mild_risk_on', () => {
-  const indicators = { rsi: 60, ma: { ma20vs50: 'bullish_alignment' } };
+  const indicators = { rsi: 60, ma: { alignment: 'bullish', ma20vs50: 'bullish_alignment' } };
   const volume     = { accDist: { bias: 'accumulation' } };
   const structure  = { trend: { direction: 'uptrend' } };
   const result     = detectRiskSentiment(indicators, volume, structure);
@@ -111,7 +111,7 @@ test('Semua bullish — risk_on atau mild_risk_on', () => {
 });
 
 test('Semua bearish — risk_off atau mild_risk_off', () => {
-  const indicators = { rsi: 40, ma: { ma20vs50: 'bearish_alignment' } };
+  const indicators = { rsi: 40, ma: { alignment: 'bearish', ma20vs50: 'bearish_alignment' } };
   const volume     = { accDist: { bias: 'distribution' } };
   const structure  = { trend: { direction: 'downtrend' } };
   const result     = detectRiskSentiment(indicators, volume, structure);
