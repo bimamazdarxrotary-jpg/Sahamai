@@ -37,15 +37,21 @@ function makeCandles(n, trend) {
 
 const baseIndicators = {
   rsi:  50,
-  ma:   { aboveMA20: true, aboveMA50: true, ma20vs50: 'bullish_alignment', type: null, ma20: 980, ma50: 950 },
-  macd: { trend: 'bullish', crossover: null, histogram: 5 },
-  bb:   { bandwidth: 10, position: 'neutral_zone', isSqueeze: false },
-  atr:  { atrPct: 2.0 },
-  obv:  { trend: 'rising' },
-  rvol: { rvol: 1.2, label: 'Normal', isSpike: false },
-  divergence:   null,
-  candlestick:  null,
-  fibonacci:    null
+  ma:   {
+    aboveEMA9: true, aboveSMA50: true, alignment: 'bullish', type: null,
+    ema9: 980, sma50: 950,
+    // backward compat aliases (tetap ada agar test lain tidak perlu diubah)
+    aboveMA20: true, aboveMA50: true, ma20vs50: 'bullish_alignment', ma20: 980, ma50: 950
+  },
+  macd:       { trend: 'bullish', crossover: null, histogram: 5 },
+  bb:         { bandwidth: 10, position: 'neutral_zone', isSqueeze: false },
+  atr:        { atrPct: 2.0 },
+  obv:        { trend: 'rising' },
+  rvol:       { rvol: 1.2, label: 'Normal', isSpike: false },
+  smartMoney: null,
+  divergence:  null,
+  candlestick: null,
+  fibonacci:   null
 };
 
 const baseVolume = {
