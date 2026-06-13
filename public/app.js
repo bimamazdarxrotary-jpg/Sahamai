@@ -3,7 +3,7 @@ let tvChart=null,tvSeries=null,tvVolSeries=null;
 let rsiChart=null,rsiSeries=null;
 let macdChart=null,macdHistSeries=null,macdLineSeries=null,macdSignalSeries=null;
 let currentCandles=[],currentChartType='candle',currentRange='3mo';
-let activeIndicators={ma20:true,ma50:true,ema9:true,bb:false,rsi:false,macd:false};
+let activeIndicators={sma50:true,ema9:true,bb:false,rsi:false,macd:false};
 let chartSeriesMap={};
 let scannerVisible=false,currentScanFilter='all';
 
@@ -160,8 +160,7 @@ function initTVChart(allCandles,type){
     tvSeries.setData(data.map(c=>({time:c.date,value:c.close})));
   }
   if(activeIndicators.ema9&&data.length>=9){const s=tvChart.addLineSeries({color:'rgba(0,214,143,0.7)',lineWidth:1,lastValueVisible:false,priceLineVisible:false});s.setData(calcEMA(data,9));chartSeriesMap.ema9=s;}
-  if(activeIndicators.ma20&&data.length>=20){const s=tvChart.addLineSeries({color:'rgba(240,180,41,0.7)',lineWidth:1,lineStyle:1,lastValueVisible:false,priceLineVisible:false});s.setData(calcSMA(data,20));chartSeriesMap.ma20=s;}
-  if(activeIndicators.ma50&&data.length>=50){const s=tvChart.addLineSeries({color:'rgba(77,159,255,0.6)',lineWidth:1,lineStyle:1,lastValueVisible:false,priceLineVisible:false});s.setData(calcSMA(data,50));chartSeriesMap.ma50=s;}
+  if(activeIndicators.sma50&&data.length>=50){const s=tvChart.addLineSeries({color:'rgba(77,159,255,0.6)',lineWidth:1,lineStyle:1,lastValueVisible:false,priceLineVisible:false});s.setData(calcSMA(data,50));chartSeriesMap.sma50=s;}
   if(activeIndicators.bb&&data.length>=20){
     const bb=calcBB(data,20);
     const bU=tvChart.addLineSeries({color:'rgba(168,85,247,0.5)',lineWidth:1,lastValueVisible:false,priceLineVisible:false});
@@ -264,10 +263,11 @@ function buildResult(ticker,d){
   const today=new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
   // BUG FIX 7: gunakan sc.final langsung, extractNum hanya fallback, jangan double-parse
   const finalScore=sc.final!=null?parseFloat(sc.final):(extractNum(d.scoreTeknikal)||5);
-  const smfData=vol.smartMoneyFlow||{};
+  // v4: smartMoney ada di indicators, bukan volumeData
+  const smfData=ind.smartMoney||{};
   const smfRatio=smfData.ratio||50;
   const smfBull=smfData.bias==='strong_buying'||smfData.bias==='mild_buying';
-  const obvTrend=vol.obv?vol.obv.trend:'unknown';
+  const obvTrend=ind.obv?ind.obv.trend:(vol.obv?vol.obv.trend:'unknown');
 
   // BUG FIX 8: tampilkan crash warning banner jika ada
   const crashBanner=d.crashWarning
@@ -443,9 +443,8 @@ function buildResult(ticker,d){
     </div>
     <div id="tvChart"></div>
     <div class="ind-toggles">
-      <span class="ind-toggle on-ma20" id="tog-ma20" onclick="toggleIndicator('ma20')">MA20</span>
-      <span class="ind-toggle on-ma50" id="tog-ma50" onclick="toggleIndicator('ma50')">MA50</span>
-      <span class="ind-toggle on-ema9" id="tog-ema9" onclick="toggleIndicator('ema9')">EMA9</span>
+      <span class="ind-toggle on-ema9"  id="tog-ema9"  onclick="toggleIndicator('ema9')">EMA9</span>
+      <span class="ind-toggle on-sma50" id="tog-sma50" onclick="toggleIndicator('sma50')">SMA50</span>
       <span class="ind-toggle off-bb" id="tog-bb" onclick="toggleIndicator('bb')">BB</span>
       <span class="ind-toggle off-rsi" id="tog-rsi" onclick="toggleIndicator('rsi')">RSI</span>
       <span class="ind-toggle off-macd" id="tog-macd" onclick="toggleIndicator('macd')">MACD</span>
