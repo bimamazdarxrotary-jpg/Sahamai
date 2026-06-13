@@ -96,6 +96,12 @@ function scanOneTicker(ticker, candleData) {
     recommendation: scoring ? scoring.recommendation : 'TAHAN',
     confidence:     scoring ? scoring.confidence     : 'Low',
     rsi:            indicators.rsi,
+    // v4: tambah field MA dan SMF untuk UI chips
+    ema9:           indicators.ma ? indicators.ma.ema9  : null,
+    sma50:          indicators.ma ? indicators.ma.sma50 : null,
+    maAlignment:    indicators.ma ? indicators.ma.alignment : null,
+    smfBias:        indicators.smartMoney ? indicators.smartMoney.bias  : null,
+    smfRatio:       indicators.smartMoney ? indicators.smartMoney.ratio : null,
     signals,
     topSignal:      signals[0]
   };
@@ -119,7 +125,9 @@ function applyFilter(results, filter) {
         const hasBull  = r.signals.some(s => s.direction === 'long' && (s.strength === 'high' || s.strength === 'medium'));
         const rsiOk    = r.rsi == null || (r.rsi < 45 && r.rsi > 10);
         const notDeath = !r.signals.some(s => s.type === 'death_cross');
-        return hasBull && rsiOk && r.score >= 6 && notDeath;
+        // v4: tambah konfirmasi SMF — lebih akurat dari sebelumnya
+        const smfOk    = !r.smfBias || r.smfBias === 'strong_buying' || r.smfBias === 'mild_buying';
+        return hasBull && rsiOk && r.score >= 6 && notDeath && smfOk;
       }).sort((a, b) => b.score - a.score);
     }
 

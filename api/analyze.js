@@ -351,10 +351,14 @@ module.exports = async function handler(req, res) {
       score:          volumeData.score,
       accDist:        volumeData.accDist,
       spike:          volumeData.spike,
-      obv:            volumeData.obv,
+      // obv dihapus dari sini — sudah ada di indicators.obv (v4)
       vwap:           volumeData.vwap,
+      current:        volumeData.current,
+      avg20:          volumeData.avg20,
       confirmation:   volumeData.confirmation,
-      smartMoneyFlow: volumeData.smartMoneyFlow || null  // FIX: was missing
+      climax:         volumeData.climax,
+      unusual:        volumeData.unusual,
+      smartMoneyFlow: volumeData.smartMoneyFlow || null
     } : null,
     structureData: structure ? {
       phase:      structure.phase,
