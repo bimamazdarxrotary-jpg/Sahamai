@@ -8,7 +8,7 @@ const { analyzeVolume }    = require('../lib/volume');
 const { analyzeStructure } = require('../lib/structure');
 const { computeScore }     = require('../lib/scoring');
 const { quickScan }        = require('../lib/scanner');
-const { cacheGet, cacheSet } = require('../lib/cache');
+const { cacheGet, cacheSet, TTL } = require('../lib/cache');
 const { fetchPriceDataWithFallback } = require('../lib/datasource');
 const { applyCompression } = require('../lib/compress');
 const IDX_STOCKS           = require('../data/idx-stocks.json');
@@ -207,7 +207,7 @@ async function runScan(filter, res) {
       };
     }
     if (Object.keys(sectorStats).length > 0) {
-      cacheSet('sector:returns', sectorStats, 30 * 60 * 1000); // TTL 30 menit
+      cacheSet('sector:returns', sectorStats, TTL.sectorReturns);
       console.log('[SCANNER] Sector returns cached:', Object.keys(sectorStats).length, 'sektor');
     }
   } catch (e) {
