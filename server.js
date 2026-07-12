@@ -72,15 +72,33 @@ function parseBody(req) {
 function mockRes(res) {
   let _status = 200;
   const _headers = { 'Access-Control-Allow-Origin': '*' };
+  let _headersSent = false;
+  function flushHead() {
+    if (!_headersSent) {
+      res.writeHead(_status, _headers);
+      _headersSent = true;
+    }
+  }
   return {
     setHeader(k, v) { _headers[k] = v; return this; },
     status(code) { _status = code; return this; },
     json(data) {
       const body = JSON.stringify(data);
       res.writeHead(_status, { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body), ..._headers });
+      _headersSent = true;
       res.end(body);
     },
-    end() { res.writeHead(_status, _headers); res.end(); }
+    // Bug fix: mockRes sebelumnya tidak punya .write() — endpoint yang pakai SSE
+    // (mis. /api/scanner?stream=true) akan crash (TypeError) saat dijalankan lewat
+    // dev server lokal ini, karena handler memanggil res.write() untuk tiap event.
+    write(chunk) {
+      flushHead();
+      return res.write(chunk);
+    },
+    end(data) {
+      flushHead();
+      res.end(data);
+    }
   };
 }
 

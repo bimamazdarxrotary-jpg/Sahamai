@@ -85,7 +85,7 @@ npm run dev
 Rate limiting (`/api/analyze` maks 10 req/menit per IP) disimpan **in-memory** dan tidak persist antar instance Vercel. Di Vercel free tier, setiap cold start menghasilkan instance baru sehingga counter reset. Ini by-design untuk kesederhanaan — jika dibutuhkan rate limiting yang ketat di production, gunakan **Vercel KV** sebagai shared store.
 
 ### Cache
-Cache analisis juga in-memory per instance (TTL 15 menit untuk analisis, 30 menit untuk sektor). Artinya dua user berbeda yang hit instance berbeda tidak sharing cache. Untuk cache terdistribusi, gunakan Vercel KV atau Redis.
+Cache analisis juga in-memory per instance (TTL 5 menit untuk analisis, 10 menit untuk return sektor, 15 menit untuk berita/foreign flow, 1 menit untuk harga). Artinya dua user berbeda yang hit instance berbeda tidak sharing cache. Untuk cache terdistribusi, gunakan Vercel KV atau Redis.
 
 ### IHSG Crash Blocker
 Saat IHSG turun lebih dari 8% dalam sehari, rekomendasi `BELI` dan `AKUMULASI` secara otomatis di-override ke `TAHAN`. Field `crashWarning` di response berisi pesan peringatan yang bisa ditampilkan ke user. Data IHSG crash di-cache selama 10 menit — artinya jika IHSG pulih, blocker akan nonaktif setelah cache expired.
