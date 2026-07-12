@@ -1463,12 +1463,6 @@
     "subsector": "Makanan Olahan",
     "board": "Utama"
   },
-  "ICLAS": {
-    "name": "Izuzu Tbk",
-    "sector": "Industri",
-    "subsector": "Otomotif",
-    "board": "Pengembangan"
-  },
   "ICON": {
     "name": "Island Concepts Indonesia Tbk",
     "sector": "Konsumer Non-Primer",
@@ -2087,12 +2081,6 @@
     "subsector": "Ritel & Distributor",
     "board": "Utama"
   },
-  "MAPS": {
-    "name": "MAP Aktif Adiperkasa Tbk",
-    "sector": "Konsumer Non-Primer",
-    "subsector": "Ritel Barang Sekunder",
-    "board": "Utama"
-  },
   "MARI": {
     "name": "Mahardika Inti Mitra Tbk",
     "sector": "Infrastruktur",
@@ -2382,9 +2370,9 @@
     "board": "Utama"
   },
   "NASA": {
-    "name": "Aneka Tambang Tbk",
+    "name": "Andalan Perkasa Abadi Tbk",
     "sector": "Konsumer Non-Primer",
-    "subsector": "Ritel",
+    "subsector": "Hotel & Pariwisata",
     "board": "Pengembangan"
   },
   "NATO": {
@@ -2553,12 +2541,6 @@
     "name": "Paramita Bangun Sarana Tbk",
     "sector": "Infrastruktur",
     "subsector": "Konstruksi",
-    "board": "Pengembangan"
-  },
-  "PBSV": {
-    "name": "Paramita Bangun Sarana Tbk",
-    "sector": "Keuangan",
-    "subsector": "Pembiayaan",
     "board": "Pengembangan"
   },
   "PCAR": {
@@ -2867,12 +2849,6 @@
     "subsector": "Teknologi",
     "board": "Pengembangan"
   },
-  "RELF": {
-    "name": "Reliance Sekuritas Indonesia Tbk",
-    "sector": "Keuangan",
-    "subsector": "Sekuritas",
-    "board": "Pengembangan"
-  },
   "RELI": {
     "name": "Reliance Sekuritas Indonesia Tbk",
     "sector": "Keuangan",
@@ -2997,12 +2973,6 @@
     "name": "Bank Woori Saudara Indonesia 1906 Tbk",
     "sector": "Keuangan",
     "subsector": "Perbankan",
-    "board": "Utama"
-  },
-  "SEMEN": {
-    "name": "Semen Indonesia (Persero) Tbk",
-    "sector": "Barang Baku",
-    "subsector": "Semen",
     "board": "Utama"
   },
   "SGRO": {
@@ -3318,9 +3288,9 @@
     "board": "Utama"
   },
   "TBMS": {
-    "name": "Tunas Baru Lampung Tbk",
+    "name": "Tembaga Mulia Semanan Tbk",
     "sector": "Barang Baku",
-    "subsector": "Agrikultur",
+    "subsector": "Logam & Mineral",
     "board": "Utama"
   },
   "TCID": {
@@ -3450,9 +3420,9 @@
     "board": "Utama"
   },
   "TRIN": {
-    "name": "Trimuda Nuansa Citra Tbk",
-    "sector": "Infrastruktur",
-    "subsector": "Logistik",
+    "name": "Perintis Triniti Properti Tbk",
+    "sector": "Properti",
+    "subsector": "Real Estat",
     "board": "Pengembangan"
   },
   "TRIS": {
@@ -3531,12 +3501,6 @@
     "name": "Unilever Indonesia Tbk",
     "sector": "Konsumer Primer",
     "subsector": "Produk Rumah Tangga & Perawatan Tubuh",
-    "board": "Utama"
-  },
-  "VALE": {
-    "name": "Vale Indonesia Tbk",
-    "sector": "Barang Baku",
-    "subsector": "Logam & Mineral",
     "board": "Utama"
   },
   "VDNI": {
