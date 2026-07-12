@@ -6,6 +6,10 @@ let currentCandles=[],currentChartType='candle',currentRange='3mo';
 let activeIndicators={sma50:true,ema9:true,bb:false,rsi:false,macd:false};
 let chartSeriesMap={};
 let scannerVisible=false,currentScanFilter='all';
+// Bug fix: pelacak ResizeObserver aktif — sebelumnya setiap re-render chart (ganti range/
+// tipe chart/toggle indikator) membuat ResizeObserver BARU tanpa disconnect yang lama,
+// menumpuk observer pada elemen DOM yang sama tiap kali user berinteraksi dengan chart.
+let activeResizeObservers=[];
 
 // ── ANALYZE ────────────────────────────────────────────────────────
 async function analyzeStock(){
@@ -47,6 +51,9 @@ function destroyAllCharts(){
   if(rsiChart){try{rsiChart.remove();}catch(e){}rsiChart=null;rsiSeries=null;}
   if(macdChart){try{macdChart.remove();}catch(e){}macdChart=null;macdHistSeries=null;macdLineSeries=null;macdSignalSeries=null;}
   chartSeriesMap={};
+  // Bug fix: disconnect semua ResizeObserver sebelumnya sebelum yang baru dibuat lagi
+  activeResizeObservers.forEach(function(ro){try{ro.disconnect();}catch(e){}});
+  activeResizeObservers=[];
 }
 
 // ── CHART CALC ─────────────────────────────────────────────────────
@@ -183,7 +190,9 @@ function initTVChart(allCandles,type){
       const times=data.map(c=>c.date);
       ob.setData(times.map(t=>({time:t,value:70})));os.setData(times.map(t=>({time:t,value:30})));
       rsiChart.timeScale().fitContent();
-      new ResizeObserver(function(){if(rsiChart&&rc)rsiChart.applyOptions({width:rc.clientWidth});}).observe(rc);
+      const roRsi=new ResizeObserver(function(){if(rsiChart&&rc)rsiChart.applyOptions({width:rc.clientWidth});});
+      roRsi.observe(rc);
+      activeResizeObservers.push(roRsi);
     }
   }
   // MACD sub-chart
@@ -199,10 +208,14 @@ function initTVChart(allCandles,type){
       if(md.macd.length)macdLineSeries.setData(md.macd);
       if(md.signal.length)macdSignalSeries.setData(md.signal);
       macdChart.timeScale().fitContent();
-      new ResizeObserver(function(){if(macdChart&&mc)macdChart.applyOptions({width:mc.clientWidth});}).observe(mc);
+      const roMacd=new ResizeObserver(function(){if(macdChart&&mc)macdChart.applyOptions({width:mc.clientWidth});});
+      roMacd.observe(mc);
+      activeResizeObservers.push(roMacd);
     }
   }
-  new ResizeObserver(function(){if(tvChart&&container)tvChart.applyOptions({width:container.clientWidth});}).observe(container);
+  const roMain=new ResizeObserver(function(){if(tvChart&&container)tvChart.applyOptions({width:container.clientWidth});});
+  roMain.observe(container);
+  activeResizeObservers.push(roMain);
 }
 
 function filterByRange(candles,range){
@@ -781,23 +794,14 @@ async function runScanner(){
     <div class="progress-bar"><div class="progress-fill" id="scanProgress"></div></div>
   </div>`;
 
-  // Cek cache dulu
-  try{
-    const cacheCheck=await fetch('/api/scanner',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({filter:currentScanFilter})});
-    if(cacheCheck.ok){
-      const data=await cacheCheck.json();
-      if(data.fromCache){
-        savePopularFromScan(data.results);
-        renderScanResults(data,currentScanFilter);
-        const lastRun=document.getElementById('scanLastRun');
-        if(lastRun)lastRun.textContent='⚡ Cache — '+data.total+' ditemukan · '+new Date().toLocaleTimeString('id-ID');
-        btn.disabled=false;icon.className='';icon.textContent='⚡';
-        return;
-      }
-    }
-  }catch(e){}
-
-  // Tidak ada cache — pakai SSE
+  // Bug fix: sebelumnya ada "cek cache dulu" via POST di sini yang, saat cache kosong,
+  // diam-diam menjalankan scan PENUH (bisa puluhan detik) lalu membuang hasilnya begitu
+  // saja karena fromCache:false — lalu SSE di bawah dijalankan lagi dari nol. Selain boros
+  // (scan berjalan 2x), begitu POST tadi selesai cache sudah terisi, sehingga koneksi SSE
+  // berikutnya menabrak jalur cache-hit dan (sebelum diperbaiki di server) merusak format
+  // SSE → browser menganggap koneksi gagal padahal data valid sudah ada.
+  // Sekarang endpoint SSE sendiri sudah menangani cache-hit maupun cache-miss dengan benar,
+  // jadi cukup langsung buka satu koneksi SSE saja.
   const prog=document.getElementById('scanProgress');
   const progLabel=document.getElementById('scanProgressLabel');
   let finalData=null;
@@ -818,7 +822,7 @@ async function runScanner(){
           savePopularFromScan(data.results);
           renderScanResults(data,currentScanFilter);
           const lastRun=document.getElementById('scanLastRun');
-          if(lastRun)lastRun.textContent=data.total+' ditemukan · '+new Date().toLocaleTimeString('id-ID');
+          if(lastRun)lastRun.textContent=(data.fromCache?'⚡ Cache — ':'')+data.total+' ditemukan · '+new Date().toLocaleTimeString('id-ID');
           btn.disabled=false;icon.className='';icon.textContent='⚡';
         }else if(data.type==='error'){
           evtSource.close();
