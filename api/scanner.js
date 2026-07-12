@@ -246,7 +246,19 @@ module.exports = async function handler(req, res) {
   const cached   = cacheGet(cacheKey);
   if (cached) {
     console.log('[SCANNER CACHE HIT]', filter);
-    return res.status(200).json(Object.assign({}, cached, { fromCache: true }));
+    const payload = Object.assign({}, cached, { fromCache: true, type: 'complete' });
+    // Bug fix: sebelumnya cache-hit SELALU dikirim sebagai JSON biasa, meski client
+    // membuka koneksi SSE (stream=true) — ini membuat EventSource di browser gagal
+    // parse response (Content-Type bukan text/event-stream) dan memicu onerror palsu
+    // padahal data valid sudah tersedia. Sekarang format response mengikuti mode request.
+    if (isStream) {
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.write('data: ' + JSON.stringify(payload) + '\n\n');
+      return res.end();
+    }
+    return res.status(200).json(payload);
   }
 
   console.log('[SCANNER START] filter=' + filter + ' stream=' + isStream);

@@ -39,46 +39,6 @@ function isRateLimited(ip) {
   return hits.length > RL_MAX;
 }
 
-// ── Fetch dengan retry (handle Yahoo 429) ─────────────────────────
-const YAHOO_TIMEOUT = 8000; // 8 detik — cegah hang saat Yahoo lambat
-
-async function fetchWithRetry(url, options, maxRetries) {
-  maxRetries = maxRetries || 2;
-  let delay  = 1000;
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    let res;
-    try {
-      const controller = new AbortController();
-      const timer = setTimeout(function() { controller.abort(); }, YAHOO_TIMEOUT);
-      res = await fetch(url, Object.assign({}, options, { signal: controller.signal }));
-      clearTimeout(timer);
-    } catch (e) {
-      if (e.name === 'AbortError') {
-        log.warn('analyze', '[YAHOO TIMEOUT]', url);
-        if (attempt === maxRetries) throw new Error('Yahoo Finance timeout setelah ' + YAHOO_TIMEOUT + 'ms');
-      } else {
-        if (attempt === maxRetries) throw e;
-      }
-      if (attempt < maxRetries) await sleep(delay);
-      delay *= 2;
-      continue;
-    }
-    if (res.status === 429) {
-      if (attempt === maxRetries) return res;
-      const retryAfter = parseInt(res.headers.get('Retry-After') || '0', 10) || delay / 1000;
-      console.warn('[YAHOO 429] retry ke-' + (attempt + 1) + ' tunggu ' + retryAfter + 's');
-      await sleep(retryAfter * 1000);
-      delay *= 2;
-      continue;
-    }
-    return res;
-  }
-}
-
-function sleep(ms) {
-  return new Promise(function(resolve) { setTimeout(resolve, ms); });
-}
-
 // ── Fetch harga dari Yahoo Finance ─────────────────────────────────
 async function fetchPriceData(ticker, isIndex) {
   const cacheKey = 'price:' + ticker;
@@ -158,7 +118,19 @@ module.exports = async function handler(req, res) {
 
   // ── 1. Fetch harga ─────────────────────────────────────────────
   const priceData = await fetchPriceData(ticker, isIndex);
-  const candles   = (priceData && priceData.candles) || [];
+
+  // Bug fix: sebelumnya jika priceData null (ticker tidak ditemukan di Yahoo/Stooq —
+  // mis. ticker salah ketik atau data metadata lokal keliru), proses tetap lanjut
+  // sampai memanggil AI, yang lalu menghasilkan analisis "percaya diri" penuh
+  // (nama perusahaan, sentiment, target harga, dst) TANPA data harga sama sekali.
+  // Sekarang berhenti lebih awal dengan pesan error yang jelas.
+  if (!priceData) {
+    return res.status(404).json({
+      error: 'Data harga untuk "' + ticker + '" tidak ditemukan. Pastikan kode saham benar dan sudah terdaftar di BEI.'
+    });
+  }
+
+  const candles = priceData.candles || [];
 
   // ── 2. Indikator matematis ─────────────────────────────────────
   const indicators = candles.length >= 5 ? computeAll(candles) : {};
