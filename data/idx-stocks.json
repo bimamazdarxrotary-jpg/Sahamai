@@ -312,9 +312,9 @@
     "board": "Utama"
   },
   "AXIO": {
-    "name": "Axiata Group Berhad",
+    "name": "Tera Data Indonusa Tbk",
     "sector": "Teknologi",
-    "subsector": "Teknologi",
+    "subsector": "Perangkat Keras & Peralatan Teknologi",
     "board": "Utama"
   },
   "BABP": {
@@ -1629,12 +1629,6 @@
     "name": "Indopoly Swakarsa Industry Tbk",
     "sector": "Barang Baku",
     "subsector": "Plastik",
-    "board": "Utama"
-  },
-  "IPOT": {
-    "name": "Indo Premier Sekuritas",
-    "sector": "Keuangan",
-    "subsector": "Sekuritas",
     "board": "Utama"
   },
   "IPPE": {
