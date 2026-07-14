@@ -79,7 +79,7 @@ function scanOneTicker(ticker, candleData) {
   const changePct = prev ? parseFloat(((candleData.lastClose - prev) / prev * 100).toFixed(2)) : 0;
 
   const indicators = computeAll(candles);
-  const volumeData = analyzeVolume(candles);
+  const volumeData = analyzeVolume(candles, indicators);
   const structure  = analyzeStructure(candles, indicators, volumeData);
   const scoring    = computeScore(indicators, volumeData, structure, { current: candleData.lastClose });
   const { signals } = quickScan(ticker, candles, indicators, volumeData, structure, scoring, changePct, cacheGet);

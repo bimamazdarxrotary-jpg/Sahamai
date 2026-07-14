@@ -3,7 +3,7 @@
 // GET /api/health — untuk monitoring uptime & dependency status
 // ══════════════════════════════════════════════════════════════════
 
-const { cacheGet, cacheSet } = require('../lib/cache');
+const { cacheGet, cacheSet, TTL } = require('../lib/cache');
 const { fetchPriceDataWithFallback } = require('../lib/datasource');
 const pkg = require('../package.json');
 
@@ -23,7 +23,11 @@ function warmupCache() {
       try {
         const data = await fetchPriceDataWithFallback(ticker, false);
         if (data) {
-          cacheSet(cacheKey, data, 5 * 60 * 1000); // cache 5 menit
+          // Bug fix: sebelumnya hardcode 5 menit di sini, padahal api/analyze.js
+          // memakai TTL.price (1 menit) untuk key cache yang SAMA ('price:'+ticker).
+          // Ini membuat saham hasil prefetch bisa dianggap "masih segar" hingga 4 menit
+          // lebih lama dari kebijakan TTL.price yang sebenarnya. Sekarang disatukan.
+          cacheSet(cacheKey, data, TTL.price);
           console.log('[PREFETCH] Cached', ticker, data.current);
         }
       } catch (e) {

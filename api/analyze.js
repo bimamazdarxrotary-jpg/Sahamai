@@ -7,7 +7,7 @@ const { computeAll }                        = require('../lib/indicators');
 const { analyzeVolume }                     = require('../lib/volume');
 const { analyzeStructure }                  = require('../lib/structure');
 const { computeScore }                      = require('../lib/scoring');
-const { callAI, sanitizeAIOutput }          = require('../lib/ai');
+const { callAI, sanitizeAIOutput, deriveSentimentFromScore } = require('../lib/ai');
 const { cacheGet, cacheSet, TTL }           = require('../lib/cache');
 const { analyzeMarketContext }              = require('../lib/context');
 const { quickScan }                         = require('../lib/scanner');
@@ -137,7 +137,7 @@ module.exports = async function handler(req, res) {
   log.info('analyze', '[IND]', ticker, 'RSI=' + (indicators && indicators.rsi), 'EMA9=' + (indicators && indicators.ma && indicators.ma.ema9));
 
   // ── 3. Volume intelligence ─────────────────────────────────────
-  const volumeData = candles.length >= 5 ? analyzeVolume(candles) : null;
+  const volumeData = candles.length >= 5 ? analyzeVolume(candles, indicators) : null;
 
   // ── 4. Market structure ────────────────────────────────────────
   const structure = candles.length >= 10 ? analyzeStructure(candles, indicators, volumeData) : null;
@@ -250,7 +250,21 @@ module.exports = async function handler(req, res) {
     }
     parsed = aiValidation.parsed;
 
+    // Bug fix: sebelumnya sentiment dari AI HANYA "diminta" lewat instruksi prompt
+    // ("sentiment WAJIB: ...") tanpa pemaksaan di level kode. LLM tidak selalu patuh
+    // instruksi format — kalau AI menyimpang, badge sentiment yang tampil ke user bisa
+    // bertentangan dengan scoringData.recommendation (skor deterministik), membingungkan.
+    // Sekarang di-hard-enforce: sentiment akhir SELALU mengikuti skor, bukan output AI.
+    const expectedSentiment = deriveSentimentFromScore(scoringFinal);
+    if (parsed.sentiment !== expectedSentiment) {
+      log.warn('analyze', '[SENTIMENT MISMATCH]', ticker,
+        'AI=' + parsed.sentiment + ' expected=' + expectedSentiment + ' (score ' + scoringFinal.final + '/10) -> override');
+      parsed.sentiment = expectedSentiment;
+    }
+
     // FIX: Sanitize angka target/SL/levelBeli dari AI — pakai ATR jika tersedia
+    // (dipanggil SETELAH enforcement sentiment di atas, agar arah target/SL yang
+    // disanitasi mengikuti sentiment yang sudah benar, bukan sentiment mentah AI)
     parsed = sanitizeAIOutput(parsed, priceData, indicators);
 
   } catch (err) {
