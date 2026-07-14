@@ -15,7 +15,8 @@ const tests = [
   'tests/context.test.js',
   'tests/scanner.test.js',
   'tests/analyze.integration.test.js',
-  'tests/scanner.integration.test.js'
+  'tests/scanner.integration.test.js',
+  'tests/regression.test.js'
 ];
 
 let totalPassed = 0, totalFailed = 0;
