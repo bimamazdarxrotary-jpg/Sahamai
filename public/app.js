@@ -273,6 +273,12 @@ function buildResult(ticker,d){
   const sc=d.scoringData||{};
   const isIndex=['IHSG','LQ45'].includes(ticker);
   const sentiment=safe(d.sentiment,'TAHAN');
+  // Bug fix: label UI (SL/TP, Stop Loss/Target) sebelumnya selalu mengasumsikan posisi
+  // bullish (long) — "TP/Profit taking" hijau dan "SL/cut loss". Setelah backend diperbaiki
+  // agar target/SL saham JUAL benar-benar mengarah bearish (target di bawah current, SL di
+  // atas current sebagai invalidasi), label UI perlu ikut menyesuaikan arah, bukan tetap
+  // memakai framing bullish untuk angka yang sekarang bearish.
+  const isBearishRek=sentiment==='JUAL';
   const today=new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
   // BUG FIX 7: gunakan sc.final langsung, extractNum hanya fallback, jangan double-parse
   const finalScore=sc.final!=null?parseFloat(sc.final):(extractNum(d.scoreTeknikal)||5);
@@ -399,8 +405,8 @@ function buildResult(ticker,d){
     <div class="entry-range">${esc(d.levelBeli||'—')}</div>
     <div class="entry-sub">RECOMMENDED ZONE</div>
     <div style="display:flex;gap:5px;margin-top:.5rem;flex-wrap:wrap">
-      ${d.stopLoss?`<span class="pill pill-r">SL: ${esc(d.stopLoss)}</span>`:''}
-      ${d.targetHarga?`<span class="pill pill-g">TP: ${esc(d.targetHarga)}</span>`:''}
+      ${d.stopLoss?`<span class="pill pill-r">${isBearishRek?'Invalidasi':'SL'}: ${esc(d.stopLoss)}</span>`:''}
+      ${d.targetHarga?`<span class="pill ${isBearishRek?'pill-r':'pill-g'}">${isBearishRek?'Target Turun':'TP'}: ${esc(d.targetHarga)}</span>`:''}
     </div>
     ${vol.vwap?`<div style="margin-top:.4rem;font-size:9px;color:var(--text3);font-family:var(--mono)">VWAP: ${fmtPrice(vol.vwap)}</div>`:''}
   </div>`;
@@ -417,15 +423,15 @@ function buildResult(ticker,d){
       ${sc.riskReward?`<span class="pill ${sc.riskReward==='Favorable'?'pill-g':sc.riskReward==='Unfavorable'?'pill-r':'pill-gold'}">${esc(sc.riskReward)}</span>`:''}
     </div>
     <div class="risk-sl">
-      <div class="risk-sl-label">STOP LOSS (EXIT)</div>
+      <div class="risk-sl-label">${isBearishRek?'BATAS INVALIDASI':'STOP LOSS (EXIT)'}</div>
       <div class="risk-sl-val">${esc(d.stopLoss||'—')}</div>
-      <div class="risk-sl-note">Batas cut loss — patuhi trading plan</div>
+      <div class="risk-sl-note">${isBearishRek?'Jika harga tembus ke atas level ini, tesis bearish batal':'Batas cut loss — patuhi trading plan'}</div>
     </div>
     <div class="risk-targets">
       <div class="risk-t">
-        <div class="risk-t-lbl">TARGET 1</div>
-        <div class="risk-t-val g">${esc(d.targetHarga||'—')}</div>
-        <div class="risk-t-sub">Profit taking</div>
+        <div class="risk-t-lbl">${isBearishRek?'TARGET TURUN':'TARGET 1'}</div>
+        <div class="risk-t-val"${isBearishRek?' style="color:var(--red)"':' class="risk-t-val g"'}>${esc(d.targetHarga||'—')}</div>
+        <div class="risk-t-sub">${isBearishRek?'Proyeksi downside':'Profit taking'}</div>
       </div>
       <div class="risk-t">
         <div class="risk-t-lbl">HARGA WAJAR</div>
